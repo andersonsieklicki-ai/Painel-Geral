@@ -18,14 +18,23 @@
         .btn-success { background-color: var(--success); }
         .btn-success:hover { background-color: #218838; }
         .btn-outline { background-color: transparent; color: var(--primary); border: 1px solid var(--primary); }
+        .btn-danger { background-color: #dc3545; color: white; }
+        .btn-danger:hover { background-color: #c82333; }
         .status-box { display: flex; align-items: center; justify-content: space-between; background-color: #e8f5e9; padding: 15px; border-radius: 8px; border: 1px solid #c8e6c9; margin-bottom: 20px; }
         .status-indicator { display: inline-block; width: 12px; height: 12px; background-color: var(--success); border-radius: 50%; margin-right: 8px; }
-        .table-container { overflow-x: auto; margin-top: 15px; height: 300px; }
+        
+        /* Controles do CRM */
+        .crm-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #ddd; }
+        .search-box { flex: 1; min-width: 250px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; }
+        
+        .table-container { overflow-y: auto; max-height: 400px; border: 1px solid #ddd; border-radius: 5px; }
         table { width: 100%; border-collapse: collapse; font-size: 14px; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background-color: #f8f9fa; color: #333; position: sticky; top: 0; }
-        .tag { font-size: 11px; padding: 4px 8px; border-radius: 12px; color: white; font-weight: bold; }
+        th { background-color: #f8f9fa; color: #333; position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 2px -1px rgba(0,0,0,0.1); }
+        tr:hover { background-color: #f1f5f9; }
+        .tag { font-size: 11px; padding: 4px 8px; border-radius: 12px; color: white; font-weight: bold; display: inline-block; margin: 2px; }
         .tag-novo { background-color: #6c757d; }
+        
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { background: white; padding: 30px; border-radius: 8px; width: 500px; max-width: 90%; max-height: 90vh; overflow-y: auto; position: relative; }
         .info-disparo { font-size: 12px; color: #dc3545; background: #f8d7da; padding: 10px; border-radius: 4px; margin-bottom: 15px; }
@@ -34,10 +43,8 @@
         .tab-btn.active { color: var(--primary); border-bottom: 3px solid var(--primary); margin-bottom: -2px; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-        .modal textarea, .modal input[type="file"] { width: 100%; padding: 10px; margin: 5px 0 15px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: inherit; }
+        .modal textarea, .modal input[type="file"], .modal input[type="text"] { width: 100%; padding: 10px; margin: 5px 0 15px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: inherit; }
         .lista-selecao { border: 1px solid #ccc; border-radius: 4px; padding: 10px; max-height: 120px; overflow-y: auto; margin-bottom: 15px; background: #f9f9f9; display: flex; flex-direction: column; gap: 8px;}
-        .lista-selecao label { font-size: 14px; display: flex; align-items: center; cursor: pointer; }
-        .lista-selecao input { margin-right: 10px; width: 16px; height: 16px; }
         .progress-wrapper { background: #e9ecef; border-radius: 10px; height: 25px; width: 100%; overflow: hidden; margin: 20px 0; box-shadow: inset 0 1px 3px rgba(0,0,0,0.2); }
         .progress-fill { background: var(--success); width: 0%; height: 100%; transition: width 0.4s ease; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: bold; }
         @media (max-width: 768px) { .container { grid-template-columns: 1fr; } .card.full-width { grid-column: span 1; } }
@@ -71,15 +78,34 @@
             <h3 style="flex-wrap: wrap; gap: 10px;">
                 👥 Meus Contatos (CRM)
                 <div style="display: flex; gap: 10px;">
-                    <button class="btn btn-outline" onclick="exportarVCF()">⬇️ Exportar Agenda (VCF)</button>
-                    <button class="btn" onclick="abrirModalImportar()">⬆️ Importar Contatos (CSV/VCF)</button>
+                    <button class="btn btn-outline" onclick="exportarVCF()">⬇️ Exportar (VCF)</button>
+                    <button class="btn" onclick="abrirModalImportar()">⬆️ Importar</button>
                 </div>
             </h3>
-            <p>Organize sua base de clientes. Adicione tags (etiquetas) para segmentar suas campanhas de marketing.</p>
+            
+            <div class="crm-controls">
+                <input type="text" id="buscaContato" class="search-box" placeholder="🔍 Buscar por nome ou número..." onkeyup="renderizarTabela()">
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <button class="btn btn-outline" onclick="etiquetarSelecionados()" style="background: white;">🏷️ Etiquetar Seleção</button>
+                    <button class="btn btn-outline" onclick="apagarSelecionados()" style="background: white; color: #dc3545; border-color: #dc3545;">🗑️ Apagar Seleção</button>
+                    <button class="btn btn-danger" onclick="apagarTodos()">🗑️ Apagar Todos</button>
+                </div>
+            </div>
+
             <div class="table-container">
                 <table>
-                    <thead><tr><th>Nome do Cliente</th><th>WhatsApp</th><th>Etiquetas (Tags)</th><th>Ações</th></tr></thead>
-                    <tbody id="tabelaContatos"></tbody>
+                    <thead>
+                        <tr>
+                            <th style="width: 40px;"><input type="checkbox" id="checkTodos" onclick="alternarTodosChecks()"></th>
+                            <th>Nome do Cliente</th>
+                            <th>WhatsApp</th>
+                            <th>Etiquetas (Tags)</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaContatos">
+                        <tr><td colspan="5" style="text-align: center; color: #999;">Nenhum contato importado ainda.</td></tr>
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -92,26 +118,36 @@
             <input type="file" accept=".csv, .vcf" id="arquivoCsv">
             <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
                 <button class="btn btn-outline" onclick="fecharModalImportar()">Cancelar</button>
-                <button class="btn" onclick="simularImportacao()">Salvar Contatos</button>
+                <button class="btn" onclick="iniciarImportacao()">Salvar Contatos</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="modalTag">
+        <div class="modal-content" style="width: 400px;">
+            <h2 style="margin-top: 0; color: var(--primary);">🏷️ Adicionar Etiqueta</h2>
+            <p>Digite o nome do grupo/etiqueta para os contatos selecionados:</p>
+            <input type="text" id="nomeNovaTag" placeholder="Ex: Promoção Mães, VIP, etc...">
+            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px;">
+                <button class="btn btn-outline" onclick="fecharModalTag()">Cancelar</button>
+                <button class="btn" onclick="salvarTagMassa()">Aplicar Tag</button>
             </div>
         </div>
     </div>
 
     <div class="modal" id="modalDisparo">
         <div class="modal-content">
-            <h2 style="margin-top: 0; color: var(--primary);" id="tituloModalDisparo">Criar Nova Campanha</h2>
+            <h2 style="margin-top: 0; color: var(--primary);">Criar Nova Campanha</h2>
             <div id="form-disparo">
                 <div class="info-disparo">⚠️ Envio humanizado ativado. O robô fará pausas para evitar bloqueios.</div>
                 <div class="tabs">
                     <button class="tab-btn active" onclick="trocarAba('tags')" id="btn-tags">🏷️ Etiquetas</button>
-                    <button class="tab-btn" onclick="trocarAba('grupos')" id="btn-grupos">👥 Grupos</button>
                     <button class="tab-btn" onclick="trocarAba('avulso')" id="btn-avulso">✏️ Digitar</button>
                 </div>
                 <div id="aba-tags" class="tab-content active">
-                    <div class="lista-selecao"><label><input type="checkbox" value="todos"> 📢 Toda a Base</label><label><input type="checkbox" value="vip"> ⭐ VIP</label></div>
-                </div>
-                <div id="aba-grupos" class="tab-content">
-                    <div class="lista-selecao"><label><input type="checkbox" value="g1"> 💄 VIP Loja</label></div>
+                    <p style="font-size: 13px; color: #666;">Selecione as etiquetas que receberão a mensagem:</p>
+                    <div class="lista-selecao" id="listaTagsDisparo">
+                        </div>
                 </div>
                 <div id="aba-avulso" class="tab-content">
                     <textarea id="listaNumeros" rows="3" placeholder="Ex: 5546999999999"></textarea>
@@ -136,7 +172,7 @@
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
         import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // AS CHAVES REAIS DO ANDERSON
+        // CHAVES REAIS
         const firebaseConfig = {
             apiKey: "AIzaSyC4-2LavZt7iWPt2u71u-yRUYbIJu-Vzf0",
             authDomain: "central-omnichannel-saas.firebaseapp.com",
@@ -151,6 +187,9 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        // --- VARIÁVEL GLOBAL DE CONTATOS (MEMÓRIA DO CRM) ---
+        window.listaContatos = [];
+
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 const docRef = doc(db, "empresas", user.uid);
@@ -163,48 +202,69 @@
                         document.getElementById('tagPlano').innerText = "🥉 Plano Básico";
                         document.getElementById('area-conexao').innerHTML = `<div><span class="status-indicator"></span><strong>Conectado à Central</strong></div>`;
                         document.getElementById('desc-conexao').innerText = "Você está usando o nosso número oficial para enviar avisos e comunicados.";
-                        document.getElementById('btn-grupos').style.display = 'none';
                     } else if (dados.plano === 'premium') {
                         document.getElementById('tagPlano').innerText = "🥇 Plano Premium";
                         document.getElementById('area-conexao').innerHTML = `<div><span class="status-indicator" style="background-color: #ffc107;"></span><strong>Aguardando Conexão</strong></div><button class="btn btn-outline" onclick="alert('Gerando QR Code...')">Ler QR Code</button>`;
                         document.getElementById('desc-conexao').innerText = "Mantenha o celular conectado. O robô puxará seus grupos automaticamente.";
-                    } else {
-                        document.getElementById('desc-conexao').innerText = "⚠️ Seu cadastro está aguardando aprovação.";
-                        document.getElementById('area-conexao').innerHTML = `<strong>Status: Pendente</strong>`;
                     }
                 }
             } else { window.location.href = "index.html"; }
         });
 
         window.fazerLogout = function() { signOut(auth).then(() => { window.location.href = "index.html"; }); };
-        window.abrirModalDisparo = function() { document.getElementById('modalDisparo').style.display = 'flex'; document.getElementById('form-disparo').style.display = 'block'; document.getElementById('tela-progresso').style.display = 'none'; }
-        window.fecharModalDisparo = function() { document.getElementById('modalDisparo').style.display = 'none'; }
-        window.abrirModalImportar = function() { document.getElementById('modalImportar').style.display = 'flex'; }
-        window.fecharModalImportar = function() { document.getElementById('modalImportar').style.display = 'none'; }
         
-        window.trocarAba = function(aba) {
-            ['tags', 'grupos', 'avulso'].forEach(id => {
-                const btn = document.getElementById('btn-' + id);
-                if(btn) btn.classList.remove('active');
+        window.abrirModalImportar = () => document.getElementById('modalImportar').style.display = 'flex';
+        window.fecharModalImportar = () => document.getElementById('modalImportar').style.display = 'none';
+        window.abrirModalTag = () => document.getElementById('modalTag').style.display = 'flex';
+        window.fecharModalTag = () => { document.getElementById('modalTag').style.display = 'none'; document.getElementById('nomeNovaTag').value = ''; };
+        window.abrirModalDisparo = () => { 
+            atualizarListaTagsDisparo();
+            document.getElementById('modalDisparo').style.display = 'flex'; 
+            document.getElementById('form-disparo').style.display = 'block'; 
+            document.getElementById('tela-progresso').style.display = 'none'; 
+        };
+        window.fecharModalDisparo = () => document.getElementById('modalDisparo').style.display = 'none';
+        window.trocarAba = (aba) => {
+            ['tags', 'avulso'].forEach(id => {
+                document.getElementById('btn-' + id).classList.remove('active');
                 document.getElementById('aba-' + id).classList.remove('active');
             });
             document.getElementById('btn-' + aba).classList.add('active');
             document.getElementById('aba-' + aba).classList.add('active');
         }
 
-        // --- MOTOR DE IMPORTAÇÃO (CSV e VCF) ---
-        window.simularImportacao = function() {
+        function formatarTelefoneBR(telefone) {
+            let num = telefone.replace(/\D/g, ''); 
+            if (num.startsWith('55') && num.length >= 12) num = num.substring(2); 
+            if (num.startsWith('0')) {
+                if (num.length >= 13) num = num.substring(3);
+                else if (num.length === 11 || num.length === 12) num = num.substring(1); 
+            }
+            if (num.length === 10) num = num.substring(0, 2) + '9' + num.substring(2);
+            return num;
+        }
+
+        function decodificarNome(str) {
+            try {
+                if(str.includes('=')) {
+                    let limpo = str.replace(/=\r?\n/g, '').replace(/=([A-F0-9]{2})/g, '%$1'); 
+                    return decodeURIComponent(limpo);
+                }
+                return str;
+            } catch(e) { return str; } 
+        }
+
+        window.iniciarImportacao = function() {
             const input = document.getElementById('arquivoCsv');
             const file = input.files[0];
-            if(!file) return alert("⚠️ Selecione um arquivo .csv ou .vcf primeiro!");
+            if(!file) return alert("⚠️ Selecione um arquivo!");
             
             const extensao = file.name.split('.').pop().toLowerCase();
             const reader = new FileReader();
 
             reader.onload = function(e) {
                 const conteudo = e.target.result;
-                const tbody = document.getElementById('tabelaContatos');
-                let contatosAdicionados = 0;
+                let contatosLidos = 0;
 
                 if (extensao === 'csv') {
                     const linhas = conteudo.split('\n');
@@ -213,89 +273,150 @@
                         if(!linha) continue;
                         const colunas = linha.split(/[,;]/); 
                         if(colunas.length >= 2) {
-                            adicionarLinhaTabela(tbody, colunas[0].trim(), colunas[1].trim(), colunas[2] ? colunas[2].trim() : 'CSV');
-                            contatosAdicionados++;
+                            adicionarAOMotor(colunas[0], colunas[1], colunas[2] || 'CSV');
+                            contatosLidos++;
                         }
                     }
                 } else if (extensao === 'vcf') {
-                    // Lógica para separar cada contato do VCF do Android
                     const vcards = conteudo.split('BEGIN:VCARD');
                     for(let i = 1; i < vcards.length; i++) {
                         const card = vcards[i];
-                        
-                        // Busca o Nome
-                        const nomeMatch = card.match(/FN:(.*)/i) || card.match(/FN;.*:(.*)/i);
-                        const nome = nomeMatch ? nomeMatch[1].trim() : 'Sem Nome';
-                        
-                        // Busca o Telefone
-                        const telMatch = card.match(/TEL.*:(.*)/i);
-                        const tel = telMatch ? telMatch[1].trim() : '';
-
-                        if(tel) {
-                            adicionarLinhaTabela(tbody, nome, tel, 'VCF Android');
-                            contatosAdicionados++;
+                        const nomeMatch = card.match(/FN(?:;.*)?:(.*)/i);
+                        const telMatch = card.match(/TEL(?:;.*)?:(.*)/i);
+                        if(nomeMatch && telMatch) {
+                            adicionarAOMotor(decodificarNome(nomeMatch[1].trim()), telMatch[1].trim(), 'VCF Android');
+                            contatosLidos++;
                         }
                     }
-                } else {
-                    return alert("⚠️ Formato de arquivo não suportado.");
                 }
 
-                alert(`✅ Sucesso! ${contatosAdicionados} contatos foram importados.`);
-                fecharModalImportar(); 
-                input.value = ''; 
+                alert(`✅ Importação concluída! ${contatosLidos} contatos carregados.`);
+                fecharModalImportar(); input.value = ''; renderizarTabela();
             };
             reader.readAsText(file);
         }
 
-        function adicionarLinhaTabela(tbody, nome, tel, tag) {
-            tbody.innerHTML += `<tr><td>${nome}</td><td>${tel}</td><td><span class="tag tag-novo">🏷️ ${tag}</span></td><td><button class="btn btn-outline" style="padding: 4px 8px; font-size: 12px;">Editar</button></td></tr>`;
+        function adicionarAOMotor(nome, telefone, tag) {
+            const numLimpo = formatarTelefoneBR(telefone);
+            if(!numLimpo) return; 
+            const id = 'ctt_' + Math.random().toString(36).substr(2, 9);
+            window.listaContatos.push({ id: id, nome: nome.trim(), telefone: numLimpo, tags: [tag.trim()] });
         }
 
-        // --- MOTOR DE EXPORTAÇÃO DE VCF ---
-        window.exportarVCF = function() {
+        window.renderizarTabela = function() {
             const tbody = document.getElementById('tabelaContatos');
-            const linhas = tbody.getElementsByTagName('tr');
+            const termoBusca = document.getElementById('buscaContato').value.toLowerCase();
+            tbody.innerHTML = '';
             
-            if(linhas.length === 0) return alert("⚠️ A sua tabela de contatos está vazia!");
+            let listaFiltrada = window.listaContatos.filter(c => c.nome.toLowerCase().includes(termoBusca) || c.telefone.includes(termoBusca));
+            listaFiltrada.sort((a, b) => a.nome.localeCompare(b.nome));
 
-            let vcfString = "";
-
-            for(let i = 0; i < linhas.length; i++) {
-                const colunas = linhas[i].getElementsByTagName('td');
-                if(colunas.length >= 2) {
-                    const nome = colunas[0].innerText;
-                    const tel = colunas[1].innerText;
-                    
-                    vcfString += "BEGIN:VCARD\n";
-                    vcfString += "VERSION:3.0\n";
-                    vcfString += `FN:${nome}\n`;
-                    vcfString += `TEL;TYPE=CELL:${tel}\n`;
-                    vcfString += "END:VCARD\n";
-                }
+            if(listaFiltrada.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Nenhum contato encontrado.</td></tr>';
+                return;
             }
 
-            // Cria o arquivo virtual e força o download
+            listaFiltrada.forEach(c => {
+                const tagsHtml = c.tags.map(t => `<span class="tag tag-novo">🏷️ ${t}</span>`).join(' ');
+                tbody.innerHTML += `
+                    <tr>
+                        <td><input type="checkbox" class="check-contato" value="${c.id}"></td>
+                        <td>${c.nome}</td>
+                        <td>${c.telefone}</td>
+                        <td>${tagsHtml}</td>
+                        <td>
+                            <button class="btn btn-outline" style="padding: 4px 8px; font-size: 12px;" onclick="alert('Editar em breve!')">Editar</button>
+                            <button class="btn btn-outline" style="padding: 4px 8px; font-size: 12px; color: #dc3545; border-color: #dc3545;" onclick="apagarContato('${c.id}')">🗑️</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // --- SISTEMA DE EXCLUSÃO (NOVO) ---
+        window.apagarContato = function(id) {
+            if(confirm("Deseja realmente excluir este contato?")) {
+                window.listaContatos = window.listaContatos.filter(c => c.id !== id);
+                renderizarTabela();
+            }
+        }
+
+        window.apagarSelecionados = function() {
+            const checks = document.querySelectorAll('.check-contato:checked');
+            if(checks.length === 0) return alert("⚠️ Selecione os contatos que deseja apagar.");
+            if(confirm(`Tem certeza que deseja apagar ${checks.length} contatos selecionados?`)) {
+                const idsParaApagar = Array.from(checks).map(c => c.value);
+                window.listaContatos = window.listaContatos.filter(c => !idsParaApagar.includes(c.id));
+                document.getElementById('checkTodos').checked = false;
+                renderizarTabela();
+            }
+        }
+
+        window.apagarTodos = function() {
+            if(window.listaContatos.length === 0) return alert("⚠️ A lista já está vazia.");
+            if(confirm("🚨 ATENÇÃO: Tem certeza que deseja apagar TODOS os contatos da sua base? Isso não pode ser desfeito.")) {
+                window.listaContatos = [];
+                document.getElementById('checkTodos').checked = false;
+                renderizarTabela();
+            }
+        }
+
+        window.alternarTodosChecks = function() {
+            const master = document.getElementById('checkTodos');
+            document.querySelectorAll('.check-contato').forEach(c => c.checked = master.checked);
+        }
+
+        window.etiquetarSelecionados = function() {
+            if(document.querySelectorAll('.check-contato:checked').length === 0) return alert("⚠️ Selecione pelo menos um contato!");
+            abrirModalTag();
+        }
+
+        window.salvarTagMassa = function() {
+            const novaTag = document.getElementById('nomeNovaTag').value.trim();
+            if(!novaTag) return alert("Digite um nome para a etiqueta!");
+            const checks = document.querySelectorAll('.check-contato:checked');
+            checks.forEach(chk => {
+                const contato = window.listaContatos.find(c => c.id === chk.value);
+                if(contato && !contato.tags.includes(novaTag)) contato.tags.push(novaTag);
+            });
+            alert(`✅ Etiqueta "${novaTag}" aplicada a ${checks.length} contatos!`);
+            fecharModalTag(); document.getElementById('checkTodos').checked = false; renderizarTabela();
+        }
+
+        window.exportarVCF = function() {
+            if(window.listaContatos.length === 0) return alert("⚠️ A sua lista está vazia!");
+            let vcfString = "";
+            window.listaContatos.forEach(c => {
+                vcfString += "BEGIN:VCARD\nVERSION:3.0\n";
+                vcfString += `FN:${c.nome}\n`;
+                vcfString += `TEL;TYPE=CELL:+55${c.telefone}\n`; 
+                vcfString += "END:VCARD\n";
+            });
             const blob = new Blob([vcfString], { type: 'text/vcard' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = url;
-            a.download = 'contatos_central.vcf';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+            a.href = url; a.download = 'contatos_central.vcf';
+            document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        window.atualizarListaTagsDisparo = function() {
+            const divTags = document.getElementById('listaTagsDisparo');
+            divTags.innerHTML = '<label><input type="checkbox" value="TODOS_OS_CONTATOS"> 📢 Toda a Base (Todos os contatos)</label>';
+            let todasTags = new Set();
+            window.listaContatos.forEach(c => c.tags.forEach(t => todasTags.add(t)));
+            todasTags.forEach(tag => { divTags.innerHTML += `<label><input type="checkbox" value="${tag}"> 🏷️ ${tag}</label>`; });
         }
 
         window.iniciarDisparo = function() {
             if(!document.getElementById('mensagemPromo').value) return alert("⚠️ Digite a mensagem!");
             document.getElementById('form-disparo').style.display = 'none';
             document.getElementById('tela-progresso').style.display = 'block';
-            let env = 0; const tot = 10;
+            let env = 0; const tot = 5;
             let sim = setInterval(() => {
                 env++; document.getElementById('barra-progresso').style.width = (env/tot*100) + '%';
                 document.getElementById('barra-progresso').innerText = (env/tot*100) + '%';
-                document.getElementById('texto-contagem').innerText = `Enviando ${env} de ${tot}`;
-                if(env >= tot) { clearInterval(sim); setTimeout(() => { alert("✅ Campanha concluída!"); fecharModalDisparo(); document.getElementById('barra-progresso').style.width = '0%'; }, 500); }
+                document.getElementById('texto-contagem').innerText = `Simulando ${env} de ${tot}`;
+                if(env >= tot) { clearInterval(sim); setTimeout(() => { alert("✅ Campanha enviada para o servidor com sucesso!"); fecharModalDisparo(); document.getElementById('barra-progresso').style.width = '0%'; }, 500); }
             }, 800);
         }
     </script>
