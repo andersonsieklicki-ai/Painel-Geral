@@ -138,33 +138,45 @@
                         <div class="card-pendente">
                             <div class="info-pendente">
                                 <h4>🏢 ${emp.nomeEmpresa}</h4>
-                                <p>📧 E-mail: ${emp.email} | 📅 Cadastrado em: ${dataFormatada}</p>
+                                <p>📧 ${emp.email} | 📅 ${dataFormatada}</p>
                             </div>
-                            <div style="display: flex; gap: 10px;">
-                                <button class="btn btn-outline" onclick="alert('Entrar em contato com: ${emp.email}')">✉️ Contatar</button>
-                                <button class="btn" onclick="aprovarCliente('${emp.id}')">✅ Registrar Empresa</button>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <select id="plano-${emp.id}" class="btn-outline" style="padding: 8px; border-radius: 4px; background: white; cursor: pointer;">
+                                    <option value="basico">🥉 Plano Básico (Nº Central)</option>
+                                    <option value="premium">🥇 Plano Premium (QR Próprio)</option>
+                                </select>
+                                <button class="btn" onclick="aprovarCliente('${emp.id}')">✅ Registrar</button>
                             </div>
                         </div>
                     `;
                 } 
                 // 2. SEPARA OS ATIVOS
                 else {
-                    const statusClass = emp.statusRobo === 'online' ? 'online' : 'offline';
-                    const statusText = emp.statusRobo === 'online' ? 'ONLINE' : 'DESCONECTADO';
+                    // Define o visual baseado no plano
+                    const ehPremium = emp.plano === 'premium';
+                    const tagPlano = ehPremium ? '🥇 PREMIUM' : '🥉 BÁSICO';
+                    const statusClass = emp.statusRobo === 'online' || emp.statusRobo === 'ativo_central' ? 'online' : 'offline';
+                    const statusText = emp.statusRobo === 'ativo_central' ? 'USANDO CENTRAL' : (emp.statusRobo === 'online' ? 'ONLINE' : 'DESCONECTADO');
                     
+                    // O botão de QR Code só aparece se for Premium
+                    const botaoQR = ehPremium ? `<button class="btn btn-outline" onclick="alert('Gerar QR Code...')">🔗 Ligar QR</button>` : '';
+
                     divAtivos.innerHTML += `
                         <div class="card">
                             <div class="card-header">
-                                ${emp.nomeEmpresa}
+                                <div>
+                                    ${emp.nomeEmpresa} <br>
+                                    <span style="font-size: 10px; color: #666; font-weight: normal;">${tagPlano}</span>
+                                </div>
                                 <span class="status ${statusClass}">${statusText}</span>
                             </div>
                             <div class="log-window">
                                 <span style="color:#aaa;">[Sistema] Configuração carregada...</span><br>
-                                <span style="color:#aaa;">[Sistema] Aguardando conexão WhatsApp...</span>
+                                <span style="color:#aaa;">[Sistema] ${ehPremium ? 'Aguardando conexão WhatsApp...' : 'Conectado ao Motor Central.'}</span>
                             </div>
                             <div class="card-actions">
-                                <button class="btn btn-outline" onclick="alert('Gerar QR Code...')">🔗 Ligar</button>
-                                <button class="btn btn-edit" onclick="abrirModal('${emp.id}')">⚙️ Editar</button>
+                                ${botaoQR}
+                                <button class="btn btn-edit" onclick="abrirModal('${emp.id}')">⚙️ Editar Respostas</button>
                             </div>
                         </div>
                     `;
@@ -178,14 +190,20 @@
 
         // --- Funções Administrativas ---
 
-        // Transforma o Pendente em Cliente Oficial
+        // Transforma o Pendente em Cliente Oficial com o Plano Escolhido
         window.aprovarCliente = async function(id) {
-            if(confirm("Deseja aprovar e registrar esta empresa na plataforma?")) {
+            const planoEscolhido = document.getElementById(`plano-${id}`).value;
+            const nomePlano = planoEscolhido === 'basico' ? 'Plano Básico' : 'Plano Premium';
+
+            if(confirm(`Deseja aprovar esta empresa no ${nomePlano}?`)) {
                 try {
+                    // Se for básico, já fica "ativo_central". Se for premium, fica "offline" esperando o QR Code.
+                    const novoStatus = planoEscolhido === 'basico' ? 'ativo_central' : 'offline';
+                    
                     await updateDoc(doc(db, "empresas", id), { 
-                        statusRobo: 'offline' // Passa para offline até ele ler o QR Code
+                        statusRobo: novoStatus,
+                        plano: planoEscolhido
                     });
-                    // Não precisa atualizar a tela, o onSnapshot faz isso sozinho!
                 } catch(erro) {
                     alert("Erro ao aprovar: " + erro.message);
                 }
@@ -207,6 +225,13 @@
                 document.getElementById('opt1Resp').value = emp.menu.opt1Resp || '';
                 document.getElementById('opt2Nome').value = emp.menu.opt2Nome || '';
                 document.getElementById('opt2Resp').value = emp.menu.opt2Resp || '';
+            } else {
+                // Reseta os campos se não tiver menu
+                document.getElementById('menuSaudacao').value = 'Olá! 👋 Bem-vindo(a). Como podemos te ajudar hoje?';
+                document.getElementById('opt1Nome').value = '';
+                document.getElementById('opt1Resp').value = '';
+                document.getElementById('opt2Nome').value = '';
+                document.getElementById('opt2Resp').value = '';
             }
 
             document.getElementById('modalEmpresa').style.display = 'flex';
@@ -236,6 +261,16 @@
                 alert("Erro ao salvar: " + erro.message);
             }
         };
+    </script>
+	<script>
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.onkeydown = function(e) {
+            if (e.keyCode === 123) return false; // Bloqueia F12
+            if (e.ctrlKey && e.shiftKey && e.keyCode === 'I'.charCodeAt(0)) return false; // Bloqueia Ctrl+Shift+I
+            if (e.ctrlKey && e.shiftKey && e.keyCode === 'C'.charCodeAt(0)) return false; // Bloqueia Ctrl+Shift+C
+            if (e.ctrlKey && e.shiftKey && e.keyCode === 'J'.charCodeAt(0)) return false; // Bloqueia Ctrl+Shift+J
+            if (e.ctrlKey && e.keyCode === 'U'.charCodeAt(0)) return false; // Bloqueia Ctrl+U (Ver código-fonte)
+        }
     </script>
 </body>
 </html>
