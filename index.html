@@ -3,19 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Central Omnichannel - Login</title>
+    <title>Central Omnichannel - Automação de WhatsApp</title>
     <style>
-        :root { --primary: #003399; --secondary: #f0f4f8; --text-dark: #333; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--secondary); margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: var(--text-dark); }
+        :root { 
+            --primary: #003399; 
+            --secondary: #f0f4f8; 
+            --accent: #ffc107;
+            --text-dark: #333; 
+            --text-light: #666;
+        }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #ffffff; 
+            margin: 0; 
+            padding: 0; 
+            color: var(--text-dark); 
+            scroll-behavior: smooth;
+        }
         
-        .container { display: flex; flex-wrap: wrap; background: white; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); overflow: hidden; max-width: 900px; width: 95%; }
-        
+        /* --- NAVEGAÇÃO --- */
+        .navbar {
+            background-color: var(--primary);
+            color: white;
+            padding: 15px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .navbar h1 { margin: 0; font-size: 22px; }
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            margin-left: 20px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .btn-nav {
+            background-color: var(--accent);
+            color: #000 !important;
+            padding: 8px 20px;
+            border-radius: 20px;
+            transition: transform 0.2s;
+        }
+        .btn-nav:hover { transform: scale(1.05); }
+
+        /* --- HERO SECTION (Apresentação) --- */
+        .hero {
+            background: linear-gradient(135deg, var(--secondary) 0%, #e2e8f0 100%);
+            padding: 80px 20px;
+            text-align: center;
+        }
+        .hero h2 {
+            font-size: 42px;
+            color: var(--primary);
+            margin-bottom: 20px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .hero p {
+            font-size: 18px;
+            color: var(--text-light);
+            max-width: 600px;
+            margin: 0 auto 30px auto;
+            line-height: 1.6;
+        }
+        .hero .btn-hero {
+            background-color: var(--primary);
+            color: white;
+            padding: 15px 35px;
+            font-size: 18px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: bold;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(0, 51, 153, 0.3);
+            transition: background 0.3s;
+        }
+        .hero .btn-hero:hover { background-color: #002266; }
+
+        /* --- BENEFÍCIOS --- */
+        .features {
+            padding: 60px 20px;
+            background: white;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        .section-title {
+            text-align: center;
+            font-size: 32px;
+            color: var(--primary);
+            margin-bottom: 50px;
+        }
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        .feature-card {
+            background: var(--secondary);
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            border-top: 4px solid var(--primary);
+            transition: transform 0.3s;
+        }
+        .feature-card:hover { transform: translateY(-5px); }
+        .feature-icon { font-size: 40px; margin-bottom: 15px; }
+        .feature-card h3 { color: var(--primary); margin-bottom: 15px; }
+        .feature-card p { color: var(--text-light); line-height: 1.5; font-size: 15px; }
+
+        /* --- ÁREA DE LOGIN E CADASTRO --- */
+        .acesso-section {
+            background-color: var(--primary);
+            padding: 80px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container-auth { 
+            display: flex; 
+            flex-wrap: wrap; 
+            background: white; 
+            border-radius: 10px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2); 
+            overflow: hidden; 
+            max-width: 900px; 
+            width: 100%; 
+        }
         .box { padding: 40px; flex: 1; min-width: 300px; box-sizing: border-box; }
         .box-login { background-color: white; }
         .box-cadastro { background-color: #f8fafc; border-left: 1px solid #e2e8f0; }
         
-        h2 { margin-top: 0; color: var(--primary); }
-        p { color: #666; font-size: 14px; line-height: 1.5; margin-bottom: 20px; }
+        .box h2 { margin-top: 0; color: var(--primary); font-size: 24px; }
+        .box p { color: #666; font-size: 14px; line-height: 1.5; margin-bottom: 20px; }
         
         label { font-size: 13px; font-weight: bold; color: #555; display: block; margin-bottom: 5px; }
         input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 14px; }
@@ -27,54 +152,117 @@
         .btn-outline:hover { background-color: var(--primary); color: white; }
 
         .loader { display: none; text-align: center; color: var(--primary); font-size: 14px; font-weight: bold; margin-top: 10px; }
+
+        /* --- FOOTER --- */
+        footer {
+            background-color: #0f172a;
+            color: #94a3b8;
+            text-align: center;
+            padding: 30px 20px;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .navbar { padding: 15px 20px; }
+            .hero h2 { font-size: 32px; }
+            .container-auth { flex-direction: column; }
+            .box-cadastro { border-left: none; border-top: 1px solid #e2e8f0; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="box box-login">
-            <h2>🔑 Acesse seu Painel</h2>
-            <p>Faça login para gerenciar sua automação de WhatsApp e disparos de mensagens.</p>
-            
-            <form id="formLogin">
-                <label>E-mail Corporativo</label>
-                <input type="email" id="loginEmail" placeholder="seu@email.com" required>
-                
-                <label>Senha</label>
-                <input type="password" id="loginSenha" placeholder="••••••••" required>
-                
-                <button type="submit" class="btn">Entrar no Sistema</button>
-                <div id="loaderLogin" class="loader">Autenticando... aguarde.</div>
-            </form>
+    <nav class="navbar">
+        <h1>Central Omnichannel</h1>
+        <div class="nav-links">
+            <a href="#beneficios">Benefícios</a>
+            <a href="#acesso" class="btn-nav">Acessar Painel</a>
         </div>
+    </nav>
 
-        <div class="box box-cadastro">
-            <h2>🚀 Criar Conta (Pré-cadastro)</h2>
-            <p>Ainda não é cliente? Preencha os dados abaixo. Nossa equipe entrará em contato para liberar seu painel.</p>
+    <section class="hero">
+        <h2>Transforme seu WhatsApp em uma Máquina de Vendas e Atendimento 24h</h2>
+        <p>Atenda seus clientes no automático, dispare promoções sem risco de bloqueio e organize seus contatos. Tudo em um único painel, simples e fácil de usar.</p>
+        <a href="#acesso" class="btn-hero">Experimente Agora</a>
+    </section>
+
+    <section id="beneficios" class="features">
+        <h2 class="section-title">Como ajudamos o seu comércio?</h2>
+        <div class="grid-3">
             
-            <form id="formCadastro">
-                <label>Nome da Empresa</label>
-                <input type="text" id="cadNome" placeholder="Ex: Farmácia São João" required>
-                
-                <label>E-mail de Contato</label>
-                <input type="email" id="cadEmail" placeholder="contato@empresa.com" required>
-                
-                <label>Crie uma Senha (Mín. 6 caracteres)</label>
-                <input type="password" id="cadSenha" placeholder="Crie uma senha forte" required>
-                
-                <button type="submit" class="btn btn-outline">Solicitar Cadastro</button>
-                <div id="loaderCadastro" class="loader">Processando seu cadastro...</div>
-            </form>
+            <div class="feature-card">
+                <div class="feature-icon">🤖</div>
+                <h3>Atendimento 24 Horas</h3>
+                <p>Pare de perder vendas de madrugada ou finais de semana. Nosso robô responde instantaneamente, apresenta o catálogo e filtra os pedidos para você.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🚀</div>
+                <h3>Disparos Humanizados</h3>
+                <p>Envie promoções em massa ou mensagens em grupos com segurança. O sistema faz pausas e simula digitação humana para proteger seu número contra banimentos.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">👥</div>
+                <h3>CRM e Organização</h3>
+                <p>Importe sua planilha de clientes. Crie etiquetas (Ex: Clientes VIP, Devedores) e envie mensagens focadas apenas para o público certo.</p>
+            </div>
+
         </div>
-    </div>
+    </section>
+
+    <section id="acesso" class="acesso-section">
+        <div class="container-auth">
+            
+            <div class="box box-login">
+                <h2>🔑 Acesse seu Painel</h2>
+                <p>Já é nosso cliente? Faça o login para gerenciar suas automações e disparos.</p>
+                
+                <form id="formLogin">
+                    <label>E-mail Corporativo</label>
+                    <input type="email" id="loginEmail" placeholder="seu@email.com" required>
+                    
+                    <label>Senha</label>
+                    <input type="password" id="loginSenha" placeholder="••••••••" required>
+                    
+                    <button type="submit" class="btn">Entrar no Sistema</button>
+                    <div id="loaderLogin" class="loader">Autenticando... aguarde.</div>
+                </form>
+            </div>
+
+            <div class="box box-cadastro">
+                <h2>🚀 Criar Conta (Pré-cadastro)</h2>
+                <p>Preencha os dados abaixo. Nossa equipe liberará seu painel comercial rapidamente.</p>
+                
+                <form id="formCadastro">
+                    <label>Nome da Empresa</label>
+                    <input type="text" id="cadNome" placeholder="Ex: PH Cosméticos" required>
+                    
+                    <label>E-mail de Contato</label>
+                    <input type="email" id="cadEmail" placeholder="contato@empresa.com" required>
+                    
+                    <label>Crie uma Senha (Mín. 6 caracteres)</label>
+                    <input type="password" id="cadSenha" placeholder="Crie uma senha forte" required>
+                    
+                    <button type="submit" class="btn btn-outline">Solicitar Cadastro</button>
+                    <div id="loaderCadastro" class="loader">Processando seu cadastro...</div>
+                </form>
+            </div>
+
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 Central Omnichannel SaaS. Todos os direitos reservados.</p>
+        <p style="margin-top: 5px;">Desenvolvido para conectar negócios e clientes.</p>
+    </footer>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        // Importamos as funções de Auth e o sendEmailVerification:
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
         import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // COLOQUE SUAS CHAVES REAIS AQUI
+        // COLOQUE SUAS CHAVES REAIS AQUI PARA O LOGIN FUNCIONAR
         const firebaseConfig = {
             apiKey: "SUA_API_KEY",
             authDomain: "SEU_PROJETO.firebaseapp.com",
@@ -100,7 +288,7 @@
             try {
                 await signInWithEmailAndPassword(auth, email, senha);
                 
-                // Mágica para você acessar o Admin (Coloque o seu e-mail real aqui)
+                // Mágica para acessar o Admin 
                 if (email === 'admin@seuemail.com') {
                     window.location.href = 'painel-admin.html';
                 } else {
@@ -116,7 +304,7 @@
             }
         });
 
-        // --- SISTEMA DE CADASTRO (Com verificação de email e duplicidade) ---
+        // --- SISTEMA DE CADASTRO ---
         document.getElementById('formCadastro').addEventListener('submit', async (e) => {
             e.preventDefault();
             document.getElementById('loaderCadastro').style.display = 'block';
@@ -126,31 +314,25 @@
             const senha = document.getElementById('cadSenha').value;
 
             try {
-                // 1. Cria o usuário no sistema de autenticação
                 const userCredential = await createUserWithEmailAndPassword(auth, email, senha);
-                
-                // 2. Dispara o E-mail de Confirmação Oficial do Google
                 await sendEmailVerification(userCredential.user);
                 
-                // 3. Salva os dados na coleção de 'empresas' no banco de dados
                 await setDoc(doc(db, "empresas", userCredential.user.uid), {
                     nomeEmpresa: nome,
                     email: email,
                     statusRobo: 'pendente',
-                    plano: '', // Fica vazio até o admin aprovar
+                    plano: '', 
                     dataCadastro: new Date().toISOString()
                 });
 
                 document.getElementById('loaderCadastro').style.display = 'none';
                 alert(`✅ Cadastro realizado com sucesso!\n\nUm e-mail de verificação foi enviado para ${email}. Por favor, verifique sua caixa de entrada e a pasta de Spam.\n\nNossa equipe avaliará seu pré-cadastro e entrará em contato em breve.`);
                 
-                // Limpa o formulário de cadastro
                 document.getElementById('formCadastro').reset();
 
             } catch (error) {
                 document.getElementById('loaderCadastro').style.display = 'none';
                 
-                // 4. Verificações rígidas de Segurança
                 if (error.code === 'auth/email-already-in-use') {
                     alert("⚠️ ATENÇÃO: Este e-mail já está cadastrado em nosso sistema! Por favor, utilize a área de Login ao lado.");
                 } else if (error.code === 'auth/weak-password') {
