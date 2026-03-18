@@ -3,273 +3,238 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Central Omnichannel - Gerenciador SaaS</title>
+    <title>Admin - Central Omnichannel SaaS</title>
     <style>
-        :root {
-            --primary: #003399;
-            --bg-color: #f4f7f6;
-            --card-bg: #ffffff;
-            --text-dark: #333;
-            --terminal-bg: #1e1e1e;
-        }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            margin: 0;
-            padding: 20px;
-            color: var(--text-dark);
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: var(--primary);
-            color: white;
-            padding: 15px 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
-        }
-        .btn {
-            background-color: #28a745;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background 0.3s;
-        }
+        :root { --primary: #003399; --bg-color: #f4f7f6; --card-bg: #ffffff; --text-dark: #333; --terminal-bg: #1e1e1e; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); margin: 0; padding: 20px; color: var(--text-dark); }
+        .header { display: flex; justify-content: space-between; align-items: center; background-color: var(--primary); color: white; padding: 15px 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 30px; }
+        
+        .btn { background-color: #28a745; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: background 0.3s; font-size: 13px; }
         .btn:hover { background-color: #218838; }
         .btn-danger { background-color: #dc3545; }
         .btn-danger:hover { background-color: #c82333; }
         .btn-edit { background-color: #ffc107; color: black; }
-        
-        /* Grid de Empresas */
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 20px;
-        }
-        .card {
-            background: var(--card-bg);
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            border-top: 4px solid var(--primary);
-            display: flex;
-            flex-direction: column;
-        }
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            font-size: 18px;
-            font-weight: bold;
-        }
-        .status {
-            font-size: 12px;
-            padding: 4px 8px;
-            border-radius: 12px;
-            color: white;
-        }
+        .btn-outline { background-color: transparent; color: var(--primary); border: 1px solid var(--primary); }
+
+        /* --- Seção de Pendentes (Pré-cadastros) --- */
+        .section-title { font-size: 20px; color: var(--primary); border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 20px; margin-top: 40px;}
+        .lista-pendentes { display: flex; flex-direction: column; gap: 15px; margin-bottom: 40px; }
+        .card-pendente { background: #fff3cd; border-left: 5px solid #ffc107; padding: 15px 20px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .info-pendente h4 { margin: 0 0 5px 0; color: #856404; font-size: 18px; }
+        .info-pendente p { margin: 0; font-size: 14px; color: #666; }
+
+        /* --- Grid de Robôs Ativos --- */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
+        .card { background: var(--card-bg); border-radius: 8px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-top: 4px solid var(--primary); display: flex; flex-direction: column; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-size: 18px; font-weight: bold; }
+        .status { font-size: 12px; padding: 4px 8px; border-radius: 12px; color: white; }
         .status.online { background-color: #28a745; }
-        .status.offline { background-color: #dc3545; }
-        
-        /* Terminal de Logs */
-        .log-window {
-            background-color: var(--terminal-bg);
-            color: #00ff00;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 12px;
-            height: 150px;
-            overflow-y: auto;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 15px;
-            flex-grow: 1;
-        }
-        .log-error { color: #ff4444; }
-        .log-info { color: #aaaaaa; }
-        
-        .card-actions {
-            display: flex;
-            gap: 10px;
-            justify-content: space-between;
-        }
+        .status.offline { background-color: #6c757d; }
+
+        .log-window { background-color: var(--terminal-bg); color: #00ff00; font-family: monospace; font-size: 12px; height: 120px; overflow-y: auto; padding: 10px; border-radius: 5px; margin-bottom: 15px; }
+        .card-actions { display: flex; gap: 10px; justify-content: space-between; }
         .card-actions button { flex: 1; }
 
-        /* Modal Nova Empresa */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-content {
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            width: 500px;
-            max-width: 90%;
-        }
-        .modal input, .modal textarea {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0 20px 0;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-            font-family: inherit;
-        }
-        .modal h2 { margin-top: 0; }
+        /* --- Modal de Edição --- */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; padding: 30px; border-radius: 8px; width: 600px; max-width: 95%; max-height: 90vh; overflow-y: auto; }
+        .modal input, .modal textarea { width: 100%; padding: 12px; margin: 8px 0 20px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: inherit; font-size: 14px; }
+        .dica-emoji { font-size: 11px; color: #666; margin-top: -15px; margin-bottom: 15px; display: block; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h2>Painel SaaS - Robôs de Atendimento</h2>
-        <button class="btn" onclick="abrirModal()">+ Nova Empresa</button>
+        <h2>Painel Admin - Central Omnichannel</h2>
+        <div>Logado como Administrador</div>
     </div>
 
-    <div class="grid" id="painelEmpresas"></div>
+    <h3 class="section-title">🔔 Solicitações de Cadastro (Aguardando Contato)</h3>
+    <div class="lista-pendentes" id="painelPendentes">
+        <p style="color: #666; font-style: italic;">Carregando banco de dados...</p>
+    </div>
+
+    <h3 class="section-title">🤖 Robôs Ativos (Clientes da Plataforma)</h3>
+    <div class="grid" id="painelAtivos">
+        </div>
 
     <div class="modal" id="modalEmpresa">
         <div class="modal-content">
-            <h2>Configurar Robô</h2>
+            <h2 style="margin-top: 0; color: var(--primary);">⚙️ Configurar Robô: <span id="nomeRoboEdit"></span></h2>
             
-            <label>Nome da Empresa:</label>
-            <input type="text" id="nomeEmpresa" placeholder="Ex: Farmácia São João">
+            <input type="hidden" id="editEmpresaId">
+
+            <label><strong>Mensagem de Boas-vindas:</strong></label>
+            <textarea id="menuSaudacao" rows="3">Olá! 👋 Bem-vindo(a). Como podemos te ajudar hoje?</textarea>
+            <span class="dica-emoji">Dica: Use atalho (Win + Ponto) no Windows para abrir o teclado de emojis ✨🚀</span>
+
+            <label><strong>Opção 1 (Texto e Resposta):</strong></label>
+            <div style="display: flex; gap: 10px;">
+                <input type="text" id="opt1Nome" placeholder="Ex: Falar com atendente 🙋‍♂️" style="flex: 1;">
+                <input type="text" id="opt1Resp" placeholder="Resposta que o robô vai dar..." style="flex: 2;">
+            </div>
+
+            <label><strong>Opção 2 (Texto e Resposta):</strong></label>
+            <div style="display: flex; gap: 10px;">
+                <input type="text" id="opt2Nome" placeholder="Ex: Ver catálogo 📖" style="flex: 1;">
+                <input type="text" id="opt2Resp" placeholder="Resposta que o robô vai dar..." style="flex: 2;">
+            </div>
             
-            <label>Menu Pré-Pronto (Formato JSON para o Robô):</label>
-            <textarea id="menuRobo" rows="8">{
-  "saudacao": "Olá! Bem-vindo(a). Escolha uma opção:",
-  "opcoes": {
-    "1": "Fazer um Pedido",
-    "2": "Falar com Atendente"
-  }
-}</textarea>
-            
-            <div style="display: flex; gap: 10px; justify-content: flex-end;">
-                <button class="btn btn-danger" onclick="fecharModal()">Cancelar</button>
-                <button class="btn" onclick="salvarEmpresa()">Salvar Configuração</button>
+            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                <button class="btn btn-outline" style="color: #dc3545; border-color: #dc3545;" onclick="fecharModal()">Cancelar</button>
+                <button class="btn" onclick="salvarConfiguracao()">💾 Salvar Configuração</button>
             </div>
         </div>
     </div>
 
-    <script>
-        // Simulando nosso Banco de Dados Inicial (Já desordenado para testar a ordem alfabética)
-        let empresas = [
-            { id: 2, nome: 'Defesa Civil - Capanema', status: 'offline', logs: [] },
-            { id: 1, nome: 'Associação de Água São Luiz', status: 'online', logs: [] }
-        ];
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, collection, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // Função para desenhar as empresas na tela (Sempre em ordem alfabética)
-        function renderizarPainel() {
-            const painel = document.getElementById('painelEmpresas');
-            painel.innerHTML = '';
+        // SUA CONFIGURAÇÃO EXATA
+        const firebaseConfig = {
+            apiKey: "AIzaSyC4-2LavZt7iWPt2u71u-yRUYbIJu-Vzf0",
+            authDomain: "central-omnichannel-saas.firebaseapp.com",
+            projectId: "central-omnichannel-saas",
+            storageBucket: "central-omnichannel-saas.firebasestorage.app",
+            messagingSenderId: "869327159480",
+            appId: "1:869327159480:web:605be5ec37ab688d44b44d",
+            measurementId: "G-984WSSJBHP"
+        };
 
-            // Coloca em ordem alfabética
-            empresas.sort((a, b) => a.nome.localeCompare(b.nome));
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
-            empresas.forEach(emp => {
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.innerHTML = `
-                    <div class="card-header">
-                        ${emp.nome}
-                        <span class="status ${emp.status}">${emp.status.toUpperCase()}</span>
-                    </div>
-                    
-                    <div class="log-window" id="logs-${emp.id}">
-                        </div>
+        let listaEmpresas = [];
 
-                    <div class="card-actions">
-                        <button class="btn" onclick="simularQR(${emp.id})">🔗 Conectar WhatsApp</button>
-                        <button class="btn btn-edit" onclick="abrirModal()">⚙️ Menu</button>
-                        <button class="btn btn-danger">⏹️ Parar</button>
-                    </div>
-                `;
-                painel.appendChild(card);
-                atualizarTelaLogs(emp.id); // Puxa os logs existentes
+        // MAGIA DO TEMPO REAL: Fica escutando o banco de dados o tempo todo
+        onSnapshot(collection(db, "empresas"), (snapshot) => {
+            listaEmpresas = [];
+            snapshot.forEach((doc) => {
+                listaEmpresas.push({ id: doc.id, ...doc.data() });
             });
+            renderizarPaineis();
+        });
+
+        function renderizarPaineis() {
+            const divPendentes = document.getElementById('painelPendentes');
+            const divAtivos = document.getElementById('painelAtivos');
+            
+            divPendentes.innerHTML = '';
+            divAtivos.innerHTML = '';
+
+            let temPendente = false;
+
+            // Ordena alfabeticamente
+            listaEmpresas.sort((a, b) => (a.nomeEmpresa || '').localeCompare(b.nomeEmpresa || ''));
+
+            listaEmpresas.forEach(emp => {
+                // 1. SEPARA OS PRÉ-CADASTROS
+                if(emp.statusRobo === 'pendente') {
+                    temPendente = true;
+                    const dataFormatada = new Date(emp.dataCadastro).toLocaleDateString('pt-BR');
+                    
+                    divPendentes.innerHTML += `
+                        <div class="card-pendente">
+                            <div class="info-pendente">
+                                <h4>🏢 ${emp.nomeEmpresa}</h4>
+                                <p>📧 E-mail: ${emp.email} | 📅 Cadastrado em: ${dataFormatada}</p>
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <button class="btn btn-outline" onclick="alert('Entrar em contato com: ${emp.email}')">✉️ Contatar</button>
+                                <button class="btn" onclick="aprovarCliente('${emp.id}')">✅ Registrar Empresa</button>
+                            </div>
+                        </div>
+                    `;
+                } 
+                // 2. SEPARA OS ATIVOS
+                else {
+                    const statusClass = emp.statusRobo === 'online' ? 'online' : 'offline';
+                    const statusText = emp.statusRobo === 'online' ? 'ONLINE' : 'DESCONECTADO';
+                    
+                    divAtivos.innerHTML += `
+                        <div class="card">
+                            <div class="card-header">
+                                ${emp.nomeEmpresa}
+                                <span class="status ${statusClass}">${statusText}</span>
+                            </div>
+                            <div class="log-window">
+                                <span style="color:#aaa;">[Sistema] Configuração carregada...</span><br>
+                                <span style="color:#aaa;">[Sistema] Aguardando conexão WhatsApp...</span>
+                            </div>
+                            <div class="card-actions">
+                                <button class="btn btn-outline" onclick="alert('Gerar QR Code...')">🔗 Ligar</button>
+                                <button class="btn btn-edit" onclick="abrirModal('${emp.id}')">⚙️ Editar</button>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            if(!temPendente) {
+                divPendentes.innerHTML = '<p style="color: #666; font-style: italic;">✅ Nenhuma solicitação pendente no momento.</p>';
+            }
         }
 
-        // Função para escrever no Mini-Terminal (Com limite de 50 linhas para não travar)
-        function adicionarLog(empresaId, mensagem, tipo = 'normal') {
-            const empresa = empresas.find(e => e.id === empresaId);
-            if(!empresa) return;
+        // --- Funções Administrativas ---
 
-            const hora = new Date().toLocaleTimeString();
-            let classeCss = '';
-            if (tipo === 'erro') classeCss = 'log-error';
-            if (tipo === 'info') classeCss = 'log-info';
+        // Transforma o Pendente em Cliente Oficial
+        window.aprovarCliente = async function(id) {
+            if(confirm("Deseja aprovar e registrar esta empresa na plataforma?")) {
+                try {
+                    await updateDoc(doc(db, "empresas", id), { 
+                        statusRobo: 'offline' // Passa para offline até ele ler o QR Code
+                    });
+                    // Não precisa atualizar a tela, o onSnapshot faz isso sozinho!
+                } catch(erro) {
+                    alert("Erro ao aprovar: " + erro.message);
+                }
+            }
+        };
 
-            // Adiciona o novo log
-            empresa.logs.push(`<span class="${classeCss}">[${hora}] ${mensagem}</span>`);
+        // Funções do Modal de Edição
+        window.abrirModal = function(id) {
+            const emp = listaEmpresas.find(e => e.id === id);
+            if(!emp) return;
 
-            // Limpeza Automática: Se passar de 50 linhas, apaga a mais velha
-            if (empresa.logs.length > 50) {
-                empresa.logs.shift();
+            document.getElementById('editEmpresaId').value = emp.id;
+            document.getElementById('nomeRoboEdit').innerText = emp.nomeEmpresa;
+            
+            // Se já tiver menu salvo, carrega na tela
+            if(emp.menu) {
+                document.getElementById('menuSaudacao').value = emp.menu.saudacao || '';
+                document.getElementById('opt1Nome').value = emp.menu.opt1Nome || '';
+                document.getElementById('opt1Resp').value = emp.menu.opt1Resp || '';
+                document.getElementById('opt2Nome').value = emp.menu.opt2Nome || '';
+                document.getElementById('opt2Resp').value = emp.menu.opt2Resp || '';
             }
 
-            atualizarTelaLogs(empresaId);
-        }
-
-        function atualizarTelaLogs(empresaId) {
-            const terminal = document.getElementById(`logs-${empresaId}`);
-            if(terminal) {
-                const empresa = empresas.find(e => e.id === empresaId);
-                terminal.innerHTML = empresa.logs.join('<br>');
-                // Rola a tela preta automaticamente para a última mensagem
-                terminal.scrollTop = terminal.scrollHeight;
-            }
-        }
-
-        // --- Funções da Interface ---
-        function abrirModal() {
             document.getElementById('modalEmpresa').style.display = 'flex';
-        }
+        };
 
-        function fecharModal() {
+        window.fecharModal = function() {
             document.getElementById('modalEmpresa').style.display = 'none';
-            document.getElementById('nomeEmpresa').value = '';
-        }
+        };
 
-        function salvarEmpresa() {
-            const nome = document.getElementById('nomeEmpresa').value;
-            if(!nome) return alert('Digite o nome da empresa!');
+        window.salvarConfiguracao = async function() {
+            const id = document.getElementById('editEmpresaId').value;
             
-            // Cria a nova empresa e joga no banco de dados (array)
-            const novaEmpresa = {
-                id: Date.now(),
-                nome: nome,
-                status: 'offline',
-                logs: []
+            const novoMenu = {
+                saudacao: document.getElementById('menuSaudacao').value,
+                opt1Nome: document.getElementById('opt1Nome').value,
+                opt1Resp: document.getElementById('opt1Resp').value,
+                opt2Nome: document.getElementById('opt2Nome').value,
+                opt2Resp: document.getElementById('opt2Resp').value
             };
-            empresas.push(novaEmpresa);
-            fecharModal();
-            renderizarPainel();
-            
-            // Simula um log inicial
-            adicionarLog(novaEmpresa.id, 'Sessão criada. Aguardando leitura de QR Code...', 'info');
-        }
 
-        // Simulador para você ver os logs rodando sozinhos
-        function simularQR(id) {
-            adicionarLog(id, 'Gerando QR Code...');
-            setTimeout(() => adicionarLog(id, 'QR Code lido com sucesso!', 'normal'), 2000);
-            setTimeout(() => adicionarLog(id, 'Aviso: Cliente não enviou a matrícula', 'erro'), 4000);
-        }
-
-        // Inicia o painel assim que abre a página
-        window.onload = () => {
-            renderizarPainel();
-            adicionarLog(1, 'Robô conectado. Aguardando mensagens...', 'normal');
-            adicionarLog(2, 'Robô desconectado.', 'erro');
+            try {
+                // Salva a configuração do robô direto no banco de dados
+                await updateDoc(doc(db, "empresas", id), { menu: novoMenu });
+                alert("✅ Configurações e respostas do robô salvas com sucesso!");
+                fecharModal();
+            } catch(erro) {
+                alert("Erro ao salvar: " + erro.message);
+            }
         };
     </script>
 </body>
