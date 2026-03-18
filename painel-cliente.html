@@ -5,165 +5,53 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel do Cliente - Automação WhatsApp</title>
     <style>
-        :root {
-            --primary: #003399; 
-            --secondary: #f0f4f8;
-            --success: #28a745;
-            --text-dark: #333;
-        }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--secondary);
-            margin: 0;
-            padding: 0;
-            color: var(--text-dark);
-        }
-        .navbar {
-            background-color: var(--primary);
-            color: white;
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        .container {
-            max-width: 1000px;
-            margin: 40px auto;
-            padding: 0 20px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
+        :root { --primary: #003399; --secondary: #f0f4f8; --success: #28a745; --text-dark: #333; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--secondary); margin: 0; padding: 0; color: var(--text-dark); }
+        .navbar { background-color: var(--primary); color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         
-        .card {
-            background: white;
-            border-radius: 8px;
-            padding: 25px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            border-top: 4px solid var(--primary);
-        }
-        .card h3 { margin-top: 0; color: var(--primary); }
+        .container { max-width: 1100px; margin: 30px auto; padding: 0 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .card { background: white; border-radius: 8px; padding: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-top: 4px solid var(--primary); }
+        .card.full-width { grid-column: span 2; }
+        .card h3 { margin-top: 0; color: var(--primary); display: flex; justify-content: space-between; align-items: center; }
         .card p { font-size: 14px; color: #666; line-height: 1.5; }
         
-        .btn {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            width: 100%;
-            font-size: 16px;
-            transition: background 0.3s;
-            margin-top: 15px;
-        }
+        .btn { background-color: var(--primary); color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 14px; transition: background 0.3s; }
         .btn:hover { background-color: #002266; }
         .btn-success { background-color: var(--success); }
         .btn-success:hover { background-color: #218838; }
+        .btn-outline { background-color: transparent; color: var(--primary); border: 1px solid var(--primary); }
 
-        .status-box {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background-color: #e8f5e9;
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid #c8e6c9;
-            margin-bottom: 20px;
-        }
-        .status-indicator {
-            display: inline-block;
-            width: 12px; height: 12px;
-            background-color: var(--success);
-            border-radius: 50%;
-            margin-right: 8px;
-        }
+        .status-box { display: flex; align-items: center; justify-content: space-between; background-color: #e8f5e9; padding: 15px; border-radius: 8px; border: 1px solid #c8e6c9; margin-bottom: 20px; }
+        .status-indicator { display: inline-block; width: 12px; height: 12px; background-color: var(--success); border-radius: 50%; margin-right: 8px; }
 
-        /* --- Estilos do Modal e Abas --- */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6);
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-content {
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            width: 500px;
-            max-width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        .info-disparo {
-            font-size: 12px;
-            color: #dc3545;
-            background: #f8d7da;
-            padding: 10px;
-            border-radius: 4px;
-            margin-bottom: 15px;
-        }
+        /* --- Tabela do CRM --- */
+        .table-container { overflow-x: auto; margin-top: 15px; }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: #f8f9fa; color: #333; }
+        .tag { font-size: 11px; padding: 4px 8px; border-radius: 12px; color: white; font-weight: bold; }
+        .tag-vip { background-color: #ffc107; color: #000; }
+        .tag-promo { background-color: #17a2b8; }
+        .tag-novo { background-color: #28a745; }
+
+        /* --- Modais e Abas --- */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; padding: 30px; border-radius: 8px; width: 500px; max-width: 90%; max-height: 90vh; overflow-y: auto; }
+        .info-disparo { font-size: 12px; color: #dc3545; background: #f8d7da; padding: 10px; border-radius: 4px; margin-bottom: 15px; }
         
-        /* Sistema de Abas */
-        .tabs {
-            display: flex;
-            border-bottom: 2px solid #ccc;
-            margin-bottom: 15px;
-        }
-        .tab-btn {
-            flex: 1;
-            background: none;
-            border: none;
-            padding: 10px;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            color: #666;
-        }
-        .tab-btn.active {
-            color: var(--primary);
-            border-bottom: 3px solid var(--primary);
-            margin-bottom: -2px;
-        }
+        .tabs { display: flex; border-bottom: 2px solid #ccc; margin-bottom: 15px; }
+        .tab-btn { flex: 1; background: none; border: none; padding: 10px; font-size: 14px; font-weight: bold; cursor: pointer; color: #666; }
+        .tab-btn.active { color: var(--primary); border-bottom: 3px solid var(--primary); margin-bottom: -2px; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        /* Inputs e Lista de Grupos */
-        .modal textarea {
-            width: 100%;
-            padding: 10px;
-            margin: 5px 0 15px 0;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-            font-family: inherit;
-        }
-        .lista-grupos {
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            padding: 10px;
-            max-height: 120px;
-            overflow-y: auto;
-            margin-bottom: 15px;
-            background: #f9f9f9;
-        }
-        .grupo-item {
-            display: flex;
-            align-items: center;
-            padding: 8px 5px;
-            border-bottom: 1px solid #eee;
-            font-size: 14px;
-        }
-        .grupo-item:last-child { border-bottom: none; }
-        .grupo-item input { margin-right: 10px; width: 16px; height: 16px; cursor: pointer; }
+        .modal textarea, .modal input[type="file"] { width: 100%; padding: 10px; margin: 5px 0 15px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: inherit; }
+        
+        .lista-selecao { border: 1px solid #ccc; border-radius: 4px; padding: 10px; max-height: 120px; overflow-y: auto; margin-bottom: 15px; background: #f9f9f9; display: flex; flex-direction: column; gap: 8px;}
+        .lista-selecao label { font-size: 14px; display: flex; align-items: center; cursor: pointer; }
+        .lista-selecao input { margin-right: 10px; width: 16px; height: 16px; }
 
-        @media (max-width: 768px) {
-            .container { grid-template-columns: 1fr; }
-        }
+        @media (max-width: 768px) { .container { grid-template-columns: 1fr; } .card.full-width { grid-column: span 1; } }
     </style>
 </head>
 <body>
@@ -177,28 +65,82 @@
 
     <div class="container">
         <div class="card">
-            <h3>🤖 Controle do Robô</h3>
+            <h3>🤖 Conexão do WhatsApp</h3>
             <div class="status-box">
                 <div>
                     <span class="status-indicator"></span>
-                    <strong>Robô Ativo e Conectado</strong>
+                    <strong>Conectado e Operando</strong>
                 </div>
-                <button class="btn" style="width: auto; margin: 0; padding: 8px 15px; font-size: 12px;" onclick="alert('Gerando novo QR Code...')">Reconectar</button>
+                <button class="btn btn-outline" onclick="alert('Lendo QR Code e puxando seus grupos...')">Ler QR Code</button>
             </div>
-            <p>Seu assistente virtual está trabalhando agora. Ele está respondendo automaticamente os clientes baseado no seu menu configurado.</p>
-            <button class="btn">✏️ Editar Menu de Respostas</button>
+            <p>Mantenha seu celular conectado à internet. O robô puxará seus grupos automaticamente assim que o QR Code for lido.</p>
         </div>
 
         <div class="card">
             <h3>📢 Central de Promoções</h3>
-            <p>Avise seus clientes sobre ofertas ou envie comunicados importantes. Você pode disparar para números específicos ou enviar direto nos seus grupos.</p>
-            
-            <div style="background: #fff3cd; border: 1px solid #ffeeba; padding: 15px; border-radius: 5px; margin: 15px 0;">
-                <strong style="color: #856404;">📊 Relatório do Mês</strong><br>
-                <span style="color: #856404;">Mensagens enviadas: <strong>342</strong></span>
+            <p>Crie campanhas direcionadas. Envie ofertas apenas para clientes VIP, para sua base inteira, ou direto nos seus grupos.</p>
+            <div style="background: #fff3cd; border: 1px solid #ffeeba; padding: 10px 15px; border-radius: 5px; margin: 15px 0; font-size: 14px;">
+                <strong style="color: #856404;">📊 Desempenho:</strong> 342 mensagens enviadas este mês.
             </div>
+            <button class="btn btn-success" style="width: 100%;" onclick="abrirModalDisparo()">🚀 Criar Nova Campanha</button>
+        </div>
 
-            <button class="btn btn-success" onclick="abrirModalDisparo()">🚀 Nova Campanha (Disparo)</button>
+        <div class="card full-width">
+            <h3>
+                👥 Meus Contatos (CRM)
+                <div>
+                    <button class="btn btn-outline" onclick="alert('Baixando modelo CSV...')">📥 Baixar Modelo</button>
+                    <button class="btn" onclick="abrirModalImportar()">⬆️ Importar Planilha (CSV)</button>
+                </div>
+            </h3>
+            <p>Organize sua base de clientes. Adicione tags (etiquetas) para segmentar suas campanhas de marketing.</p>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nome do Cliente</th>
+                            <th>WhatsApp</th>
+                            <th>Etiquetas (Tags)</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>João Silva</td>
+                            <td>(46) 99999-1111</td>
+                            <td><span class="tag tag-vip">⭐ VIP</span></td>
+                            <td><button class="btn btn-outline" style="padding: 4px 8px; font-size: 12px;">Editar</button></td>
+                        </tr>
+                        <tr>
+                            <td>Maria Oliveira</td>
+                            <td>(46) 98888-2222</td>
+                            <td><span class="tag tag-promo">🏷️ Só Promoção</span></td>
+                            <td><button class="btn btn-outline" style="padding: 4px 8px; font-size: 12px;">Editar</button></td>
+                        </tr>
+                        <tr>
+                            <td>Carlos Souza</td>
+                            <td>(45) 97777-3333</td>
+                            <td><span class="tag tag-novo">🟢 Cliente Novo</span></td>
+                            <td><button class="btn btn-outline" style="padding: 4px 8px; font-size: 12px;">Editar</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="modalImportar">
+        <div class="modal-content">
+            <h2 style="margin-top: 0; color: var(--primary);">Importar Contatos</h2>
+            <p>Selecione um arquivo <strong>.csv</strong> com a lista de clientes. As colunas devem ser: Nome, Telefone, Tag.</p>
+            
+            <input type="file" accept=".csv" id="arquivoCsv">
+            
+            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                <button class="btn btn-outline" onclick="fecharModalImportar()">Cancelar</button>
+                <button class="btn" onclick="simularImportacao()">Salvar Contatos</button>
+            </div>
         </div>
     </div>
 
@@ -207,90 +149,79 @@
             <h2 style="margin-top: 0; color: var(--primary);">Criar Nova Campanha</h2>
             
             <div class="info-disparo">
-                ⚠️ <strong>Aviso anti-bloqueio:</strong> As mensagens serão enviadas com um intervalo de segurança para simular digitação humana e proteger seu número.
+                ⚠️ Envio humanizado ativado. O robô fará pausas entre as mensagens para evitar bloqueios.
             </div>
 
             <div class="tabs">
-                <button class="tab-btn active" onclick="trocarAba('individual')" id="btn-individual">👤 Contatos Individuais</button>
+                <button class="tab-btn active" onclick="trocarAba('tags')" id="btn-tags">🏷️ Por Etiquetas</button>
                 <button class="tab-btn" onclick="trocarAba('grupos')" id="btn-grupos">👥 Meus Grupos</button>
+                <button class="tab-btn" onclick="trocarAba('avulso')" id="btn-avulso">✏️ Digitar/Colar</button>
             </div>
 
-            <div id="aba-individual" class="tab-content active">
-                <label><strong>1. Cole a lista de números (um por linha):</strong></label>
-                <textarea id="listaNumeros" rows="4" placeholder="Exemplo:&#10;5546999999999&#10;5546888888888"></textarea>
-            </div>
-
-            <div id="aba-grupos" class="tab-content">
-                <label><strong>1. Selecione os grupos para enviar:</strong></label>
-                <div class="lista-grupos">
-                    <label class="grupo-item"><input type="checkbox" value="g1"> 💄 VIP PH Cosméticos</label>
-                    <label class="grupo-item"><input type="checkbox" value="g2"> 💧 Avisos Água São Luiz</label>
-                    <label class="grupo-item"><input type="checkbox" value="g3"> 📢 Ofertas Capanema</label>
-                    <label class="grupo-item"><input type="checkbox" value="g4"> 🏫 Pais de Alunos (Manhã)</label>
+            <div id="aba-tags" class="tab-content active">
+                <label><strong>1. Para quem deseja enviar?</strong></label>
+                <div class="lista-selecao">
+                    <label><input type="checkbox" value="todos"> 📢 Toda a Base (Todos os contatos)</label>
+                    <label><input type="checkbox" value="vip"> ⭐ Apenas Clientes VIP</label>
+                    <label><input type="checkbox" value="promo"> 🏷️ Clientes de Promoção</label>
+                    <label><input type="checkbox" value="novo"> 🟢 Clientes Novos</label>
                 </div>
             </div>
 
-            <label><strong>2. Digite a mensagem da campanha:</strong></label>
+            <div id="aba-grupos" class="tab-content">
+                <label><strong>1. Selecione os grupos:</strong></label>
+                <div class="lista-selecao">
+                    <label><input type="checkbox" value="g1"> 💄 VIP PH Cosméticos</label>
+                    <label><input type="checkbox" value="g3"> 📢 Ofertas Capanema</label>
+                </div>
+            </div>
+
+            <div id="aba-avulso" class="tab-content">
+                <label><strong>1. Cole os números (um por linha):</strong></label>
+                <textarea id="listaNumeros" rows="4" placeholder="Exemplo:&#10;5546999999999"></textarea>
+            </div>
+
+            <label><strong>2. Digite a mensagem:</strong></label>
             <textarea id="mensagemPromo" rows="5" placeholder="Olá! Temos uma novidade especial para você hoje..."></textarea>
             
             <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px;">
-                <button class="btn" style="background: #dc3545;" onclick="fecharModalDisparo()">Cancelar</button>
+                <button class="btn btn-outline" style="color: #dc3545; border-color: #dc3545;" onclick="fecharModalDisparo()">Cancelar</button>
                 <button class="btn btn-success" onclick="iniciarDisparo()">🚀 Iniciar Disparo</button>
             </div>
         </div>
     </div>
 
     <script type="module">
-        // Simulando os dados do cliente que logou
-        window.onload = () => {
-            // Mais para frente, o Firebase vai puxar o nome real do banco de dados aqui
-            document.getElementById('nomeCliente').innerText = "Painel da Empresa";
-        };
+        window.onload = () => { document.getElementById('nomeCliente').innerText = "Painel da Empresa"; };
 
-        // --- Funções Visuais do Modal ---
-        window.abrirModalDisparo = function() {
-            document.getElementById('modalDisparo').style.display = 'flex';
-        }
-
-        window.fecharModalDisparo = function() {
-            document.getElementById('modalDisparo').style.display = 'none';
+        // Funções Modais Disparo
+        window.abrirModalDisparo = function() { document.getElementById('modalDisparo').style.display = 'flex'; }
+        window.fecharModalDisparo = function() { document.getElementById('modalDisparo').style.display = 'none'; }
+        
+        // Funções Modal Importar CSV
+        window.abrirModalImportar = function() { document.getElementById('modalImportar').style.display = 'flex'; }
+        window.fecharModalImportar = function() { document.getElementById('modalImportar').style.display = 'none'; }
+        window.simularImportacao = function() {
+            const file = document.getElementById('arquivoCsv').value;
+            if(!file) return alert("Selecione um arquivo primeiro!");
+            alert("✅ Planilha importada com sucesso! O sistema está processando seus contatos.");
+            fecharModalImportar();
         }
 
         window.trocarAba = function(aba) {
-            // Remove a classe "active" de tudo
-            document.getElementById('btn-individual').classList.remove('active');
-            document.getElementById('btn-grupos').classList.remove('active');
-            document.getElementById('aba-individual').classList.remove('active');
-            document.getElementById('aba-grupos').classList.remove('active');
-
-            // Adiciona a classe "active" só na aba clicada
+            ['tags', 'grupos', 'avulso'].forEach(id => {
+                document.getElementById('btn-' + id).classList.remove('active');
+                document.getElementById('aba-' + id).classList.remove('active');
+            });
             document.getElementById('btn-' + aba).classList.add('active');
             document.getElementById('aba-' + aba).classList.add('active');
         }
 
-        // --- Função de Disparo ---
         window.iniciarDisparo = function() {
             const mensagem = document.getElementById('mensagemPromo').value;
+            if(!mensagem) return alert("⚠️ Digite a mensagem da campanha!");
             
-            // Verifica qual aba está ativa para saber de onde puxar os dados
-            const abaAtiva = document.getElementById('aba-individual').classList.contains('active') ? 'individual' : 'grupos';
-
-            if(!mensagem) {
-                return alert("⚠️ Por favor, digite a mensagem da campanha!");
-            }
-
-            if (abaAtiva === 'individual') {
-                const numeros = document.getElementById('listaNumeros').value;
-                if(!numeros) return alert("⚠️ Cole pelo menos um número de telefone!");
-                alert("✅ Campanha agendada! O robô enviará a mensagem para os números informados.");
-            } else {
-                // Checa se pelo menos um grupo foi marcado
-                const gruposMarcados = document.querySelectorAll('#aba-grupos input[type="checkbox"]:checked');
-                if(gruposMarcados.length === 0) return alert("⚠️ Selecione pelo menos um grupo!");
-                alert(`✅ Campanha agendada! O robô enviará a mensagem em ${gruposMarcados.length} grupo(s).`);
-            }
-
-            // Limpa e fecha a tela
+            alert("✅ Campanha processada e enviada para a fila do robô!");
             document.getElementById('mensagemPromo').value = '';
             fecharModalDisparo();
         }
