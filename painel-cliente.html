@@ -81,18 +81,14 @@
         <div class="card">
             <h3>📢 Central de Promoções</h3>
             <p>Crie campanhas direcionadas para sua base de clientes usando nossas etiquetas de inteligência.</p>
-            <div style="background: #fff3cd; border: 1px solid #ffeeba; padding: 10px 15px; border-radius: 5px; margin: 15px 0; font-size: 14px;">
-                <strong style="color: #856404;">📊 Desempenho:</strong> 0 mensagens enviadas este mês.
-            </div>
-            <button class="btn btn-success" style="width: 100%;" onclick="abrirModalDisparo()">🚀 Criar Nova Campanha</button>
+            <button class="btn btn-success" style="width: 100%; margin-top: 15px;" onclick="abrirModalDisparo()">🚀 Criar Nova Campanha</button>
         </div>
 
         <div class="card full-width">
             <h3>
                 👥 Meus Contatos (CRM)
                 <div>
-                    <button class="btn btn-outline" onclick="alert('Baixando modelo CSV...')">📥 Baixar Modelo</button>
-                    <button class="btn" onclick="abrirModalImportar()">⬆️ Importar Planilha</button>
+                    <button class="btn" onclick="abrirModalImportar()">⬆️ Importar Planilha CSV</button>
                 </div>
             </h3>
             <p>Organize sua base de clientes. Adicione tags (etiquetas) para segmentar suas campanhas de marketing.</p>
@@ -107,9 +103,8 @@
                             <th>Ações</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr><td>João Silva</td><td>(46) 99999-1111</td><td><span class="tag tag-vip">⭐ VIP</span></td><td><button class="btn btn-outline" style="padding: 4px 8px; font-size: 12px;">Editar</button></td></tr>
-                    </tbody>
+                    <tbody id="tabelaContatos">
+                        </tbody>
                 </table>
             </div>
         </div>
@@ -190,14 +185,15 @@
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
         import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
+        // COLOQUE SUAS CHAVES REAIS AQUI
         const firebaseConfig = {
-            apiKey: "AIzaSyC4-2LavZt7iWPt2u71u-yRUYbIJu-Vzf0",
-            authDomain: "central-omnichannel-saas.firebaseapp.com",
-            projectId: "central-omnichannel-saas",
-            storageBucket: "central-omnichannel-saas.firebasestorage.app",
-            messagingSenderId: "869327159480",
-            appId: "1:869327159480:web:605be5ec37ab688d44b44d",
-            measurementId: "G-984WSSJBHP"
+            apiKey: "SUA_API_KEY",
+            authDomain: "SEU_PROJETO.firebaseapp.com",
+            projectId: "SEU_PROJETO",
+            storageBucket: "SEU_PROJETO.firebasestorage.app",
+            messagingSenderId: "...",
+            appId: "...",
+            measurementId: "..."
         };
 
         const app = initializeApp(firebaseConfig);
@@ -207,7 +203,6 @@
         // O GUARDA COSTAS E A INTELIGÊNCIA DE PLANOS
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                // Puxa os dados da empresa logada
                 const docRef = doc(db, "empresas", user.uid);
                 const docSnap = await getDoc(docRef);
                 
@@ -215,7 +210,6 @@
                     const dados = docSnap.data();
                     document.getElementById('nomeCliente').innerText = dados.nomeEmpresa;
 
-                    // MÁGICA: Ajusta a tela baseado no plano
                     if (dados.plano === 'basico') {
                         document.getElementById('tagPlano').innerText = "🥉 Plano Básico";
                         document.getElementById('area-conexao').innerHTML = `
@@ -225,9 +219,7 @@
                             </div>
                             <span style="font-size: 12px; background: #e2e8f0; padding: 5px 10px; border-radius: 4px; color: #333;">🚀 Motor Compartilhado</span>
                         `;
-                        document.getElementById('desc-conexao').innerText = "Você está usando o nosso número oficial para enviar avisos e comunicados. Tudo pronto para disparar!";
-                        
-                        // Esconde a aba de grupos (O motor central não tem acesso aos grupos pessoais dele)
+                        document.getElementById('desc-conexao').innerText = "Você está usando o nosso número oficial para enviar avisos e comunicados.";
                         document.getElementById('btn-grupos').style.display = 'none';
                         
                     } else if (dados.plano === 'premium') {
@@ -241,24 +233,17 @@
                         `;
                         document.getElementById('desc-conexao').innerText = "Mantenha o celular da sua loja conectado à internet. O robô puxará seus grupos automaticamente assim que o QR Code for lido.";
                     } else {
-                        // Se ainda for pendente
                         document.getElementById('desc-conexao').innerText = "⚠️ Seu cadastro está aguardando aprovação pelo administrador.";
                         document.getElementById('area-conexao').innerHTML = `<strong>Status: Pendente</strong>`;
                     }
                 }
             } else {
-                // Expulsa pra tela de login se não tiver logado
                 window.location.href = "index.html";
             }
         });
 
-        window.fazerLogout = function() {
-            signOut(auth).then(() => {
-                window.location.href = "index.html";
-            });
-        };
+        window.fazerLogout = function() { signOut(auth).then(() => { window.location.href = "index.html"; }); };
 
-        // Funções Modais Padrão
         window.abrirModalDisparo = function() { document.getElementById('modalDisparo').style.display = 'flex'; document.getElementById('form-disparo').style.display = 'block'; document.getElementById('tela-progresso').style.display = 'none'; }
         window.fecharModalDisparo = function() { document.getElementById('modalDisparo').style.display = 'none'; }
         window.abrirModalImportar = function() { document.getElementById('modalImportar').style.display = 'flex'; }
@@ -274,7 +259,52 @@
             document.getElementById('aba-' + aba).classList.add('active');
         }
 
-        window.simularImportacao = function() { alert("✅ Planilha importada com sucesso!"); fecharModalImportar(); }
+        // --- MOTOR DE IMPORTAÇÃO REAL (CSV) ---
+        window.simularImportacao = function() {
+            const input = document.getElementById('arquivoCsv');
+            const file = input.files[0];
+            
+            if(!file) return alert("⚠️ Selecione um arquivo .csv primeiro!");
+
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const conteudo = e.target.result;
+                const linhas = conteudo.split('\n');
+                const tbody = document.getElementById('tabelaContatos');
+                
+                let contatosAdicionados = 0;
+
+                for(let i = 1; i < linhas.length; i++) { 
+                    const linha = linhas[i].trim();
+                    if(!linha) continue;
+
+                    const colunas = linha.split(/[,;]/); 
+                    
+                    if(colunas.length >= 2) {
+                        const nome = colunas[0].trim();
+                        const telefone = colunas[1].trim();
+                        const tag = colunas[2] ? colunas[2].trim() : 'Importado';
+                        
+                        const novaLinha = document.createElement('tr');
+                        novaLinha.innerHTML = `
+                            <td>${nome}</td>
+                            <td>${telefone}</td>
+                            <td><span class="tag tag-novo" style="background-color: #6c757d;">🏷️ ${tag}</span></td>
+                            <td><button class="btn btn-outline" style="padding: 4px 8px; font-size: 12px;">Editar</button></td>
+                        `;
+                        
+                        tbody.appendChild(novaLinha);
+                        contatosAdicionados++;
+                    }
+                }
+
+                alert(`✅ Sucesso! ${contatosAdicionados} contatos foram importados.`);
+                fecharModalImportar();
+                input.value = ''; 
+            };
+            reader.readAsText(file);
+        }
 
         window.iniciarDisparo = function() {
             const mensagem = document.getElementById('mensagemPromo').value;
@@ -305,7 +335,6 @@
             }, 800);
         }
     </script>
-
     <script>
         document.addEventListener('contextmenu', event => event.preventDefault());
         document.onkeydown = function(e) {
