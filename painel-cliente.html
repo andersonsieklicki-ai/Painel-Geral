@@ -42,10 +42,16 @@
         .tab-btn.active { color: var(--primary); border-bottom: 3px solid var(--primary); margin-bottom: -2px; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-        .modal textarea, .modal input[type="file"], .modal input[type="text"] { width: 100%; padding: 10px; margin: 5px 0 15px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: inherit; }
+        .modal textarea, .modal input[type="text"] { width: 100%; padding: 10px; margin: 5px 0 15px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: inherit; }
         .lista-selecao { border: 1px solid #ccc; border-radius: 4px; padding: 10px; max-height: 120px; overflow-y: auto; margin-bottom: 15px; background: #f9f9f9; display: flex; flex-direction: column; gap: 8px;}
         .progress-wrapper { background: #e9ecef; border-radius: 10px; height: 25px; width: 100%; overflow: hidden; margin: 20px 0; box-shadow: inset 0 1px 3px rgba(0,0,0,0.2); }
         .progress-fill { background: var(--success); width: 0%; height: 100%; transition: width 0.4s ease; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: bold; }
+        
+        /* Estilo da caixa de upload de mídia */
+        .upload-box { border: 2px dashed #ccc; padding: 15px; border-radius: 6px; background: #fafafa; margin-bottom: 15px; text-align: center; transition: border-color 0.3s; }
+        .upload-box:hover { border-color: var(--primary); }
+        .upload-box input[type="file"] { width: 100%; cursor: pointer; font-size: 13px; }
+
         @media (max-width: 768px) { .container { grid-template-columns: 1fr; } .card.full-width { grid-column: span 1; } }
     </style>
 </head>
@@ -114,7 +120,7 @@
         <div class="modal-content">
             <h2 style="margin-top: 0; color: var(--primary);">Importar Contatos</h2>
             <p>Selecione um arquivo <strong>.csv</strong> ou <strong>.vcf</strong> (Agenda do Celular).</p>
-            <input type="file" accept=".csv, .vcf" id="arquivoCsv">
+            <input type="file" accept=".csv, .vcf" id="arquivoCsv" style="width: 100%; padding: 10px; margin: 5px 0 15px 0; border: 1px solid #ccc; border-radius: 4px;">
             <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
                 <button class="btn btn-outline" onclick="fecharModalImportar()">Cancelar</button>
                 <button class="btn" id="btnSalvarImportacao" onclick="iniciarImportacao()">Salvar Contatos</button>
@@ -139,24 +145,36 @@
             <h2 style="margin-top: 0; color: var(--primary);">Criar Nova Campanha</h2>
             <div id="form-disparo">
                 <div class="info-disparo">⚠️ Envio humanizado ativado. O robô fará pausas para evitar bloqueios.</div>
+                
                 <div class="tabs">
                     <button class="tab-btn active" onclick="trocarAba('tags')" id="btn-tags">🏷️ Etiquetas</button>
                     <button class="tab-btn" onclick="trocarAba('avulso')" id="btn-avulso">✏️ Digitar</button>
                 </div>
+                
                 <div id="aba-tags" class="tab-content active">
                     <p style="font-size: 13px; color: #666;">Selecione as etiquetas que receberão a mensagem:</p>
                     <div class="lista-selecao" id="listaTagsDisparo"></div>
                 </div>
+                
                 <div id="aba-avulso" class="tab-content">
                     <textarea id="listaNumeros" rows="3" placeholder="Ex: 5546999999999"></textarea>
                 </div>
-                <label><strong>Digite a mensagem:</strong></label>
-                <textarea id="mensagemPromo" rows="4"></textarea>
+
+                <label><strong>Anexar Mídia (Opcional):</strong></label>
+                <div class="upload-box">
+                    <span style="font-size: 12px; color: #666; display: block; margin-bottom: 8px;">📎 Envie uma Imagem (.jpg, .png), Catálogo (.pdf) ou Áudio (.mp3, .ogg)</span>
+                    <input type="file" id="arquivoMidia" accept="image/*, application/pdf, audio/*">
+                </div>
+
+                <label><strong>Digite a mensagem (Legenda):</strong></label>
+                <textarea id="mensagemPromo" rows="4" placeholder="Escreva o texto da sua campanha aqui..."></textarea>
+                
                 <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px;">
                     <button class="btn btn-outline" style="color: #dc3545; border-color: #dc3545;" onclick="fecharModalDisparo()">Cancelar</button>
                     <button class="btn btn-success" onclick="iniciarDisparo()">🚀 Iniciar</button>
                 </div>
             </div>
+            
             <div id="tela-progresso" style="display: none; text-align: center; padding: 20px 0;">
                 <h3 style="color: var(--primary); margin-top: 0;">Disparando Campanha...</h3>
                 <div class="progress-wrapper"><div id="barra-progresso" class="progress-fill">0%</div></div>
@@ -170,7 +188,6 @@
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
         import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // CHAVES REAIS
         const firebaseConfig = {
             apiKey: "AIzaSyC4-2LavZt7iWPt2u71u-yRUYbIJu-Vzf0",
             authDomain: "central-omnichannel-saas.firebaseapp.com",
@@ -185,7 +202,6 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // VARIÁVEL GLOBAL (MEMÓRIA DO CRM)
         window.listaContatos = [];
 
         onAuthStateChanged(auth, async (user) => {
@@ -219,8 +235,11 @@
             document.getElementById('modalDisparo').style.display = 'flex'; 
             document.getElementById('form-disparo').style.display = 'block'; 
             document.getElementById('tela-progresso').style.display = 'none'; 
+            // Limpa o input de mídia ao abrir
+            document.getElementById('arquivoMidia').value = '';
         };
         window.fecharModalDisparo = () => document.getElementById('modalDisparo').style.display = 'none';
+        
         window.trocarAba = (aba) => {
             ['tags', 'avulso'].forEach(id => {
                 document.getElementById('btn-' + id).classList.remove('active');
@@ -251,13 +270,11 @@
             } catch(e) { return str; } 
         }
 
-        // --- IMPORTAÇÃO DE ALTA PERFORMANCE ---
         window.iniciarImportacao = function() {
             const input = document.getElementById('arquivoCsv');
             const file = input.files[0];
             if(!file) return alert("⚠️ Selecione um arquivo!");
             
-            // Trava o botão e avisa o usuário
             const btnSalvar = document.getElementById('btnSalvarImportacao');
             btnSalvar.innerText = "⏳ Processando...";
             btnSalvar.disabled = true;
@@ -266,7 +283,6 @@
             const reader = new FileReader();
 
             reader.onload = function(e) {
-                // Usamos o setTimeout para o navegador ter tempo de desenhar o "Processando..." na tela
                 setTimeout(() => {
                     const conteudo = e.target.result;
                     let contatosLidos = 0;
@@ -298,12 +314,9 @@
                     alert(`✅ Importação concluída! ${contatosLidos} contatos carregados.`);
                     fecharModalImportar(); 
                     input.value = ''; 
-                    
-                    // Libera o botão
                     btnSalvar.innerText = "Salvar Contatos";
                     btnSalvar.disabled = false;
-                    
-                    renderizarTabela(); // Chama a tela de alta performance
+                    renderizarTabela(); 
                 }, 50); 
             };
             reader.readAsText(file);
@@ -316,7 +329,6 @@
             window.listaContatos.push({ id: id, nome: nome.trim(), telefone: numLimpo, tags: [tag.trim()] });
         }
 
-        // --- RENDERIZAÇÃO DE ALTA PERFORMANCE (STRING ÚNICA) ---
         window.renderizarTabela = function() {
             const tbody = document.getElementById('tabelaContatos');
             const termoBusca = document.getElementById('buscaContato').value.toLowerCase();
@@ -329,7 +341,6 @@
                 return;
             }
 
-            // O SEGREDOS: Monta TUDO na memória primeiro, num texto só.
             let htmlGigante = '';
             listaFiltrada.forEach(c => {
                 const tagsHtml = c.tags.map(t => `<span class="tag tag-novo">🏷️ ${t}</span>`).join(' ');
@@ -346,8 +357,6 @@
                     </tr>
                 `;
             });
-            
-            // Joga tudo na tela num comando só!
             tbody.innerHTML = htmlGigante;
         }
 
@@ -360,8 +369,8 @@
 
         window.apagarSelecionados = function() {
             const checks = document.querySelectorAll('.check-contato:checked');
-            if(checks.length === 0) return alert("⚠️ Selecione os contatos.");
-            if(confirm(`Apagar ${checks.length} contatos?`)) {
+            if(checks.length === 0) return alert("⚠️ Selecione os contatos marcando as caixinhas ao lado do nome.");
+            if(confirm(`Apagar os ${checks.length} contatos marcados?`)) {
                 const idsParaApagar = Array.from(checks).map(c => c.value);
                 window.listaContatos = window.listaContatos.filter(c => !idsParaApagar.includes(c.id));
                 document.getElementById('checkTodos').checked = false;
@@ -425,15 +434,27 @@
         }
 
         window.iniciarDisparo = function() {
-            if(!document.getElementById('mensagemPromo').value) return alert("⚠️ Digite a mensagem!");
+            const msg = document.getElementById('mensagemPromo').value;
+            const arquivo = document.getElementById('arquivoMidia').files[0];
+            
+            if(!msg && !arquivo) return alert("⚠️ Digite uma mensagem ou anexe uma mídia!");
+            
             document.getElementById('form-disparo').style.display = 'none';
             document.getElementById('tela-progresso').style.display = 'block';
+            
             let env = 0; const tot = 5;
             let sim = setInterval(() => {
                 env++; document.getElementById('barra-progresso').style.width = (env/tot*100) + '%';
                 document.getElementById('barra-progresso').innerText = (env/tot*100) + '%';
                 document.getElementById('texto-contagem').innerText = `Simulando ${env} de ${tot}`;
-                if(env >= tot) { clearInterval(sim); setTimeout(() => { alert("✅ Campanha enviada para o servidor com sucesso!"); fecharModalDisparo(); document.getElementById('barra-progresso').style.width = '0%'; }, 500); }
+                if(env >= tot) { 
+                    clearInterval(sim); 
+                    setTimeout(() => { 
+                        alert("✅ Campanha enviada para o servidor com sucesso!"); 
+                        fecharModalDisparo(); 
+                        document.getElementById('barra-progresso').style.width = '0%'; 
+                    }, 500); 
+                }
             }, 800);
         }
     </script>
