@@ -118,10 +118,9 @@
         /* Ocultar formulário de cadastro por padrão */
         #form-cadastro { display: none; }
 
-        /* Responsividade para celular */
         @media (max-width: 768px) {
             body { flex-direction: column; }
-            .info-section { display: none; /* Esconde a parte azul no celular */ }
+            .info-section { display: none; }
         }
     </style>
 </head>
@@ -135,7 +134,7 @@
             
             <div class="input-group">
                 <label>E-mail Profissional</label>
-                <input type="email" id="emailLogin" placeholder="Ex: contato@phcosmeticos.com.br">
+                <input type="email" id="emailLogin" placeholder="Ex: contato@empresa.com.br">
             </div>
             
             <div class="input-group">
@@ -183,12 +182,33 @@
         <p>A plataforma definitiva para empresas que querem atender 24 horas por dia, agendar serviços e enviar promoções pelo WhatsApp sem complicação.</p>
     </div>
 
-    <script>
-        // Função simples para trocar entre Login e Cadastro
-        function alternarTelas() {
+    <script type="module">
+        // 1. Importando as ferramentas do Firebase direto da internet
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        // 2. A SUA configuração exata do cofre
+        const firebaseConfig = {
+            apiKey: "AIzaSyC4-2LavZt7iWPt2u71u-yRUYbIJu-Vzf0",
+            authDomain: "central-omnichannel-saas.firebaseapp.com",
+            projectId: "central-omnichannel-saas",
+            storageBucket: "central-omnichannel-saas.firebasestorage.app",
+            messagingSenderId: "869327159480",
+            appId: "1:869327159480:web:605be5ec37ab688d44b44d",
+            measurementId: "G-984WSSJBHP"
+        };
+
+        // 3. Ligando os motores do Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // --- Funções da Tela ---
+
+        window.alternarTelas = function() {
             const telaLogin = document.getElementById('form-login');
             const telaCadastro = document.getElementById('form-cadastro');
-            
             if (telaLogin.style.display === 'none') {
                 telaLogin.style.display = 'block';
                 telaCadastro.style.display = 'none';
@@ -196,28 +216,59 @@
                 telaLogin.style.display = 'none';
                 telaCadastro.style.display = 'block';
             }
-        }
+        };
 
-        // Simulação dos botões (O Firebase entrará exatamente aqui)
-        function fazerLogin() {
-            const email = document.getElementById('emailLogin').value;
-            const senha = document.getElementById('senhaLogin').value;
-            
-            if(!email || !senha) return alert("Preencha e-mail e senha!");
-            
-            alert("Simulando login... No futuro o Firebase fará a checagem real.");
-            // Aqui direcionaremos para painel-cliente.html ou painel-admin.html
-        }
-
-        function fazerCadastro() {
+        // 4. Função Real de Cadastro
+        window.fazerCadastro = async function() {
             const nome = document.getElementById('nomeCadastro').value;
             const email = document.getElementById('emailCadastro').value;
             const senha = document.getElementById('senhaCadastro').value;
             
             if(!nome || !email || !senha) return alert("Preencha todos os campos!");
             
-            alert("Cadastro simulado! O Firebase criará o banco de dados do cliente.");
-        }
+            try {
+                // A. Cria o usuário no sistema de senhas
+                const credencial = await createUserWithEmailAndPassword(auth, email, senha);
+                const usuario = credencial.user;
+
+                // B. Salva os dados da empresa no Banco de Dados (Firestore)
+                await setDoc(doc(db, "empresas", usuario.uid), {
+                    nomeEmpresa: nome,
+                    email: email,
+                    dataCadastro: new Date().toISOString(),
+                    statusRobo: "desligado"
+                });
+
+                alert("Cadastro realizado com sucesso! Pode fazer o login.");
+                alternarTelas(); // Volta pra tela de login
+                
+            } catch (erro) {
+                console.error(erro);
+                if(erro.code === 'auth/email-already-in-use') alert("Esse e-mail já está cadastrado!");
+                else if(erro.code === 'auth/weak-password') alert("A senha deve ter pelo menos 6 caracteres.");
+                else alert("Erro ao cadastrar: " + erro.message);
+            }
+        };
+
+        // 5. Função Real de Login
+        window.fazerLogin = async function() {
+            const email = document.getElementById('emailLogin').value;
+            const senha = document.getElementById('senhaLogin').value;
+            
+            if(!email || !senha) return alert("Preencha e-mail e senha!");
+            
+            try {
+                // Tenta validar no Firebase
+                await signInWithEmailAndPassword(auth, email, senha);
+                
+                // Se passar, manda o usuário para o painel!
+                window.location.href = "painel-cliente.html";
+                
+            } catch (erro) {
+                console.error(erro);
+                alert("Erro ao entrar: E-mail ou senha incorretos.");
+            }
+        };
     </script>
 </body>
 </html>
