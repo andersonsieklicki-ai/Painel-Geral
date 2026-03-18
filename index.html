@@ -101,10 +101,16 @@
                 <form id="formCadastro">
                     <label>Nome da Empresa</label>
                     <input type="text" id="cadNome" placeholder="Ex: PH Cosméticos" required>
+                    
                     <label>E-mail de Contato</label>
                     <input type="email" id="cadEmail" placeholder="contato@empresa.com" required>
+                    
+                    <label>WhatsApp de Atendimento (Com DDD)</label>
+                    <input type="text" id="cadWhatsapp" placeholder="Ex: 46999999999" required>
+
                     <label>Crie uma Senha (Mín. 6 caracteres)</label>
                     <input type="password" id="cadSenha" placeholder="Crie uma senha forte" required>
+                    
                     <button type="submit" class="btn btn-outline">Solicitar Cadastro</button>
                     <div id="loaderCadastro" class="loader">Processando seu cadastro...</div>
                 </form>
@@ -122,7 +128,7 @@
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
         import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // CHAVES OFICIAIS DO ANDERSON (CORRIGIDAS)
+        // CHAVES REAIS
         const firebaseConfig = {
             apiKey: "AIzaSyC4-2LavZt7iWPt2u71u-yRUYbIJu-Vzf0",
             authDomain: "central-omnichannel-saas.firebaseapp.com",
@@ -163,16 +169,24 @@
         document.getElementById('formCadastro').addEventListener('submit', async (e) => {
             e.preventDefault();
             document.getElementById('loaderCadastro').style.display = 'block';
+            
             const nome = document.getElementById('cadNome').value;
             const email = document.getElementById('cadEmail').value;
+            const zap = document.getElementById('cadWhatsapp').value; // PEGA O ZAP
             const senha = document.getElementById('cadSenha').value;
+
+            // Formata o zap pra garantir que vai só número
+            let zapLimpo = zap.replace(/\D/g, '');
 
             try {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, senha);
                 await sendEmailVerification(userCredential.user);
+                
+                // Salva o ZAP limpo no banco de dados!
                 await setDoc(doc(db, "empresas", userCredential.user.uid), {
                     nomeEmpresa: nome,
                     email: email,
+                    whatsappLojista: zapLimpo, 
                     statusRobo: 'pendente',
                     plano: '', 
                     dataCadastro: new Date().toISOString()
@@ -196,13 +210,7 @@
     </script>
     <script>
         document.addEventListener('contextmenu', event => event.preventDefault());
-        document.onkeydown = function(e) {
-            if (e.keyCode === 123) return false;
-            if (e.ctrlKey && e.shiftKey && e.keyCode === 'I'.charCodeAt(0)) return false;
-            if (e.ctrlKey && e.shiftKey && e.keyCode === 'C'.charCodeAt(0)) return false;
-            if (e.ctrlKey && e.shiftKey && e.keyCode === 'J'.charCodeAt(0)) return false;
-            if (e.ctrlKey && e.keyCode === 'U'.charCodeAt(0)) return false;
-        }
+        document.onkeydown = function(e) { if (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && (e.keyCode === 'I'.charCodeAt(0) || e.keyCode === 'C'.charCodeAt(0) || e.keyCode === 'J'.charCodeAt(0))) || (e.ctrlKey && e.keyCode === 'U'.charCodeAt(0))) return false; }
     </script>
 </body>
 </html>
