@@ -11,19 +11,17 @@
         
         .btn { background-color: #28a745; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: background 0.3s; font-size: 13px; }
         .btn:hover { background-color: #218838; }
-        .btn-danger { background-color: #dc3545; }
+        .btn-danger { background-color: #dc3545; color: white; }
         .btn-danger:hover { background-color: #c82333; }
         .btn-edit { background-color: #ffc107; color: black; }
         .btn-outline { background-color: transparent; color: var(--primary); border: 1px solid var(--primary); }
 
-        /* --- Seção de Pendentes (Pré-cadastros) --- */
         .section-title { font-size: 20px; color: var(--primary); border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 20px; margin-top: 40px;}
         .lista-pendentes { display: flex; flex-direction: column; gap: 15px; margin-bottom: 40px; }
         .card-pendente { background: #fff3cd; border-left: 5px solid #ffc107; padding: 15px 20px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .info-pendente h4 { margin: 0 0 5px 0; color: #856404; font-size: 18px; }
         .info-pendente p { margin: 0; font-size: 14px; color: #666; }
 
-        /* --- Grid de Robôs Ativos --- */
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
         .card { background: var(--card-bg); border-radius: 8px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-top: 4px solid var(--primary); display: flex; flex-direction: column; }
         .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-size: 18px; font-weight: bold; }
@@ -35,7 +33,6 @@
         .card-actions { display: flex; gap: 10px; justify-content: space-between; }
         .card-actions button { flex: 1; }
 
-        /* --- Modal de Edição --- */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { background: white; padding: 30px; border-radius: 8px; width: 600px; max-width: 95%; max-height: 90vh; overflow-y: auto; }
         .modal input, .modal textarea { width: 100%; padding: 12px; margin: 8px 0 20px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: inherit; font-size: 14px; }
@@ -49,19 +46,17 @@
         <div>Logado como Administrador</div>
     </div>
 
-    <h3 class="section-title">🔔 Solicitações de Cadastro (Aguardando Contato)</h3>
+    <h3 class="section-title">🔔 Solicitações de Cadastro (Aguardando Aprovação)</h3>
     <div class="lista-pendentes" id="painelPendentes">
         <p style="color: #666; font-style: italic;">Carregando banco de dados...</p>
     </div>
 
     <h3 class="section-title">🤖 Robôs Ativos (Clientes da Plataforma)</h3>
-    <div class="grid" id="painelAtivos">
-        </div>
+    <div class="grid" id="painelAtivos"></div>
 
     <div class="modal" id="modalEmpresa">
         <div class="modal-content">
             <h2 style="margin-top: 0; color: var(--primary);">⚙️ Configurar Robô: <span id="nomeRoboEdit"></span></h2>
-            
             <input type="hidden" id="editEmpresaId">
 
             <label><strong>Mensagem de Boas-vindas:</strong></label>
@@ -89,17 +84,18 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        // Importamos o deleteDoc aqui:
+        import { getFirestore, collection, onSnapshot, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // SUA CONFIGURAÇÃO EXATA
+        // COLOQUE SUAS CHAVES REAIS AQUI
         const firebaseConfig = {
-            apiKey: "AIzaSyC4-2LavZt7iWPt2u71u-yRUYbIJu-Vzf0",
-            authDomain: "central-omnichannel-saas.firebaseapp.com",
-            projectId: "central-omnichannel-saas",
-            storageBucket: "central-omnichannel-saas.firebasestorage.app",
-            messagingSenderId: "869327159480",
-            appId: "1:869327159480:web:605be5ec37ab688d44b44d",
-            measurementId: "G-984WSSJBHP"
+            apiKey: "SUA_API_KEY",
+            authDomain: "SEU_PROJETO.firebaseapp.com",
+            projectId: "SEU_PROJETO",
+            storageBucket: "SEU_PROJETO.firebasestorage.app",
+            messagingSenderId: "...",
+            appId: "...",
+            measurementId: "..."
         };
 
         const app = initializeApp(firebaseConfig);
@@ -107,7 +103,6 @@
 
         let listaEmpresas = [];
 
-        // MAGIA DO TEMPO REAL: Fica escutando o banco de dados o tempo todo
         onSnapshot(collection(db, "empresas"), (snapshot) => {
             listaEmpresas = [];
             snapshot.forEach((doc) => {
@@ -125,11 +120,9 @@
 
             let temPendente = false;
 
-            // Ordena alfabeticamente
             listaEmpresas.sort((a, b) => (a.nomeEmpresa || '').localeCompare(b.nomeEmpresa || ''));
 
             listaEmpresas.forEach(emp => {
-                // 1. SEPARA OS PRÉ-CADASTROS
                 if(emp.statusRobo === 'pendente') {
                     temPendente = true;
                     const dataFormatada = new Date(emp.dataCadastro).toLocaleDateString('pt-BR');
@@ -142,23 +135,20 @@
                             </div>
                             <div style="display: flex; gap: 10px; align-items: center;">
                                 <select id="plano-${emp.id}" class="btn-outline" style="padding: 8px; border-radius: 4px; background: white; cursor: pointer;">
-                                    <option value="basico">🥉 Plano Básico (Nº Central)</option>
-                                    <option value="premium">🥇 Plano Premium (QR Próprio)</option>
+                                    <option value="basico">🥉 Básico (Central)</option>
+                                    <option value="premium">🥇 Premium (QR)</option>
                                 </select>
                                 <button class="btn" onclick="aprovarCliente('${emp.id}')">✅ Registrar</button>
+                                <button class="btn btn-danger" onclick="excluirEmpresa('${emp.id}', '${emp.nomeEmpresa}')">🗑️ Excluir</button>
                             </div>
                         </div>
                     `;
-                } 
-                // 2. SEPARA OS ATIVOS
-                else {
-                    // Define o visual baseado no plano
+                } else {
                     const ehPremium = emp.plano === 'premium';
                     const tagPlano = ehPremium ? '🥇 PREMIUM' : '🥉 BÁSICO';
                     const statusClass = emp.statusRobo === 'online' || emp.statusRobo === 'ativo_central' ? 'online' : 'offline';
                     const statusText = emp.statusRobo === 'ativo_central' ? 'USANDO CENTRAL' : (emp.statusRobo === 'online' ? 'ONLINE' : 'DESCONECTADO');
                     
-                    // O botão de QR Code só aparece se for Premium
                     const botaoQR = ehPremium ? `<button class="btn btn-outline" onclick="alert('Gerar QR Code...')">🔗 Ligar QR</button>` : '';
 
                     divAtivos.innerHTML += `
@@ -176,41 +166,39 @@
                             </div>
                             <div class="card-actions">
                                 ${botaoQR}
-                                <button class="btn btn-edit" onclick="abrirModal('${emp.id}')">⚙️ Editar Respostas</button>
+                                <button class="btn btn-edit" onclick="abrirModal('${emp.id}')">⚙️ Editar</button>
+                                <button class="btn btn-danger" onclick="excluirEmpresa('${emp.id}', '${emp.nomeEmpresa}')">🗑️</button>
                             </div>
                         </div>
                     `;
                 }
             });
 
-            if(!temPendente) {
-                divPendentes.innerHTML = '<p style="color: #666; font-style: italic;">✅ Nenhuma solicitação pendente no momento.</p>';
-            }
+            if(!temPendente) { divPendentes.innerHTML = '<p style="color: #666; font-style: italic;">✅ Nenhuma solicitação pendente.</p>'; }
         }
 
-        // --- Funções Administrativas ---
-
-        // Transforma o Pendente em Cliente Oficial com o Plano Escolhido
         window.aprovarCliente = async function(id) {
             const planoEscolhido = document.getElementById(`plano-${id}`).value;
-            const nomePlano = planoEscolhido === 'basico' ? 'Plano Básico' : 'Plano Premium';
-
-            if(confirm(`Deseja aprovar esta empresa no ${nomePlano}?`)) {
+            if(confirm(`Deseja aprovar esta empresa no plano selecionado?`)) {
                 try {
-                    // Se for básico, já fica "ativo_central". Se for premium, fica "offline" esperando o QR Code.
                     const novoStatus = planoEscolhido === 'basico' ? 'ativo_central' : 'offline';
-                    
-                    await updateDoc(doc(db, "empresas", id), { 
-                        statusRobo: novoStatus,
-                        plano: planoEscolhido
-                    });
+                    await updateDoc(doc(db, "empresas", id), { statusRobo: novoStatus, plano: planoEscolhido });
+                } catch(erro) { alert("Erro ao aprovar: " + erro.message); }
+            }
+        };
+
+        // NOVA FUNÇÃO: Excluir Cliente
+        window.excluirEmpresa = async function(id, nomeEmpresa) {
+            if(confirm(`⚠️ ALERTA: Tem certeza que deseja excluir o cadastro de "${nomeEmpresa}" permanentemente? Isso não pode ser desfeito.`)) {
+                try {
+                    await deleteDoc(doc(db, "empresas", id));
+                    alert("🗑️ Cliente excluído com sucesso.");
                 } catch(erro) {
-                    alert("Erro ao aprovar: " + erro.message);
+                    alert("Erro ao excluir: " + erro.message);
                 }
             }
         };
 
-        // Funções do Modal de Edição
         window.abrirModal = function(id) {
             const emp = listaEmpresas.find(e => e.id === id);
             if(!emp) return;
@@ -218,7 +206,6 @@
             document.getElementById('editEmpresaId').value = emp.id;
             document.getElementById('nomeRoboEdit').innerText = emp.nomeEmpresa;
             
-            // Se já tiver menu salvo, carrega na tela
             if(emp.menu) {
                 document.getElementById('menuSaudacao').value = emp.menu.saudacao || '';
                 document.getElementById('opt1Nome').value = emp.menu.opt1Nome || '';
@@ -226,24 +213,17 @@
                 document.getElementById('opt2Nome').value = emp.menu.opt2Nome || '';
                 document.getElementById('opt2Resp').value = emp.menu.opt2Resp || '';
             } else {
-                // Reseta os campos se não tiver menu
                 document.getElementById('menuSaudacao').value = 'Olá! 👋 Bem-vindo(a). Como podemos te ajudar hoje?';
-                document.getElementById('opt1Nome').value = '';
-                document.getElementById('opt1Resp').value = '';
-                document.getElementById('opt2Nome').value = '';
-                document.getElementById('opt2Resp').value = '';
+                document.getElementById('opt1Nome').value = ''; document.getElementById('opt1Resp').value = '';
+                document.getElementById('opt2Nome').value = ''; document.getElementById('opt2Resp').value = '';
             }
-
             document.getElementById('modalEmpresa').style.display = 'flex';
         };
 
-        window.fecharModal = function() {
-            document.getElementById('modalEmpresa').style.display = 'none';
-        };
+        window.fecharModal = function() { document.getElementById('modalEmpresa').style.display = 'none'; };
 
         window.salvarConfiguracao = async function() {
             const id = document.getElementById('editEmpresaId').value;
-            
             const novoMenu = {
                 saudacao: document.getElementById('menuSaudacao').value,
                 opt1Nome: document.getElementById('opt1Nome').value,
@@ -253,23 +233,21 @@
             };
 
             try {
-                // Salva a configuração do robô direto no banco de dados
                 await updateDoc(doc(db, "empresas", id), { menu: novoMenu });
-                alert("✅ Configurações e respostas do robô salvas com sucesso!");
+                alert("✅ Configurações salvas!");
                 fecharModal();
-            } catch(erro) {
-                alert("Erro ao salvar: " + erro.message);
-            }
+            } catch(erro) { alert("Erro ao salvar: " + erro.message); }
         };
     </script>
-	<script>
+
+    <script>
         document.addEventListener('contextmenu', event => event.preventDefault());
         document.onkeydown = function(e) {
-            if (e.keyCode === 123) return false; // Bloqueia F12
-            if (e.ctrlKey && e.shiftKey && e.keyCode === 'I'.charCodeAt(0)) return false; // Bloqueia Ctrl+Shift+I
-            if (e.ctrlKey && e.shiftKey && e.keyCode === 'C'.charCodeAt(0)) return false; // Bloqueia Ctrl+Shift+C
-            if (e.ctrlKey && e.shiftKey && e.keyCode === 'J'.charCodeAt(0)) return false; // Bloqueia Ctrl+Shift+J
-            if (e.ctrlKey && e.keyCode === 'U'.charCodeAt(0)) return false; // Bloqueia Ctrl+U (Ver código-fonte)
+            if (e.keyCode === 123) return false;
+            if (e.ctrlKey && e.shiftKey && e.keyCode === 'I'.charCodeAt(0)) return false;
+            if (e.ctrlKey && e.shiftKey && e.keyCode === 'C'.charCodeAt(0)) return false;
+            if (e.ctrlKey && e.shiftKey && e.keyCode === 'J'.charCodeAt(0)) return false;
+            if (e.ctrlKey && e.keyCode === 'U'.charCodeAt(0)) return false;
         }
     </script>
 </body>
