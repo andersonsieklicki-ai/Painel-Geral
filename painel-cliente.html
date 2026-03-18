@@ -51,7 +51,6 @@
         .lista-selecao label { font-size: 14px; display: flex; align-items: center; cursor: pointer; }
         .lista-selecao input { margin-right: 10px; width: 16px; height: 16px; }
 
-        /* --- Estilos da Barra de Progresso --- */
         .progress-wrapper { background: #e9ecef; border-radius: 10px; height: 25px; width: 100%; overflow: hidden; margin: 20px 0; box-shadow: inset 0 1px 3px rgba(0,0,0,0.2); }
         .progress-fill { background: var(--success); width: 0%; height: 100%; transition: width 0.4s ease; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: bold; }
 
@@ -61,30 +60,29 @@
 <body>
 
     <div class="navbar">
-        <h2>Meu Painel - <span id="nomeCliente">Carregando...</span></h2>
+        <h2>Meu Painel - <span id="nomeCliente">Carregando...</span> <span id="tagPlano" style="font-size: 12px; background: rgba(255,255,255,0.2); padding: 4px 8px; border-radius: 12px; margin-left: 10px; font-weight: normal;"></span></h2>
         <div>
-            <span style="font-size: 14px;">Status: Logado</span> | <a href="#" style="color: white; text-decoration: none; margin-left: 10px; font-weight: bold;">Sair</a>
+            <span style="font-size: 14px;">Status: Logado</span> | <a href="#" onclick="fazerLogout()" style="color: white; text-decoration: none; margin-left: 10px; font-weight: bold;">Sair</a>
         </div>
     </div>
 
     <div class="container">
         <div class="card">
             <h3>🤖 Conexão do WhatsApp</h3>
-            <div class="status-box">
+            <div class="status-box" id="area-conexao">
                 <div>
-                    <span class="status-indicator"></span>
-                    <strong>Conectado e Operando</strong>
+                    <span class="status-indicator" style="background-color: #ccc;"></span>
+                    <strong>Verificando status...</strong>
                 </div>
-                <button class="btn btn-outline" onclick="alert('Lendo QR Code e puxando seus grupos...')">Ler QR Code</button>
             </div>
-            <p>Mantenha seu celular conectado à internet. O robô puxará seus grupos automaticamente assim que o QR Code for lido.</p>
+            <p id="desc-conexao">Analisando o status do seu robô no servidor...</p>
         </div>
 
         <div class="card">
             <h3>📢 Central de Promoções</h3>
-            <p>Crie campanhas direcionadas. Envie ofertas apenas para clientes VIP, para sua base inteira, ou direto nos seus grupos.</p>
+            <p>Crie campanhas direcionadas para sua base de clientes usando nossas etiquetas de inteligência.</p>
             <div style="background: #fff3cd; border: 1px solid #ffeeba; padding: 10px 15px; border-radius: 5px; margin: 15px 0; font-size: 14px;">
-                <strong style="color: #856404;">📊 Desempenho:</strong> 342 mensagens enviadas este mês.
+                <strong style="color: #856404;">📊 Desempenho:</strong> 0 mensagens enviadas este mês.
             </div>
             <button class="btn btn-success" style="width: 100%;" onclick="abrirModalDisparo()">🚀 Criar Nova Campanha</button>
         </div>
@@ -94,7 +92,7 @@
                 👥 Meus Contatos (CRM)
                 <div>
                     <button class="btn btn-outline" onclick="alert('Baixando modelo CSV...')">📥 Baixar Modelo</button>
-                    <button class="btn" onclick="abrirModalImportar()">⬆️ Importar Planilha (CSV)</button>
+                    <button class="btn" onclick="abrirModalImportar()">⬆️ Importar Planilha</button>
                 </div>
             </h3>
             <p>Organize sua base de clientes. Adicione tags (etiquetas) para segmentar suas campanhas de marketing.</p>
@@ -111,8 +109,6 @@
                     </thead>
                     <tbody>
                         <tr><td>João Silva</td><td>(46) 99999-1111</td><td><span class="tag tag-vip">⭐ VIP</span></td><td><button class="btn btn-outline" style="padding: 4px 8px; font-size: 12px;">Editar</button></td></tr>
-                        <tr><td>Maria Oliveira</td><td>(46) 98888-2222</td><td><span class="tag tag-promo">🏷️ Só Promoção</span></td><td><button class="btn btn-outline" style="padding: 4px 8px; font-size: 12px;">Editar</button></td></tr>
-                        <tr><td>Carlos Souza</td><td>(45) 97777-3333</td><td><span class="tag tag-novo">🟢 Cliente Novo</span></td><td><button class="btn btn-outline" style="padding: 4px 8px; font-size: 12px;">Editar</button></td></tr>
                     </tbody>
                 </table>
             </div>
@@ -136,9 +132,7 @@
             <h2 style="margin-top: 0; color: var(--primary);" id="tituloModalDisparo">Criar Nova Campanha</h2>
             
             <div id="form-disparo">
-                <div class="info-disparo">
-                    ⚠️ Envio humanizado ativado. O robô fará pausas e simulará digitação entre as mensagens para evitar bloqueios.
-                </div>
+                <div class="info-disparo">⚠️ Envio humanizado ativado. O robô fará pausas para evitar bloqueios.</div>
 
                 <div class="tabs">
                     <button class="tab-btn active" onclick="trocarAba('tags')" id="btn-tags">🏷️ Por Etiquetas</button>
@@ -151,7 +145,6 @@
                     <div class="lista-selecao">
                         <label><input type="checkbox" value="todos"> 📢 Toda a Base (Todos os contatos)</label>
                         <label><input type="checkbox" value="vip"> ⭐ Apenas Clientes VIP</label>
-                        <label><input type="checkbox" value="promo"> 🏷️ Clientes de Promoção</label>
                     </div>
                 </div>
 
@@ -159,7 +152,6 @@
                     <label><strong>1. Selecione os grupos:</strong></label>
                     <div class="lista-selecao">
                         <label><input type="checkbox" value="g1"> 💄 VIP PH Cosméticos</label>
-                        <label><input type="checkbox" value="g3"> 📢 Ofertas Capanema</label>
                     </div>
                 </div>
 
@@ -169,8 +161,7 @@
                 </div>
 
                 <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #ddd; margin: 15px 0;">
-                    <label><strong>2. Anexar Mídia ou Catálogo (Opcional):</strong></label>
-                    <p style="font-size: 11px; margin: 0 0 10px 0; color: #666;">Envie uma foto da promoção (.jpg, .png) ou o catálogo em .pdf.</p>
+                    <label><strong>2. Anexar Mídia (Opcional):</strong></label>
                     <input type="file" id="arquivoMidia" accept="image/*, application/pdf" style="margin:0;">
                 </div>
 
@@ -185,109 +176,154 @@
 
             <div id="tela-progresso" style="display: none; text-align: center; padding: 20px 0;">
                 <h3 style="color: var(--primary); margin-top: 0;">Disparando Campanha...</h3>
-                <p style="font-size: 13px; color: #666;">Por favor, não feche esta janela. O robô está enviando os arquivos e mensagens com pausas de segurança.</p>
-                
                 <div class="progress-wrapper">
                     <div id="barra-progresso" class="progress-fill">0%</div>
                 </div>
-                
-                <div style="font-size: 18px; font-weight: bold; color: var(--text-dark);" id="texto-contagem">
-                    Enviando 0 de 0
-                </div>
-                <div style="font-size: 12px; color: #999; margin-top: 10px;" id="status-acao">
-                    Preparando arquivos...
-                </div>
+                <div style="font-size: 18px; font-weight: bold; color: var(--text-dark);" id="texto-contagem">Enviando 0 de 0</div>
+                <div style="font-size: 12px; color: #999; margin-top: 10px;" id="status-acao">Preparando arquivos...</div>
             </div>
-
         </div>
     </div>
 
     <script type="module">
-        window.onload = () => { document.getElementById('nomeCliente').innerText = "Painel da Empresa"; };
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        window.abrirModalDisparo = function() { 
-            document.getElementById('modalDisparo').style.display = 'flex'; 
-            // Garante que o formulário apareça e o progresso fique escondido ao abrir
-            document.getElementById('form-disparo').style.display = 'block';
-            document.getElementById('tela-progresso').style.display = 'none';
-            document.getElementById('tituloModalDisparo').innerText = "Criar Nova Campanha";
-        }
-        
+        const firebaseConfig = {
+            apiKey: "AIzaSyC4-2LavZt7iWPt2u71u-yRUYbIJu-Vzf0",
+            authDomain: "central-omnichannel-saas.firebaseapp.com",
+            projectId: "central-omnichannel-saas",
+            storageBucket: "central-omnichannel-saas.firebasestorage.app",
+            messagingSenderId: "869327159480",
+            appId: "1:869327159480:web:605be5ec37ab688d44b44d",
+            measurementId: "G-984WSSJBHP"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // O GUARDA COSTAS E A INTELIGÊNCIA DE PLANOS
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // Puxa os dados da empresa logada
+                const docRef = doc(db, "empresas", user.uid);
+                const docSnap = await getDoc(docRef);
+                
+                if (docSnap.exists()) {
+                    const dados = docSnap.data();
+                    document.getElementById('nomeCliente').innerText = dados.nomeEmpresa;
+
+                    // MÁGICA: Ajusta a tela baseado no plano
+                    if (dados.plano === 'basico') {
+                        document.getElementById('tagPlano').innerText = "🥉 Plano Básico";
+                        document.getElementById('area-conexao').innerHTML = `
+                            <div>
+                                <span class="status-indicator"></span>
+                                <strong>Conectado à Central</strong>
+                            </div>
+                            <span style="font-size: 12px; background: #e2e8f0; padding: 5px 10px; border-radius: 4px; color: #333;">🚀 Motor Compartilhado</span>
+                        `;
+                        document.getElementById('desc-conexao').innerText = "Você está usando o nosso número oficial para enviar avisos e comunicados. Tudo pronto para disparar!";
+                        
+                        // Esconde a aba de grupos (O motor central não tem acesso aos grupos pessoais dele)
+                        document.getElementById('btn-grupos').style.display = 'none';
+                        
+                    } else if (dados.plano === 'premium') {
+                        document.getElementById('tagPlano').innerText = "🥇 Plano Premium";
+                        document.getElementById('area-conexao').innerHTML = `
+                            <div>
+                                <span class="status-indicator" style="background-color: #ffc107;"></span>
+                                <strong>Aguardando Conexão</strong>
+                            </div>
+                            <button class="btn btn-outline" onclick="alert('Gerando QR Code do seu número exclusivo...')">Ler QR Code</button>
+                        `;
+                        document.getElementById('desc-conexao').innerText = "Mantenha o celular da sua loja conectado à internet. O robô puxará seus grupos automaticamente assim que o QR Code for lido.";
+                    } else {
+                        // Se ainda for pendente
+                        document.getElementById('desc-conexao').innerText = "⚠️ Seu cadastro está aguardando aprovação pelo administrador.";
+                        document.getElementById('area-conexao').innerHTML = `<strong>Status: Pendente</strong>`;
+                    }
+                }
+            } else {
+                // Expulsa pra tela de login se não tiver logado
+                window.location.href = "index.html";
+            }
+        });
+
+        window.fazerLogout = function() {
+            signOut(auth).then(() => {
+                window.location.href = "index.html";
+            });
+        };
+
+        // Funções Modais Padrão
+        window.abrirModalDisparo = function() { document.getElementById('modalDisparo').style.display = 'flex'; document.getElementById('form-disparo').style.display = 'block'; document.getElementById('tela-progresso').style.display = 'none'; }
         window.fecharModalDisparo = function() { document.getElementById('modalDisparo').style.display = 'none'; }
         window.abrirModalImportar = function() { document.getElementById('modalImportar').style.display = 'flex'; }
         window.fecharModalImportar = function() { document.getElementById('modalImportar').style.display = 'none'; }
         
-        window.simularImportacao = function() {
-            const file = document.getElementById('arquivoCsv').value;
-            if(!file) return alert("Selecione um arquivo primeiro!");
-            alert("✅ Planilha importada com sucesso!");
-            fecharModalImportar();
-        }
-
         window.trocarAba = function(aba) {
             ['tags', 'grupos', 'avulso'].forEach(id => {
-                document.getElementById('btn-' + id).classList.remove('active');
+                const btn = document.getElementById('btn-' + id);
+                if(btn) btn.classList.remove('active');
                 document.getElementById('aba-' + id).classList.remove('active');
             });
             document.getElementById('btn-' + aba).classList.add('active');
             document.getElementById('aba-' + aba).classList.add('active');
         }
 
-        // --- A Mágica da Barra de Progresso ---
+        window.simularImportacao = function() { alert("✅ Planilha importada com sucesso!"); fecharModalImportar(); }
+
         window.iniciarDisparo = function() {
             const mensagem = document.getElementById('mensagemPromo').value;
             if(!mensagem) return alert("⚠️ Digite a mensagem da campanha!");
             
-            // 1. Esconde o formulário e mostra a barra de progresso
             document.getElementById('form-disparo').style.display = 'none';
             document.getElementById('tela-progresso').style.display = 'block';
-            document.getElementById('tituloModalDisparo').innerText = "Acompanhamento ao Vivo";
 
-            // 2. Simulação de Envio (Acelerada para demonstração no painel)
-            // No mundo real, o Firebase mandará os dados reais para cá
-            let totalMensagens = 12; // Número fictício de clientes para o teste
+            let totalMensagens = 10;
             let enviadas = 0;
-            
             const barra = document.getElementById('barra-progresso');
             const textoContagem = document.getElementById('texto-contagem');
-            const statusAcao = document.getElementById('status-acao');
 
-            // Atualiza a tela a cada 800ms para simular o trabalho do robô
             let simulador = setInterval(() => {
                 enviadas++;
                 let porcentagem = Math.round((enviadas / totalMensagens) * 100);
-                
-                // Atualiza a barrinha verde
-                barra.style.width = porcentagem + '%';
-                barra.innerText = porcentagem + '%';
-                
-                // Atualiza os textos
+                barra.style.width = porcentagem + '%'; barra.innerText = porcentagem + '%';
                 textoContagem.innerText = `Enviando ${enviadas} de ${totalMensagens}`;
-                
-                // Alterna mensagens de status para parecer real
-                if(enviadas % 2 === 0) {
-                    statusAcao.innerText = "Simulando digitação...";
-                } else {
-                    statusAcao.innerText = "Enviando arquivo de mídia...";
-                }
 
-                // Quando terminar...
                 if(enviadas >= totalMensagens) {
                     clearInterval(simulador);
-                    statusAcao.innerText = "Finalizado com sucesso!";
-                    
                     setTimeout(() => {
-                        alert("✅ Campanha concluída com sucesso! Todos os clientes receberam as mensagens.");
+                        alert("✅ Campanha concluída com sucesso!");
                         fecharModalDisparo();
-                        
-                        // Reseta tudo para o próximo disparo
-                        document.getElementById('mensagemPromo').value = '';
-                        document.getElementById('arquivoMidia').value = '';
                         barra.style.width = '0%';
-                        barra.innerText = '0%';
                     }, 500);
                 }
-            }, 800); // Fim do simulador
+            }, 800);
+        }
+    </script>
+
+    <script>
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.onkeydown = function(e) {
+            if (e.keyCode === 123) return false;
+            if (e.ctrlKey && e.shiftKey && e.keyCode === 'I'.charCodeAt(0)) return false;
+            if (e.ctrlKey && e.shiftKey && e.keyCode === 'C'.charCodeAt(0)) return false;
+            if (e.ctrlKey && e.shiftKey && e.keyCode === 'J'.charCodeAt(0)) return false;
+            if (e.ctrlKey && e.keyCode === 'U'.charCodeAt(0)) return false;
+        }
+    </script>
+    <script>
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.onkeydown = function(e) {
+            if (e.keyCode === 123) return false; // Bloqueia F12
+            if (e.ctrlKey && e.shiftKey && e.keyCode === 'I'.charCodeAt(0)) return false; // Bloqueia Ctrl+Shift+I
+            if (e.ctrlKey && e.shiftKey && e.keyCode === 'C'.charCodeAt(0)) return false; // Bloqueia Ctrl+Shift+C
+            if (e.ctrlKey && e.shiftKey && e.keyCode === 'J'.charCodeAt(0)) return false; // Bloqueia Ctrl+Shift+J
+            if (e.ctrlKey && e.keyCode === 'U'.charCodeAt(0)) return false; // Bloqueia Ctrl+U (Ver código-fonte)
         }
     </script>
 </body>
