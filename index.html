@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Central Omnichannel</title>
+    <style>
+        :root {
+            --primary: #003399;
+            --secondary: #002266;
+            --bg-color: #f4f7f6;
+            --text-dark: #333;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            color: var(--text-dark);
+        }
+        
+        /* Lado Esquerdo - Formulário */
+        .login-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            background: white;
+        }
+        .login-box {
+            width: 100%;
+            max-width: 400px;
+        }
+        .login-box h2 {
+            color: var(--primary);
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        .login-box p {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        .input-group input:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            font-size: 16px;
+            transition: background 0.3s;
+            margin-top: 10px;
+        }
+        .btn:hover {
+            background-color: var(--secondary);
+        }
+        .toggle-form {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        .toggle-form a {
+            color: var(--primary);
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Lado Direito - Imagem/Marketing */
+        .info-section {
+            flex: 1;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            text-align: center;
+        }
+        .info-section h1 {
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+        .info-section p {
+            font-size: 18px;
+            max-width: 80%;
+            line-height: 1.6;
+        }
+
+        /* Ocultar formulário de cadastro por padrão */
+        #form-cadastro { display: none; }
+
+        /* Responsividade para celular */
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .info-section { display: none; /* Esconde a parte azul no celular */ }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-section">
+        
+        <div class="login-box" id="form-login">
+            <h2>Bem-vindo de volta!</h2>
+            <p>Acesse o painel de controle do seu robô.</p>
+            
+            <div class="input-group">
+                <label>E-mail Profissional</label>
+                <input type="email" id="emailLogin" placeholder="Ex: contato@phcosmeticos.com.br">
+            </div>
+            
+            <div class="input-group">
+                <label>Senha</label>
+                <input type="password" id="senhaLogin" placeholder="••••••••">
+            </div>
+            
+            <button class="btn" onclick="fazerLogin()">Entrar no Painel</button>
+            
+            <div class="toggle-form">
+                Ainda não tem uma conta? <a onclick="alternarTelas()">Cadastre sua empresa</a>
+            </div>
+        </div>
+
+        <div class="login-box" id="form-cadastro">
+            <h2>Crie sua conta</h2>
+            <p>Automatize seu atendimento em minutos.</p>
+            
+            <div class="input-group">
+                <label>Nome da Empresa</label>
+                <input type="text" id="nomeCadastro" placeholder="Ex: Loja Central">
+            </div>
+
+            <div class="input-group">
+                <label>E-mail</label>
+                <input type="email" id="emailCadastro" placeholder="seu@email.com">
+            </div>
+            
+            <div class="input-group">
+                <label>Crie uma Senha</label>
+                <input type="password" id="senhaCadastro" placeholder="Mínimo 6 caracteres">
+            </div>
+            
+            <button class="btn" onclick="fazerCadastro()">Criar Minha Conta</button>
+            
+            <div class="toggle-form">
+                Já tem uma conta? <a onclick="alternarTelas()">Faça login</a>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="info-section">
+        <h1>Venda mais no automático.</h1>
+        <p>A plataforma definitiva para empresas que querem atender 24 horas por dia, agendar serviços e enviar promoções pelo WhatsApp sem complicação.</p>
+    </div>
+
+    <script>
+        // Função simples para trocar entre Login e Cadastro
+        function alternarTelas() {
+            const telaLogin = document.getElementById('form-login');
+            const telaCadastro = document.getElementById('form-cadastro');
+            
+            if (telaLogin.style.display === 'none') {
+                telaLogin.style.display = 'block';
+                telaCadastro.style.display = 'none';
+            } else {
+                telaLogin.style.display = 'none';
+                telaCadastro.style.display = 'block';
+            }
+        }
+
+        // Simulação dos botões (O Firebase entrará exatamente aqui)
+        function fazerLogin() {
+            const email = document.getElementById('emailLogin').value;
+            const senha = document.getElementById('senhaLogin').value;
+            
+            if(!email || !senha) return alert("Preencha e-mail e senha!");
+            
+            alert("Simulando login... No futuro o Firebase fará a checagem real.");
+            // Aqui direcionaremos para painel-cliente.html ou painel-admin.html
+        }
+
+        function fazerCadastro() {
+            const nome = document.getElementById('nomeCadastro').value;
+            const email = document.getElementById('emailCadastro').value;
+            const senha = document.getElementById('senhaCadastro').value;
+            
+            if(!nome || !email || !senha) return alert("Preencha todos os campos!");
+            
+            alert("Cadastro simulado! O Firebase criará o banco de dados do cliente.");
+        }
+    </script>
+</body>
+</html>
