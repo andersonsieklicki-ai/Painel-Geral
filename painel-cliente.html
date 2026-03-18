@@ -20,12 +20,12 @@
         .btn-outline { background-color: transparent; color: var(--primary); border: 1px solid var(--primary); }
         .status-box { display: flex; align-items: center; justify-content: space-between; background-color: #e8f5e9; padding: 15px; border-radius: 8px; border: 1px solid #c8e6c9; margin-bottom: 20px; }
         .status-indicator { display: inline-block; width: 12px; height: 12px; background-color: var(--success); border-radius: 50%; margin-right: 8px; }
-        .table-container { overflow-x: auto; margin-top: 15px; }
+        .table-container { overflow-x: auto; margin-top: 15px; height: 300px; }
         table { width: 100%; border-collapse: collapse; font-size: 14px; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background-color: #f8f9fa; color: #333; }
+        th { background-color: #f8f9fa; color: #333; position: sticky; top: 0; }
         .tag { font-size: 11px; padding: 4px 8px; border-radius: 12px; color: white; font-weight: bold; }
-        .tag-novo { background-color: #28a745; }
+        .tag-novo { background-color: #6c757d; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { background: white; padding: 30px; border-radius: 8px; width: 500px; max-width: 90%; max-height: 90vh; overflow-y: auto; position: relative; }
         .info-disparo { font-size: 12px; color: #dc3545; background: #f8d7da; padding: 10px; border-radius: 4px; margin-bottom: 15px; }
@@ -68,8 +68,12 @@
         </div>
 
         <div class="card full-width">
-            <h3>👥 Meus Contatos (CRM)
-                <div><button class="btn" onclick="abrirModalImportar()">⬆️ Importar Planilha CSV</button></div>
+            <h3 style="flex-wrap: wrap; gap: 10px;">
+                👥 Meus Contatos (CRM)
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-outline" onclick="exportarVCF()">⬇️ Exportar Agenda (VCF)</button>
+                    <button class="btn" onclick="abrirModalImportar()">⬆️ Importar Contatos (CSV/VCF)</button>
+                </div>
             </h3>
             <p>Organize sua base de clientes. Adicione tags (etiquetas) para segmentar suas campanhas de marketing.</p>
             <div class="table-container">
@@ -84,8 +88,8 @@
     <div class="modal" id="modalImportar">
         <div class="modal-content">
             <h2 style="margin-top: 0; color: var(--primary);">Importar Contatos</h2>
-            <p>Selecione um arquivo <strong>.csv</strong>. Colunas: Nome, Telefone, Tag.</p>
-            <input type="file" accept=".csv" id="arquivoCsv">
+            <p>Selecione um arquivo <strong>.csv</strong> ou <strong>.vcf</strong> (Agenda do Celular).</p>
+            <input type="file" accept=".csv, .vcf" id="arquivoCsv">
             <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
                 <button class="btn btn-outline" onclick="fecharModalImportar()">Cancelar</button>
                 <button class="btn" onclick="simularImportacao()">Salvar Contatos</button>
@@ -132,7 +136,7 @@
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
         import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // CHAVES OFICIAIS DO ANDERSON (CORRIGIDAS)
+        // AS CHAVES REAIS DO ANDERSON
         const firebaseConfig = {
             apiKey: "AIzaSyC4-2LavZt7iWPt2u71u-yRUYbIJu-Vzf0",
             authDomain: "central-omnichannel-saas.firebaseapp.com",
@@ -169,9 +173,7 @@
                         document.getElementById('area-conexao').innerHTML = `<strong>Status: Pendente</strong>`;
                     }
                 }
-            } else {
-                window.location.href = "index.html";
-            }
+            } else { window.location.href = "index.html"; }
         });
 
         window.fazerLogout = function() { signOut(auth).then(() => { window.location.href = "index.html"; }); };
@@ -190,26 +192,98 @@
             document.getElementById('aba-' + aba).classList.add('active');
         }
 
+        // --- MOTOR DE IMPORTAÇÃO (CSV e VCF) ---
         window.simularImportacao = function() {
             const input = document.getElementById('arquivoCsv');
             const file = input.files[0];
-            if(!file) return alert("⚠️ Selecione um arquivo .csv primeiro!");
+            if(!file) return alert("⚠️ Selecione um arquivo .csv ou .vcf primeiro!");
+            
+            const extensao = file.name.split('.').pop().toLowerCase();
             const reader = new FileReader();
+
             reader.onload = function(e) {
-                const linhas = e.target.result.split('\n');
+                const conteudo = e.target.result;
                 const tbody = document.getElementById('tabelaContatos');
-                let contatos = 0;
-                for(let i = 1; i < linhas.length; i++) { 
-                    const colunas = linhas[i].trim().split(/[,;]/); 
-                    if(colunas.length >= 2) {
-                        tbody.innerHTML += `<tr><td>${colunas[0].trim()}</td><td>${colunas[1].trim()}</td><td><span class="tag tag-novo" style="background-color: #6c757d;">🏷️ ${colunas[2] ? colunas[2].trim() : 'Importado'}</span></td><td><button class="btn btn-outline" style="padding: 4px 8px; font-size: 12px;">Editar</button></td></tr>`;
-                        contatos++;
+                let contatosAdicionados = 0;
+
+                if (extensao === 'csv') {
+                    const linhas = conteudo.split('\n');
+                    for(let i = 1; i < linhas.length; i++) { 
+                        const linha = linhas[i].trim();
+                        if(!linha) continue;
+                        const colunas = linha.split(/[,;]/); 
+                        if(colunas.length >= 2) {
+                            adicionarLinhaTabela(tbody, colunas[0].trim(), colunas[1].trim(), colunas[2] ? colunas[2].trim() : 'CSV');
+                            contatosAdicionados++;
+                        }
                     }
+                } else if (extensao === 'vcf') {
+                    // Lógica para separar cada contato do VCF do Android
+                    const vcards = conteudo.split('BEGIN:VCARD');
+                    for(let i = 1; i < vcards.length; i++) {
+                        const card = vcards[i];
+                        
+                        // Busca o Nome
+                        const nomeMatch = card.match(/FN:(.*)/i) || card.match(/FN;.*:(.*)/i);
+                        const nome = nomeMatch ? nomeMatch[1].trim() : 'Sem Nome';
+                        
+                        // Busca o Telefone
+                        const telMatch = card.match(/TEL.*:(.*)/i);
+                        const tel = telMatch ? telMatch[1].trim() : '';
+
+                        if(tel) {
+                            adicionarLinhaTabela(tbody, nome, tel, 'VCF Android');
+                            contatosAdicionados++;
+                        }
+                    }
+                } else {
+                    return alert("⚠️ Formato de arquivo não suportado.");
                 }
-                alert(`✅ ${contatos} contatos importados.`);
-                fecharModalImportar(); input.value = ''; 
+
+                alert(`✅ Sucesso! ${contatosAdicionados} contatos foram importados.`);
+                fecharModalImportar(); 
+                input.value = ''; 
             };
             reader.readAsText(file);
+        }
+
+        function adicionarLinhaTabela(tbody, nome, tel, tag) {
+            tbody.innerHTML += `<tr><td>${nome}</td><td>${tel}</td><td><span class="tag tag-novo">🏷️ ${tag}</span></td><td><button class="btn btn-outline" style="padding: 4px 8px; font-size: 12px;">Editar</button></td></tr>`;
+        }
+
+        // --- MOTOR DE EXPORTAÇÃO DE VCF ---
+        window.exportarVCF = function() {
+            const tbody = document.getElementById('tabelaContatos');
+            const linhas = tbody.getElementsByTagName('tr');
+            
+            if(linhas.length === 0) return alert("⚠️ A sua tabela de contatos está vazia!");
+
+            let vcfString = "";
+
+            for(let i = 0; i < linhas.length; i++) {
+                const colunas = linhas[i].getElementsByTagName('td');
+                if(colunas.length >= 2) {
+                    const nome = colunas[0].innerText;
+                    const tel = colunas[1].innerText;
+                    
+                    vcfString += "BEGIN:VCARD\n";
+                    vcfString += "VERSION:3.0\n";
+                    vcfString += `FN:${nome}\n`;
+                    vcfString += `TEL;TYPE=CELL:${tel}\n`;
+                    vcfString += "END:VCARD\n";
+                }
+            }
+
+            // Cria o arquivo virtual e força o download
+            const blob = new Blob([vcfString], { type: 'text/vcard' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'contatos_central.vcf';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
 
         window.iniciarDisparo = function() {
