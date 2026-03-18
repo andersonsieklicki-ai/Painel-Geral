@@ -3,72 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Central Omnichannel SaaS</title>
+    <title>Master Admin - Central Omnichannel</title>
     <style>
-        :root { --primary: #003399; --bg-color: #f4f7f6; --card-bg: #ffffff; --text-dark: #333; --terminal-bg: #1e1e1e; }
+        :root { --primary: #003399; --bg-color: #f4f7f6; --card-bg: #ffffff; --text-dark: #333; --terminal-bg: #1e1e1e; --danger: #dc3545; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); margin: 0; padding: 20px; color: var(--text-dark); }
+        
+        /* Cabeçalho */
         .header { display: flex; justify-content: space-between; align-items: center; background-color: var(--primary); color: white; padding: 15px 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 30px; }
-        .btn { background-color: #28a745; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: background 0.3s; font-size: 13px; }
+        
+        /* Botões */
+        .btn { background-color: #28a745; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: background 0.3s; font-size: 13px; display: inline-flex; align-items: center; gap: 5px; }
         .btn:hover { background-color: #218838; }
-        .btn-danger { background-color: #dc3545; color: white; }
+        .btn-danger { background-color: var(--danger); }
         .btn-danger:hover { background-color: #c82333; }
-        .btn-edit { background-color: #ffc107; color: black; }
         .btn-outline { background-color: transparent; color: var(--primary); border: 1px solid var(--primary); }
-        .section-title { font-size: 20px; color: var(--primary); border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 20px; margin-top: 40px;}
+        .btn-edit { background-color: #ffc107; color: black; }
+
+        /* Títulos de Seção */
+        .section-title { font-size: 20px; color: var(--primary); border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 20px; margin-top: 40px; display: flex; align-items: center; gap: 10px;}
+        
+        /* Lista de Pendentes */
         .lista-pendentes { display: flex; flex-direction: column; gap: 15px; margin-bottom: 40px; }
         .card-pendente { background: #fff3cd; border-left: 5px solid #ffc107; padding: 15px 20px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .info-pendente h4 { margin: 0 0 5px 0; color: #856404; font-size: 18px; }
         .info-pendente p { margin: 0; font-size: 14px; color: #666; }
+
+        /* Grid de Ativos */
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
-        .card { background: var(--card-bg); border-radius: 8px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-top: 4px solid var(--primary); display: flex; flex-direction: column; }
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-size: 18px; font-weight: bold; }
-        .status { font-size: 12px; padding: 4px 8px; border-radius: 12px; color: white; }
-        .status.online { background-color: #28a745; }
-        .status.offline { background-color: #6c757d; }
-        .log-window { background-color: var(--terminal-bg); color: #00ff00; font-family: monospace; font-size: 12px; height: 120px; overflow-y: auto; padding: 10px; border-radius: 5px; margin-bottom: 15px; }
-        .card-actions { display: flex; gap: 10px; justify-content: space-between; }
+        .card { background: var(--card-bg); border-radius: 8px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-top: 4px solid var(--primary); display: flex; flex-direction: column; position: relative; }
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
+        .empresa-nome { font-size: 18px; font-weight: bold; color: var(--primary); }
+        .empresa-sub { font-size: 11px; color: #777; margin-top: 3px; }
+        
+        .status-tag { font-size: 10px; padding: 4px 8px; border-radius: 12px; color: white; font-weight: bold; text-transform: uppercase; }
+        .status-tag.online { background-color: #28a745; }
+        .status-tag.offline { background-color: #6c757d; }
+
+        /* Log Estilo Terminal */
+        .log-window { background-color: var(--terminal-bg); color: #00ff00; font-family: 'Courier New', monospace; font-size: 11px; height: 100px; overflow-y: auto; padding: 10px; border-radius: 5px; margin-bottom: 15px; border: 1px solid #333; }
+        
+        .card-actions { display: flex; gap: 8px; margin-top: auto; }
         .card-actions button { flex: 1; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: white; padding: 30px; border-radius: 8px; width: 600px; max-width: 95%; max-height: 90vh; overflow-y: auto; }
-        .modal input, .modal textarea { width: 100%; padding: 12px; margin: 8px 0 20px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: inherit; font-size: 14px; }
-        .dica-emoji { font-size: 11px; color: #666; margin-top: -15px; margin-bottom: 15px; display: block; }
+
+        /* Modal */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; padding: 30px; border-radius: 8px; width: 550px; max-width: 95%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+        .modal label { font-weight: bold; font-size: 13px; display: block; margin-bottom: 5px; color: #555; }
+        .modal input, .modal textarea { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: inherit; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h2>Painel Admin - Central Omnichannel</h2>
-        <div>Logado como Administrador</div>
+        <h2>🛠️ Painel Admin - Central Omnichannel</h2>
+        <div>Logado como: <strong>Anderson Sieklicki</strong></div>
     </div>
 
-    <h3 class="section-title">🔔 Solicitações de Cadastro (Aguardando Aprovação)</h3>
+    <h3 class="section-title">🔔 Solicitações Pendentes</h3>
     <div class="lista-pendentes" id="painelPendentes">
-        <p style="color: #666; font-style: italic;">Carregando banco de dados...</p>
+        <p style="text-align: center; color: #999;">Conectando ao Firebase...</p>
     </div>
 
-    <h3 class="section-title">🤖 Robôs Ativos (Clientes da Plataforma)</h3>
-    <div class="grid" id="painelAtivos"></div>
+    <h3 class="section-title">🤖 Clientes Ativos</h3>
+    <div class="grid" id="painelAtivos">
+        </div>
 
     <div class="modal" id="modalEmpresa">
         <div class="modal-content">
-            <h2 style="margin-top: 0; color: var(--primary);">⚙️ Configurar Robô: <span id="nomeRoboEdit"></span></h2>
+            <h2 style="margin-top: 0; color: var(--primary);">⚙️ Editar Cliente: <span id="nomeRoboEdit"></span></h2>
             <input type="hidden" id="editEmpresaId">
-            <label><strong>Mensagem de Boas-vindas:</strong></label>
-            <textarea id="menuSaudacao" rows="3">Olá! 👋 Bem-vindo(a). Como podemos te ajudar hoje?</textarea>
-            <span class="dica-emoji">Dica: Use atalho (Win + Ponto) no Windows para abrir o teclado de emojis ✨🚀</span>
-            <label><strong>Opção 1 (Texto e Resposta):</strong></label>
-            <div style="display: flex; gap: 10px;">
-                <input type="text" id="opt1Nome" placeholder="Ex: Falar com atendente 🙋‍♂️" style="flex: 1;">
-                <input type="text" id="opt1Resp" placeholder="Resposta que o robô vai dar..." style="flex: 2;">
+            
+            <label>WhatsApp de Atendimento (Link wa.me):</label>
+            <input type="text" id="editZapLoja" placeholder="Ex: 46999999999">
+
+            <label>Mensagem de Boas-vindas (Plano Premium):</label>
+            <textarea id="menuSaudacao" rows="3"></textarea>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div>
+                    <label>Opção 1 (Botão):</label>
+                    <input type="text" id="opt1Nome" placeholder="Ex: Catálogo">
+                </div>
+                <div>
+                    <label>Resposta Opção 1:</label>
+                    <input type="text" id="opt1Resp">
+                </div>
             </div>
-            <label><strong>Opção 2 (Texto e Resposta):</strong></label>
-            <div style="display: flex; gap: 10px;">
-                <input type="text" id="opt2Nome" placeholder="Ex: Ver catálogo 📖" style="flex: 1;">
-                <input type="text" id="opt2Resp" placeholder="Resposta que o robô vai dar..." style="flex: 2;">
-            </div>
+
             <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
-                <button class="btn btn-outline" style="color: #dc3545; border-color: #dc3545;" onclick="fecharModal()">Cancelar</button>
-                <button class="btn" onclick="salvarConfiguracao()">💾 Salvar Configuração</button>
+                <button class="btn btn-outline" onclick="fecharModal()">Cancelar</button>
+                <button class="btn" onclick="salvarConfiguracao()">💾 Salvar Alterações</button>
             </div>
         </div>
     </div>
@@ -77,7 +101,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, onSnapshot, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // CHAVES OFICIAIS DO ANDERSON (CORRIGIDAS)
+        // SUAS CHAVES REAIS
         const firebaseConfig = {
             apiKey: "AIzaSyC4-2LavZt7iWPt2u71u-yRUYbIJu-Vzf0",
             authDomain: "central-omnichannel-saas.firebaseapp.com",
@@ -92,130 +116,120 @@
         const db = getFirestore(app);
         let listaEmpresas = [];
 
+        // Escuta o banco de dados em tempo real
         onSnapshot(collection(db, "empresas"), (snapshot) => {
             listaEmpresas = [];
             snapshot.forEach((doc) => { listaEmpresas.push({ id: doc.id, ...doc.data() }); });
-            renderizarPaineis();
+            renderizarPainel();
         });
 
-        function renderizarPaineis() {
-            const divPendentes = document.getElementById('painelPendentes');
-            const divAtivos = document.getElementById('painelAtivos');
-            divPendentes.innerHTML = ''; divAtivos.innerHTML = '';
-            let temPendente = false;
+        function renderizarPainel() {
+            const divP = document.getElementById('painelPendentes');
+            const divA = document.getElementById('painelAtivos');
+            divP.innerHTML = ''; divA.innerHTML = '';
+            let temP = false;
 
             listaEmpresas.sort((a, b) => (a.nomeEmpresa || '').localeCompare(b.nomeEmpresa || ''));
 
             listaEmpresas.forEach(emp => {
                 if(emp.statusRobo === 'pendente') {
-                    temPendente = true;
-                    const dataFormatada = new Date(emp.dataCadastro).toLocaleDateString('pt-BR');
-                    divPendentes.innerHTML += `
+                    temP = true;
+                    divP.innerHTML += `
                         <div class="card-pendente">
                             <div class="info-pendente">
                                 <h4>🏢 ${emp.nomeEmpresa}</h4>
-                                <p>📧 ${emp.email} | 📅 ${dataFormatada}</p>
+                                <p>📧 ${emp.email} | 📱 ${emp.whatsappLojista || 'S/ Zap'} | 📅 ${new Date(emp.dataCadastro).toLocaleDateString()}</p>
                             </div>
-                            <div style="display: flex; gap: 10px; align-items: center;">
-                                <select id="plano-${emp.id}" class="btn-outline" style="padding: 8px; border-radius: 4px; background: white; cursor: pointer;">
-                                    <option value="basico">🥉 Básico (Central)</option>
-                                    <option value="premium">🥇 Premium (QR)</option>
+                            <div style="display: flex; gap: 10px;">
+                                <select id="plano-${emp.id}" class="btn-outline" style="padding: 5px; border-radius: 4px;">
+                                    <option value="basico">🥉 Básico</option>
+                                    <option value="premium">🥇 Premium</option>
                                 </select>
-                                <button class="btn" onclick="aprovarCliente('${emp.id}')">✅ Registrar</button>
-                                <button class="btn btn-danger" onclick="excluirEmpresa('${emp.id}', '${emp.nomeEmpresa}')">🗑️ Excluir</button>
+                                <button class="btn" onclick="aprovarCliente('${emp.id}')">✅ Aprovar</button>
+                                <button class="btn btn-danger" onclick="excluirEmpresa('${emp.id}', '${emp.nomeEmpresa}')">🗑️</button>
                             </div>
                         </div>
                     `;
                 } else {
-                    const ehPremium = emp.plano === 'premium';
-                    const tagPlano = ehPremium ? '🥇 PREMIUM' : '🥉 BÁSICO';
-                    const statusClass = emp.statusRobo === 'online' || emp.statusRobo === 'ativo_central' ? 'online' : 'offline';
-                    const statusText = emp.statusRobo === 'ativo_central' ? 'USANDO CENTRAL' : (emp.statusRobo === 'online' ? 'ONLINE' : 'DESCONECTADO');
-                    const botaoQR = ehPremium ? `<button class="btn btn-outline" onclick="alert('Gerar QR Code...')">🔗 Ligar QR</button>` : '';
-
-                    divAtivos.innerHTML += `
+                    const premium = emp.plano === 'premium';
+                    const status = emp.statusRobo === 'ativo_central' || emp.statusRobo === 'online' ? 'online' : 'offline';
+                    
+                    divA.innerHTML += `
                         <div class="card">
                             <div class="card-header">
-                                <div>${emp.nomeEmpresa} <br><span style="font-size: 10px; color: #666; font-weight: normal;">${tagPlano}</span></div>
-                                <span class="status ${statusClass}">${statusText}</span>
+                                <div>
+                                    <div class="empresa-nome">${emp.nomeEmpresa}</div>
+                                    <div class="empresa-sub">${premium ? '🥇 PREMIUM' : '🥉 BÁSICO'} | 📱 ${emp.whatsappLojista || 'N/A'}</div>
+                                </div>
+                                <span class="status-tag ${status}">${status}</span>
                             </div>
                             <div class="log-window">
-                                <span style="color:#aaa;">[Sistema] Configuração carregada...</span><br>
-                                <span style="color:#aaa;">[Sistema] ${ehPremium ? 'Aguardando conexão WhatsApp...' : 'Conectado ao Motor Central.'}</span>
+                                > [${new Date().toLocaleTimeString()}] Sistema pronto.<br>
+                                > [Status] ${premium ? 'Aguardando QR Code...' : 'Conectado à Central.'}
                             </div>
                             <div class="card-actions">
-                                ${botaoQR}
+                                ${premium ? `<button class="btn btn-outline" onclick="alert('Gerando QR...')">🔗 Link QR</button>` : ''}
                                 <button class="btn btn-edit" onclick="abrirModal('${emp.id}')">⚙️ Editar</button>
-                                <button class="btn btn-danger" onclick="excluirEmpresa('${emp.id}', '${emp.nomeEmpresa}')">🗑️</button>
+                                <button class="btn btn-danger" onclick="excluirEmpresa('${emp.id}', '${emp.nomeEmpresa}')" style="flex:0; padding: 10px 12px;">🗑️</button>
                             </div>
                         </div>
                     `;
                 }
             });
-
-            if(!temPendente) { divPendentes.innerHTML = '<p style="color: #666; font-style: italic;">✅ Nenhuma solicitação pendente.</p>'; }
+            if(!temP) divP.innerHTML = '<p style="text-align: center; color: #999;">Nenhuma solicitação nova.</p>';
         }
 
-        window.aprovarCliente = async function(id) {
-            const planoEscolhido = document.getElementById(`plano-${id}`).value;
-            if(confirm(`Deseja aprovar esta empresa no plano selecionado?`)) {
-                try {
-                    const novoStatus = planoEscolhido === 'basico' ? 'ativo_central' : 'offline';
-                    await updateDoc(doc(db, "empresas", id), { statusRobo: novoStatus, plano: planoEscolhido });
-                } catch(erro) { alert("Erro ao aprovar: " + erro.message); }
+        window.aprovarCliente = async (id) => {
+            const plano = document.getElementById('plano-'+id).value;
+            if(confirm("Confirmar aprovação?")) {
+                const status = plano === 'basico' ? 'ativo_central' : 'offline';
+                await updateDoc(doc(db, "empresas", id), { statusRobo: status, plano: plano });
             }
         };
 
-        window.excluirEmpresa = async function(id, nomeEmpresa) {
-            if(confirm(`⚠️ ALERTA: Tem certeza que deseja excluir o cadastro de "${nomeEmpresa}" permanentemente?`)) {
-                try {
-                    await deleteDoc(doc(db, "empresas", id));
-                    alert("🗑️ Cliente excluído com sucesso.");
-                } catch(erro) { alert("Erro ao excluir: " + erro.message); }
+        window.excluirEmpresa = async (id, nome) => {
+            if(confirm(`Excluir permanentemente "${nome}"?`)) {
+                await deleteDoc(doc(db, "empresas", id));
             }
         };
 
-        window.abrirModal = function(id) {
+        window.abrirModal = (id) => {
             const emp = listaEmpresas.find(e => e.id === id);
-            if(!emp) return;
             document.getElementById('editEmpresaId').value = emp.id;
             document.getElementById('nomeRoboEdit').innerText = emp.nomeEmpresa;
+            document.getElementById('editZapLoja').value = emp.whatsappLojista || '';
             if(emp.menu) {
                 document.getElementById('menuSaudacao').value = emp.menu.saudacao || '';
-                document.getElementById('opt1Nome').value = emp.menu.opt1Nome || ''; document.getElementById('opt1Resp').value = emp.menu.opt1Resp || '';
-                document.getElementById('opt2Nome').value = emp.menu.opt2Nome || ''; document.getElementById('opt2Resp').value = emp.menu.opt2Resp || '';
-            } else {
-                document.getElementById('menuSaudacao').value = 'Olá! 👋 Bem-vindo(a). Como podemos te ajudar hoje?';
-                document.getElementById('opt1Nome').value = ''; document.getElementById('opt1Resp').value = '';
-                document.getElementById('opt2Nome').value = ''; document.getElementById('opt2Resp').value = '';
+                document.getElementById('opt1Nome').value = emp.menu.opt1Nome || '';
+                document.getElementById('opt1Resp').value = emp.menu.opt1Resp || '';
             }
             document.getElementById('modalEmpresa').style.display = 'flex';
         };
 
-        window.fecharModal = function() { document.getElementById('modalEmpresa').style.display = 'none'; };
+        window.fecharModal = () => document.getElementById('modalEmpresa').style.display = 'none';
 
-        window.salvarConfiguracao = async function() {
+        window.salvarConfiguracao = async () => {
             const id = document.getElementById('editEmpresaId').value;
-            const novoMenu = {
+            const zap = document.getElementById('editZapLoja').value.replace(/\D/g, '');
+            const menu = {
                 saudacao: document.getElementById('menuSaudacao').value,
-                opt1Nome: document.getElementById('opt1Nome').value, opt1Resp: document.getElementById('opt1Resp').value,
-                opt2Nome: document.getElementById('opt2Nome').value, opt2Resp: document.getElementById('opt2Resp').value
+                opt1Nome: document.getElementById('opt1Nome').value,
+                opt1Resp: document.getElementById('opt1Resp').value
             };
-            try {
-                await updateDoc(doc(db, "empresas", id), { menu: novoMenu });
-                alert("✅ Configurações salvas!");
-                fecharModal();
-            } catch(erro) { alert("Erro ao salvar: " + erro.message); }
+            await updateDoc(doc(db, "empresas", id), { whatsappLojista: zap, menu: menu });
+            fecharModal();
+            alert("✅ Atualizado!");
         };
     </script>
+
     <script>
-        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.addEventListener('contextmenu', e => e.preventDefault());
         document.onkeydown = function(e) {
-            if (e.keyCode === 123) return false;
-            if (e.ctrlKey && e.shiftKey && e.keyCode === 'I'.charCodeAt(0)) return false;
-            if (e.ctrlKey && e.shiftKey && e.keyCode === 'C'.charCodeAt(0)) return false;
-            if (e.ctrlKey && e.shiftKey && e.keyCode === 'J'.charCodeAt(0)) return false;
-            if (e.ctrlKey && e.keyCode === 'U'.charCodeAt(0)) return false;
+            if (e.keyCode === 123 || 
+               (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 67 || e.keyCode === 74)) || 
+               (e.ctrlKey && e.keyCode === 85)) {
+                return false;
+            }
         }
     </script>
 </body>
