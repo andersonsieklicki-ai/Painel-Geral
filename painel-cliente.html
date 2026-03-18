@@ -15,19 +15,18 @@
         .card p { font-size: 14px; color: #666; line-height: 1.5; }
         .btn { background-color: var(--primary); color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 14px; transition: background 0.3s; }
         .btn:hover { background-color: #002266; }
+        .btn:disabled { background-color: #999; cursor: not-allowed; }
         .btn-success { background-color: var(--success); }
         .btn-success:hover { background-color: #218838; }
         .btn-outline { background-color: transparent; color: var(--primary); border: 1px solid var(--primary); }
-        .btn-danger { background-color: #dc3545; color: white; }
-        .btn-danger:hover { background-color: #c82333; }
+        .btn-danger { background-color: #dc3545; color: white; border: none; }
         .status-box { display: flex; align-items: center; justify-content: space-between; background-color: #e8f5e9; padding: 15px; border-radius: 8px; border: 1px solid #c8e6c9; margin-bottom: 20px; }
         .status-indicator { display: inline-block; width: 12px; height: 12px; background-color: var(--success); border-radius: 50%; margin-right: 8px; }
         
-        /* Controles do CRM */
         .crm-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #ddd; }
         .search-box { flex: 1; min-width: 250px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; }
         
-        .table-container { overflow-y: auto; max-height: 400px; border: 1px solid #ddd; border-radius: 5px; }
+        .table-container { overflow-y: auto; max-height: 500px; border: 1px solid #ddd; border-radius: 5px; }
         table { width: 100%; border-collapse: collapse; font-size: 14px; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
         th { background-color: #f8f9fa; color: #333; position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 2px -1px rgba(0,0,0,0.1); }
@@ -118,7 +117,7 @@
             <input type="file" accept=".csv, .vcf" id="arquivoCsv">
             <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
                 <button class="btn btn-outline" onclick="fecharModalImportar()">Cancelar</button>
-                <button class="btn" onclick="iniciarImportacao()">Salvar Contatos</button>
+                <button class="btn" id="btnSalvarImportacao" onclick="iniciarImportacao()">Salvar Contatos</button>
             </div>
         </div>
     </div>
@@ -146,8 +145,7 @@
                 </div>
                 <div id="aba-tags" class="tab-content active">
                     <p style="font-size: 13px; color: #666;">Selecione as etiquetas que receberão a mensagem:</p>
-                    <div class="lista-selecao" id="listaTagsDisparo">
-                        </div>
+                    <div class="lista-selecao" id="listaTagsDisparo"></div>
                 </div>
                 <div id="aba-avulso" class="tab-content">
                     <textarea id="listaNumeros" rows="3" placeholder="Ex: 5546999999999"></textarea>
@@ -187,7 +185,7 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // --- VARIÁVEL GLOBAL DE CONTATOS (MEMÓRIA DO CRM) ---
+        // VARIÁVEL GLOBAL (MEMÓRIA DO CRM)
         window.listaContatos = [];
 
         onAuthStateChanged(auth, async (user) => {
@@ -197,7 +195,6 @@
                 if (docSnap.exists()) {
                     const dados = docSnap.data();
                     document.getElementById('nomeCliente').innerText = dados.nomeEmpresa;
-
                     if (dados.plano === 'basico') {
                         document.getElementById('tagPlano').innerText = "🥉 Plano Básico";
                         document.getElementById('area-conexao').innerHTML = `<div><span class="status-indicator"></span><strong>Conectado à Central</strong></div>`;
@@ -254,44 +251,60 @@
             } catch(e) { return str; } 
         }
 
+        // --- IMPORTAÇÃO DE ALTA PERFORMANCE ---
         window.iniciarImportacao = function() {
             const input = document.getElementById('arquivoCsv');
             const file = input.files[0];
             if(!file) return alert("⚠️ Selecione um arquivo!");
             
+            // Trava o botão e avisa o usuário
+            const btnSalvar = document.getElementById('btnSalvarImportacao');
+            btnSalvar.innerText = "⏳ Processando...";
+            btnSalvar.disabled = true;
+
             const extensao = file.name.split('.').pop().toLowerCase();
             const reader = new FileReader();
 
             reader.onload = function(e) {
-                const conteudo = e.target.result;
-                let contatosLidos = 0;
+                // Usamos o setTimeout para o navegador ter tempo de desenhar o "Processando..." na tela
+                setTimeout(() => {
+                    const conteudo = e.target.result;
+                    let contatosLidos = 0;
 
-                if (extensao === 'csv') {
-                    const linhas = conteudo.split('\n');
-                    for(let i = 1; i < linhas.length; i++) { 
-                        const linha = linhas[i].trim();
-                        if(!linha) continue;
-                        const colunas = linha.split(/[,;]/); 
-                        if(colunas.length >= 2) {
-                            adicionarAOMotor(colunas[0], colunas[1], colunas[2] || 'CSV');
-                            contatosLidos++;
+                    if (extensao === 'csv') {
+                        const linhas = conteudo.split('\n');
+                        for(let i = 1; i < linhas.length; i++) { 
+                            const linha = linhas[i].trim();
+                            if(!linha) continue;
+                            const colunas = linha.split(/[,;]/); 
+                            if(colunas.length >= 2) {
+                                adicionarAOMotor(colunas[0], colunas[1], colunas[2] || 'CSV');
+                                contatosLidos++;
+                            }
+                        }
+                    } else if (extensao === 'vcf') {
+                        const vcards = conteudo.split('BEGIN:VCARD');
+                        for(let i = 1; i < vcards.length; i++) {
+                            const card = vcards[i];
+                            const nomeMatch = card.match(/FN(?:;.*)?:(.*)/i);
+                            const telMatch = card.match(/TEL(?:;.*)?:(.*)/i);
+                            if(nomeMatch && telMatch) {
+                                adicionarAOMotor(decodificarNome(nomeMatch[1].trim()), telMatch[1].trim(), 'VCF Android');
+                                contatosLidos++;
+                            }
                         }
                     }
-                } else if (extensao === 'vcf') {
-                    const vcards = conteudo.split('BEGIN:VCARD');
-                    for(let i = 1; i < vcards.length; i++) {
-                        const card = vcards[i];
-                        const nomeMatch = card.match(/FN(?:;.*)?:(.*)/i);
-                        const telMatch = card.match(/TEL(?:;.*)?:(.*)/i);
-                        if(nomeMatch && telMatch) {
-                            adicionarAOMotor(decodificarNome(nomeMatch[1].trim()), telMatch[1].trim(), 'VCF Android');
-                            contatosLidos++;
-                        }
-                    }
-                }
 
-                alert(`✅ Importação concluída! ${contatosLidos} contatos carregados.`);
-                fecharModalImportar(); input.value = ''; renderizarTabela();
+                    alert(`✅ Importação concluída! ${contatosLidos} contatos carregados.`);
+                    fecharModalImportar(); 
+                    input.value = ''; 
+                    
+                    // Libera o botão
+                    btnSalvar.innerText = "Salvar Contatos";
+                    btnSalvar.disabled = false;
+                    
+                    renderizarTabela(); // Chama a tela de alta performance
+                }, 50); 
             };
             reader.readAsText(file);
         }
@@ -303,10 +316,10 @@
             window.listaContatos.push({ id: id, nome: nome.trim(), telefone: numLimpo, tags: [tag.trim()] });
         }
 
+        // --- RENDERIZAÇÃO DE ALTA PERFORMANCE (STRING ÚNICA) ---
         window.renderizarTabela = function() {
             const tbody = document.getElementById('tabelaContatos');
             const termoBusca = document.getElementById('buscaContato').value.toLowerCase();
-            tbody.innerHTML = '';
             
             let listaFiltrada = window.listaContatos.filter(c => c.nome.toLowerCase().includes(termoBusca) || c.telefone.includes(termoBusca));
             listaFiltrada.sort((a, b) => a.nome.localeCompare(b.nome));
@@ -316,9 +329,11 @@
                 return;
             }
 
+            // O SEGREDOS: Monta TUDO na memória primeiro, num texto só.
+            let htmlGigante = '';
             listaFiltrada.forEach(c => {
                 const tagsHtml = c.tags.map(t => `<span class="tag tag-novo">🏷️ ${t}</span>`).join(' ');
-                tbody.innerHTML += `
+                htmlGigante += `
                     <tr>
                         <td><input type="checkbox" class="check-contato" value="${c.id}"></td>
                         <td>${c.nome}</td>
@@ -331,11 +346,13 @@
                     </tr>
                 `;
             });
+            
+            // Joga tudo na tela num comando só!
+            tbody.innerHTML = htmlGigante;
         }
 
-        // --- SISTEMA DE EXCLUSÃO (NOVO) ---
         window.apagarContato = function(id) {
-            if(confirm("Deseja realmente excluir este contato?")) {
+            if(confirm("Deseja excluir este contato?")) {
                 window.listaContatos = window.listaContatos.filter(c => c.id !== id);
                 renderizarTabela();
             }
@@ -343,8 +360,8 @@
 
         window.apagarSelecionados = function() {
             const checks = document.querySelectorAll('.check-contato:checked');
-            if(checks.length === 0) return alert("⚠️ Selecione os contatos que deseja apagar.");
-            if(confirm(`Tem certeza que deseja apagar ${checks.length} contatos selecionados?`)) {
+            if(checks.length === 0) return alert("⚠️ Selecione os contatos.");
+            if(confirm(`Apagar ${checks.length} contatos?`)) {
                 const idsParaApagar = Array.from(checks).map(c => c.value);
                 window.listaContatos = window.listaContatos.filter(c => !idsParaApagar.includes(c.id));
                 document.getElementById('checkTodos').checked = false;
@@ -354,7 +371,7 @@
 
         window.apagarTodos = function() {
             if(window.listaContatos.length === 0) return alert("⚠️ A lista já está vazia.");
-            if(confirm("🚨 ATENÇÃO: Tem certeza que deseja apagar TODOS os contatos da sua base? Isso não pode ser desfeito.")) {
+            if(confirm("🚨 ATENÇÃO: Apagar TODOS os contatos?")) {
                 window.listaContatos = [];
                 document.getElementById('checkTodos').checked = false;
                 renderizarTabela();
@@ -367,24 +384,24 @@
         }
 
         window.etiquetarSelecionados = function() {
-            if(document.querySelectorAll('.check-contato:checked').length === 0) return alert("⚠️ Selecione pelo menos um contato!");
+            if(document.querySelectorAll('.check-contato:checked').length === 0) return alert("⚠️ Selecione um contato!");
             abrirModalTag();
         }
 
         window.salvarTagMassa = function() {
             const novaTag = document.getElementById('nomeNovaTag').value.trim();
-            if(!novaTag) return alert("Digite um nome para a etiqueta!");
+            if(!novaTag) return alert("Digite um nome!");
             const checks = document.querySelectorAll('.check-contato:checked');
             checks.forEach(chk => {
                 const contato = window.listaContatos.find(c => c.id === chk.value);
                 if(contato && !contato.tags.includes(novaTag)) contato.tags.push(novaTag);
             });
-            alert(`✅ Etiqueta "${novaTag}" aplicada a ${checks.length} contatos!`);
+            alert(`✅ Etiqueta aplicada a ${checks.length} contatos!`);
             fecharModalTag(); document.getElementById('checkTodos').checked = false; renderizarTabela();
         }
 
         window.exportarVCF = function() {
-            if(window.listaContatos.length === 0) return alert("⚠️ A sua lista está vazia!");
+            if(window.listaContatos.length === 0) return alert("⚠️ Lista vazia!");
             let vcfString = "";
             window.listaContatos.forEach(c => {
                 vcfString += "BEGIN:VCARD\nVERSION:3.0\n";
