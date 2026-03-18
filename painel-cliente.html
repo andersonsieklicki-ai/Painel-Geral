@@ -6,7 +6,7 @@
     <title>Painel do Cliente - Automação WhatsApp</title>
     <style>
         :root {
-            --primary: #003399; /* Mantendo a identidade visual */
+            --primary: #003399; 
             --secondary: #f0f4f8;
             --success: #28a745;
             --text-dark: #333;
@@ -36,7 +36,6 @@
             gap: 20px;
         }
         
-        /* Cartões de Ação */
         .card {
             background: white;
             border-radius: 8px;
@@ -47,7 +46,6 @@
         .card h3 { margin-top: 0; color: var(--primary); }
         .card p { font-size: 14px; color: #666; line-height: 1.5; }
         
-        /* Botões */
         .btn {
             background-color: var(--primary);
             color: white;
@@ -65,7 +63,6 @@
         .btn-success { background-color: var(--success); }
         .btn-success:hover { background-color: #218838; }
 
-        /* Status do Robô */
         .status-box {
             display: flex;
             align-items: center;
@@ -84,7 +81,7 @@
             margin-right: 8px;
         }
 
-        /* Modal de Disparo */
+        /* --- Estilos do Modal e Abas --- */
         .modal {
             display: none;
             position: fixed;
@@ -99,15 +96,8 @@
             border-radius: 8px;
             width: 500px;
             max-width: 90%;
-        }
-        .modal textarea, .modal input {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-            font-family: inherit;
+            max-height: 90vh;
+            overflow-y: auto;
         }
         .info-disparo {
             font-size: 12px;
@@ -117,6 +107,63 @@
             border-radius: 4px;
             margin-bottom: 15px;
         }
+        
+        /* Sistema de Abas */
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #ccc;
+            margin-bottom: 15px;
+        }
+        .tab-btn {
+            flex: 1;
+            background: none;
+            border: none;
+            padding: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #666;
+        }
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+            margin-bottom: -2px;
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Inputs e Lista de Grupos */
+        .modal textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0 15px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+        .lista-grupos {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 10px;
+            max-height: 120px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            background: #f9f9f9;
+        }
+        .grupo-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 5px;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+        .grupo-item:last-child { border-bottom: none; }
+        .grupo-item input { margin-right: 10px; width: 16px; height: 16px; cursor: pointer; }
+
+        @media (max-width: 768px) {
+            .container { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
@@ -124,14 +171,13 @@
     <div class="navbar">
         <h2>Meu Painel - <span id="nomeCliente">Carregando...</span></h2>
         <div>
-            <span>Status: Logado</span> | <a href="#" style="color: white; text-decoration: none; margin-left: 10px;">Sair</a>
+            <span style="font-size: 14px;">Status: Logado</span> | <a href="#" style="color: white; text-decoration: none; margin-left: 10px; font-weight: bold;">Sair</a>
         </div>
     </div>
 
     <div class="container">
         <div class="card">
             <h3>🤖 Controle do Robô</h3>
-            
             <div class="status-box">
                 <div>
                     <span class="status-indicator"></span>
@@ -139,19 +185,17 @@
                 </div>
                 <button class="btn" style="width: auto; margin: 0; padding: 8px 15px; font-size: 12px;" onclick="alert('Gerando novo QR Code...')">Reconectar</button>
             </div>
-            
             <p>Seu assistente virtual está trabalhando agora. Ele está respondendo automaticamente os clientes baseado no seu menu configurado.</p>
-            
             <button class="btn">✏️ Editar Menu de Respostas</button>
         </div>
 
         <div class="card">
             <h3>📢 Central de Promoções</h3>
-            <p>Avise seus clientes sobre ofertas, novidades ou comunicados importantes. O robô enviará as mensagens de forma humanizada para evitar bloqueios.</p>
+            <p>Avise seus clientes sobre ofertas ou envie comunicados importantes. Você pode disparar para números específicos ou enviar direto nos seus grupos.</p>
             
             <div style="background: #fff3cd; border: 1px solid #ffeeba; padding: 15px; border-radius: 5px; margin: 15px 0;">
                 <strong style="color: #856404;">📊 Relatório do Mês</strong><br>
-                <span style="color: #856404;">Mensagens automáticas enviadas: <strong>342</strong></span>
+                <span style="color: #856404;">Mensagens enviadas: <strong>342</strong></span>
             </div>
 
             <button class="btn btn-success" onclick="abrirModalDisparo()">🚀 Nova Campanha (Disparo)</button>
@@ -163,47 +207,91 @@
             <h2 style="margin-top: 0; color: var(--primary);">Criar Nova Campanha</h2>
             
             <div class="info-disparo">
-                ⚠️ <strong>Aviso anti-bloqueio:</strong> As mensagens serão enviadas com um intervalo de 15 a 25 segundos entre cada uma para simular digitação humana e proteger seu número.
+                ⚠️ <strong>Aviso anti-bloqueio:</strong> As mensagens serão enviadas com um intervalo de segurança para simular digitação humana e proteger seu número.
             </div>
 
-            <label><strong>1. Cole a lista de números (um por linha):</strong></label>
-            <textarea id="listaNumeros" rows="4" placeholder="Exemplo:&#10;5546999999999&#10;5546888888888"></textarea>
+            <div class="tabs">
+                <button class="tab-btn active" onclick="trocarAba('individual')" id="btn-individual">👤 Contatos Individuais</button>
+                <button class="tab-btn" onclick="trocarAba('grupos')" id="btn-grupos">👥 Meus Grupos</button>
+            </div>
 
-            <label><strong>2. Digite a mensagem da promoção:</strong></label>
-            <textarea id="mensagemPromo" rows="5" placeholder="Olá! Temos uma promoção especial para você hoje..."></textarea>
+            <div id="aba-individual" class="tab-content active">
+                <label><strong>1. Cole a lista de números (um por linha):</strong></label>
+                <textarea id="listaNumeros" rows="4" placeholder="Exemplo:&#10;5546999999999&#10;5546888888888"></textarea>
+            </div>
+
+            <div id="aba-grupos" class="tab-content">
+                <label><strong>1. Selecione os grupos para enviar:</strong></label>
+                <div class="lista-grupos">
+                    <label class="grupo-item"><input type="checkbox" value="g1"> 💄 VIP PH Cosméticos</label>
+                    <label class="grupo-item"><input type="checkbox" value="g2"> 💧 Avisos Água São Luiz</label>
+                    <label class="grupo-item"><input type="checkbox" value="g3"> 📢 Ofertas Capanema</label>
+                    <label class="grupo-item"><input type="checkbox" value="g4"> 🏫 Pais de Alunos (Manhã)</label>
+                </div>
+            </div>
+
+            <label><strong>2. Digite a mensagem da campanha:</strong></label>
+            <textarea id="mensagemPromo" rows="5" placeholder="Olá! Temos uma novidade especial para você hoje..."></textarea>
             
-            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px;">
                 <button class="btn" style="background: #dc3545;" onclick="fecharModalDisparo()">Cancelar</button>
-                <button class="btn btn-success" onclick="iniciarDisparo()">Iniciar Disparo</button>
+                <button class="btn btn-success" onclick="iniciarDisparo()">🚀 Iniciar Disparo</button>
             </div>
         </div>
     </div>
 
-    <script>
-        // Simulando os dados do cliente que logou (No futuro, o Firebase fará isso)
+    <script type="module">
+        // Simulando os dados do cliente que logou
         window.onload = () => {
-            document.getElementById('nomeCliente').innerText = "Loja de Cosméticos";
+            // Mais para frente, o Firebase vai puxar o nome real do banco de dados aqui
+            document.getElementById('nomeCliente').innerText = "Painel da Empresa";
         };
 
-        function abrirModalDisparo() {
+        // --- Funções Visuais do Modal ---
+        window.abrirModalDisparo = function() {
             document.getElementById('modalDisparo').style.display = 'flex';
         }
 
-        function fecharModalDisparo() {
+        window.fecharModalDisparo = function() {
             document.getElementById('modalDisparo').style.display = 'none';
         }
 
-        function iniciarDisparo() {
-            const numeros = document.getElementById('listaNumeros').value;
-            const mensagem = document.getElementById('mensagemPromo').value;
+        window.trocarAba = function(aba) {
+            // Remove a classe "active" de tudo
+            document.getElementById('btn-individual').classList.remove('active');
+            document.getElementById('btn-grupos').classList.remove('active');
+            document.getElementById('aba-individual').classList.remove('active');
+            document.getElementById('aba-grupos').classList.remove('active');
 
-            if(!numeros || !mensagem) {
-                alert("Por favor, preencha os números e a mensagem!");
-                return;
+            // Adiciona a classe "active" só na aba clicada
+            document.getElementById('btn-' + aba).classList.add('active');
+            document.getElementById('aba-' + aba).classList.add('active');
+        }
+
+        // --- Função de Disparo ---
+        window.iniciarDisparo = function() {
+            const mensagem = document.getElementById('mensagemPromo').value;
+            
+            // Verifica qual aba está ativa para saber de onde puxar os dados
+            const abaAtiva = document.getElementById('aba-individual').classList.contains('active') ? 'individual' : 'grupos';
+
+            if(!mensagem) {
+                return alert("⚠️ Por favor, digite a mensagem da campanha!");
             }
 
-            // Aqui entrará o código do Firebase para avisar a Oracle
-            alert("✅ Campanha agendada com sucesso! O robô começará os disparos em alguns instantes.");
+            if (abaAtiva === 'individual') {
+                const numeros = document.getElementById('listaNumeros').value;
+                if(!numeros) return alert("⚠️ Cole pelo menos um número de telefone!");
+                alert("✅ Campanha agendada! O robô enviará a mensagem para os números informados.");
+            } else {
+                // Checa se pelo menos um grupo foi marcado
+                const gruposMarcados = document.querySelectorAll('#aba-grupos input[type="checkbox"]:checked');
+                if(gruposMarcados.length === 0) return alert("⚠️ Selecione pelo menos um grupo!");
+                alert(`✅ Campanha agendada! O robô enviará a mensagem em ${gruposMarcados.length} grupo(s).`);
+            }
+
+            // Limpa e fecha a tela
+            document.getElementById('mensagemPromo').value = '';
             fecharModalDisparo();
         }
     </script>
