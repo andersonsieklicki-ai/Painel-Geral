@@ -190,7 +190,6 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        // IMPORTANTE: Adicionado o onSnapshot na linha abaixo
         import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -208,6 +207,11 @@
         const db = getFirestore(app);
 
         window.listaContatos = [];
+        window.idClienteLogado = ""; 
+        window.planoClienteLogado = "basico"; 
+        window.nomeLojista = "Nossa Loja";
+        window.zapLojista = "";
+
         // ==========================================
         // 💾 SISTEMA DE MEMÓRIA (Salva no Navegador)
         // ==========================================
@@ -227,6 +231,7 @@
                 }
             }
         }
+
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 const docRef = doc(db, "empresas", user.uid);
@@ -234,13 +239,13 @@
                 if (docSnap.exists()) {
                     const dados = docSnap.data();
                     document.getElementById('nomeCliente').innerText = dados.nomeEmpresa;
-                   // Suas variáveis já existentes...
+                    
                     window.idClienteLogado = user.uid; 
                     window.planoClienteLogado = dados.plano || 'basico'; 
                     window.nomeLojista = dados.nomeEmpresa || "Nossa Loja";
                     window.zapLojista = dados.whatsappLojista || ""; 
                     
-                    // 👉 NOVO: CARREGA OS CONTATOS SALVOS NA HORA QUE LOGA!
+                    // 👉 CARREGA OS CONTATOS SALVOS NA HORA QUE LOGA!
                     window.carregarContatosLocal();
                     
                     if (dados.plano === 'basico') {
@@ -400,6 +405,8 @@
                     btnSalvar.innerText = "Salvar Contatos";
                     btnSalvar.disabled = false;
                     renderizarTabela(); 
+                    
+                    window.salvarContatosLocal(); // 👉 SALVA APÓS IMPORTAR
                 }, 50); 
             };
             reader.readAsText(file);
@@ -447,6 +454,7 @@
             if(confirm("Deseja excluir este contato?")) {
                 window.listaContatos = window.listaContatos.filter(c => c.id !== id);
                 renderizarTabela();
+                window.salvarContatosLocal(); // 👉 SALVA APÓS APAGAR UM
             }
         }
 
@@ -458,6 +466,7 @@
                 window.listaContatos = window.listaContatos.filter(c => !idsParaApagar.includes(c.id));
                 document.getElementById('checkTodos').checked = false;
                 renderizarTabela();
+                window.salvarContatosLocal(); // 👉 SALVA APÓS APAGAR VÁRIOS
             }
         }
 
@@ -465,12 +474,9 @@
             if(window.listaContatos.length === 0) return alert("⚠️ A lista já está vazia.");
             if(confirm("🚨 ATENÇÃO: Apagar TODOS os contatos?")) {
                window.listaContatos = [];
-        window.idClienteLogado = ""; 
-        window.planoClienteLogado = "basico"; 
-        window.nomeLojista = "Nossa Loja";
-        window.zapLojista = "";
-                document.getElementById('checkTodos').checked = false;
-                renderizarTabela();
+               document.getElementById('checkTodos').checked = false;
+               renderizarTabela();
+               window.salvarContatosLocal(); // 👉 SALVA APÓS ZERAR A LISTA
             }
         }
 
@@ -493,7 +499,10 @@
                 if(contato && !contato.tags.includes(novaTag)) contato.tags.push(novaTag);
             });
             alert(`✅ Etiqueta aplicada a ${checks.length} contatos!`);
-            fecharModalTag(); document.getElementById('checkTodos').checked = false; renderizarTabela();
+            fecharModalTag(); 
+            document.getElementById('checkTodos').checked = false; 
+            renderizarTabela();
+            window.salvarContatosLocal(); // 👉 SALVA APÓS ETIQUETAR
         }
 
         window.exportarVCF = function() {
