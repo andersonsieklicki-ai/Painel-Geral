@@ -3,63 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Central Omnichannel - Automação e CRM para WhatsApp</title>
+    <title>Omnichannel PRO - Organize Clientes e Venda Mais via WhatsApp</title>
     <style>
-        :root {
-            --primary: #003399;
-            --primary-dark: #002266;
-            --secondary: #f4f7f6;
-            --accent: #ffc107;
-            --success: #28a745;
-            --text-dark: #2c3e50;
-            --text-light: #6c757d;
-        }
+        :root { --primary: #003399; --primary-dark: #002266; --secondary: #f4f7f6; --accent: #ffc107; --success: #28a745; --text-dark: #2c3e50; --text-light: #6c757d; }
+        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background-color: #ffffff; margin: 0; padding: 0; color: var(--text-dark); overflow-x: hidden; }
         
-        body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background-color: #ffffff;
-            margin: 0;
-            padding: 0;
-            color: var(--text-dark);
-            overflow-x: hidden;
-        }
-
         /* 🟢 CABEÇALHO */
-        header {
-            background-color: #ffffff;
-            padding: 20px 5%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
+        header { background-color: #ffffff; padding: 20px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
         .logo { font-size: 1.5rem; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 8px; }
         .btn-login-header { background: transparent; border: 2px solid var(--primary); color: var(--primary); padding: 8px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; }
         .btn-login-header:hover { background: var(--primary); color: white; }
 
-        /* 🟢 HERO SECTION (A PROMESSA) */
-        .hero {
-            background: linear-gradient(135deg, var(--primary) 0%, #0055ff 100%);
-            color: white;
-            padding: 80px 5%;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 40px;
-            min-height: 60vh;
-        }
+        /* 🟢 HERO SECTION (A MUDANÇA DA IMAGEM) */
+        .hero { background: linear-gradient(135deg, var(--primary) 0%, #0055ff 100%); color: white; padding: 80px 5%; display: flex; align-items: center; justify-content: space-between; gap: 40px; min-height: 60vh; }
         .hero-content { flex: 1; max-width: 600px; }
         .hero h1 { font-size: 3rem; margin-bottom: 20px; line-height: 1.2; }
         .hero p { font-size: 1.2rem; margin-bottom: 30px; opacity: 0.9; line-height: 1.5; }
         .btn-cta { background: var(--accent); color: #000; font-size: 1.1rem; font-weight: bold; border: none; padding: 15px 30px; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 15px rgba(255, 193, 7, 0.4); transition: 0.3s; }
         .btn-cta:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(255, 193, 7, 0.6); }
         .hero-image { flex: 1; text-align: center; }
+        
+        /* 📸 A imagem bonita do robô que você pediu */
         .hero-image img { max-width: 100%; height: auto; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
 
-        /* 🟢 BENEFÍCIOS (O QUE FAZ) */
+        /* 🟢 BENEFÍCIOS (AJUSTES DE COPY QUE VOCÊ PEDIU) */
         .features { padding: 80px 5%; background: var(--secondary); text-align: center; }
         .features h2 { font-size: 2.2rem; color: var(--primary); margin-bottom: 10px; }
         .features p.subtitle { color: var(--text-light); margin-bottom: 50px; font-size: 1.1rem; }
@@ -90,7 +57,7 @@
         /* 🟢 FOOTER */
         footer { background: var(--text-dark); color: white; text-align: center; padding: 20px; font-size: 0.9rem; }
 
-        /* 🟢 MODAL DE LOGIN (PARA QUEM JÁ É CLIENTE) */
+        /* 🟢 MODAL DE LOGIN (ÁREA DO CLIENTE) */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(3px); justify-content: center; align-items: center; z-index: 1000; padding: 20px; box-sizing: border-box; }
         .modal-content { background: white; padding: 40px 30px; border-radius: 15px; width: 100%; max-width: 380px; text-align: center; position: relative; box-shadow: 0 15px 40px rgba(0,0,0,0.2); }
         .btn-close { position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #999; }
@@ -101,11 +68,10 @@
         .btn-login:hover { background-color: var(--primary-dark); }
         .error-msg { color: #dc3545; font-size: 0.85rem; margin-top: 15px; display: none; font-weight: bold; }
 
-        /* 📱 RESPONSIVIDADE (SMARTPHONES) */
         @media (max-width: 768px) {
             .hero { flex-direction: column; text-align: center; padding: 60px 5%; }
             .hero h1 { font-size: 2.2rem; }
-            .hero-image { display: none; /* Esconde a imagem no celular para focar no texto */ }
+            .hero-image { display: none; }
             .lead-section { flex-direction: column; padding: 50px 5%; text-align: center; }
             .lead-text h2 { font-size: 1.8rem; }
             .lead-form { padding: 30px 20px; }
@@ -123,71 +89,66 @@
 
     <section class="hero">
         <div class="hero-content">
-            <h1>Revolucione o seu Atendimento e Vendas no WhatsApp</h1>
-            <p>Esqueça o trabalho manual. A Central Omnichannel permite que você organize seus clientes, envie promoções com imagens e programe felicitações de aniversário de forma 100% automatizada e segura.</p>
-            <button class="btn-cta" onclick="rolarParaCadastro()">Quero Conhecer o Sistema</button>
+            <h1>Organize e Venda Mais no WhatsApp</h1>
+            <p>Deixe o trabalho manual para trás. Nossa Central Omnichannel permite controlar clientes, enviar promoções massivas e gerir a Defesa Civil e Associação de Água, tudo em um só lugar.</p>
+            <button class="btn-cta" onclick="rolarParaCadastro()">Quero Vender Mais e Perder Menos Tempo</button>
         </div>
         <div class="hero-image">
-            <img src="https://images.unsplash.com/photo-1611162617474-5b21e879e113?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Automação de WhatsApp">
+            <img src="https://images.unsplash.com/photo-1546776246-bb2439c3755f?q=80&w=600" alt="Automação WhatsApp Profissional">
         </div>
     </section>
 
     <section class="features">
-        <h2>Como vamos facilitar a sua vida?</h2>
-        <p class="subtitle">Recursos criados especificamente para donos de negócios que precisam vender mais e perder menos tempo.</p>
+        <h2>A ferramenta ideal para sua empresa ou associação</h2>
+        <p class="subtitle">Chega de perder tempo digitando ou gerenciando planilhas furadas.</p>
         
         <div class="grid-features">
             <div class="card-feature">
                 <span class="feature-icon">👥</span>
-                <h3>CRM Inteligente</h3>
-                <p>Importe a agenda do seu celular (VCF) ou planilhas (CSV). Organize seus clientes por etiquetas (Ex: VIP, Mães, Atacado) com nosso sistema anti-duplicação.</p>
+                <h3>CRM & Etiquetas</h3>
+                <p>Melhor controle de seus contatos, organização a todo vapor! Importe de planilhas CSV ou agenda VCF e etiquete por grupo (VIP, etc.).</p>
             </div>
             <div class="card-feature">
                 <span class="feature-icon">📸</span>
-                <h3>Disparo de Mídias</h3>
-                <p>Envie flyers, fotos de produtos ou PDFs pesados junto com textos atrativos. O sistema faz pausas humanizadas automaticamente para blindar seu número.</p>
+                <h3>Envio de Mídias</h3>
+                <p>O robô simula a digitação como se fosse um humano para melhor interação! Possui pausas humanizadas automaticamente para blindar seu número.</p>
             </div>
             <div class="card-feature">
                 <span class="feature-icon">🎁</span>
-                <h3>Motor de Aniversários</h3>
-                <p>Insira a data de nascimento do cliente. O robô acorda todos os dias de manhã e envia uma foto com uma mensagem de parabéns personalizada com o nome dele!</p>
+                <h3>Motor de Aniversário</h3>
+                <p>Nada melhor que ser lembrado por uma empresa que sabe o valor do seu cliente! Envio automático matinal com foto e texto.</p>
             </div>
             <div class="card-feature">
-                <span class="feature-icon">📱</span>
-                <h3>O "Painel do Chefe"</h3>
-                <p>Não tem computador por perto? Mande um "Oi" para o seu próprio robô e dispare promoções para etiquetas inteiras diretamente pelo seu WhatsApp!</p>
+                <span class="feature-icon">💧</span>
+                <h3>Módulo Água & PDF</h3>
+                <p>Emissão de extrato em PDF gerado na hora! Autoatendimento via CPF e consulta de faturas pendentes.</p>
             </div>
         </div>
     </section>
 
     <section class="lead-section" id="cadastro">
         <div class="lead-text">
-            <h2>Pronto para escalar as suas vendas?</h2>
-            <p>Deixe a tecnologia trabalhar por você enquanto foca no que realmente importa: <b>o crescimento da sua empresa.</b></p>
-            <p>Preencha o formulário ao lado e a nossa equipe entrará em contato pelo WhatsApp para lhe mostrar como a Central Omnichannel se adapta ao seu negócio.</p>
-            <ul style="list-style: none; padding: 0; color: var(--text-light); line-height: 1.8;">
-                <li>✅ Sem taxas de instalação surpresa</li>
-                <li>✅ Suporte técnico direto com o desenvolvedor</li>
-                <li>✅ Setup imediato do sistema</li>
-            </ul>
+            <h2>Pronto para escalar a sua operação?</h2>
+            <p>Tire suas dúvidas e veja como a nossa Inteligência Omnichannel se adapta ao seu negócio ou associação.</p>
+            <p>Preencha os dados e entraremos em contato via WhatsApp.</p>
         </div>
         
         <div class="lead-form">
-            <h3>Solicitar Demonstração</h3>
+            <h3>Falar com Consultor</h3>
             <div class="input-group">
                 <label>Seu Nome</label>
-                <input type="text" id="leadNome" placeholder="Como gosta de ser chamado?">
+                <input type="text" id="leadNome" placeholder="Seu nome completo">
             </div>
             <div class="input-group">
-                <label>Nome da sua Empresa</label>
-                <input type="text" id="leadEmpresa" placeholder="Ex: pH Cosméticos">
+                <label>Nome da Empresa/Associação</label>
+                <input type="text" id="leadEmpresa" placeholder="Ex: Mercado São Luiz">
             </div>
             <div class="input-group">
                 <label>Seu WhatsApp (com DDD)</label>
-                <input type="tel" id="leadZap" placeholder="(00) 00000-0000">
+                <input type="tel" id="leadZap" placeholder="(46) 99999-0000">
             </div>
-            <button class="btn-submit" id="btnLead" onclick="enviarLead()">Quero Vender Mais 🚀</button>
-            <p id="leadSucesso" style="display:none; color: var(--success); font-weight:bold; margin-top: 15px; text-align: center;">Tudo certo! Logo chamaremos você no WhatsApp.</p>
+            <button class="btn-submit" id="btnLead" onclick="enviarLead()">Quero Conhecer 🚀</button>
+            <p id="leadSucesso" style="display:none; color: var(--success); font-weight:bold; margin-top: 15px; text-align: center;">Tudo certo! Logo chamaremos.</p>
         </div>
     </section>
 
@@ -198,8 +159,8 @@
     <div class="modal" id="modalLogin">
         <div class="modal-content">
             <button class="btn-close" onclick="fecharModalLogin()">&times;</button>
-            <h2>Área do Lojista</h2>
-            <p>Acesse o seu painel de controle</p>
+            <h2>Acessar Painel</h2>
+            <p>Acesse o painel de lojista/administrador</p>
             
             <div class="input-group" style="text-align: left;">
                 <label for="email">E-mail de Acesso</label>
@@ -211,7 +172,7 @@
             </div>
             
             <button class="btn-login" id="btnLogin" onclick="fazerLogin()">Acessar Painel</button>
-            <div class="error-msg" id="erroMsg">Senha ou e-mail incorretos.</div>
+            <div class="error-msg" id="erroMsg">Dados inválidos.</div>
         </div>
     </div>
 
@@ -235,14 +196,12 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Se já estiver logado, manda direto pro painel sem pedir senha
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 window.location.href = "painel-cliente.html";
             }
         });
 
-        // LÓGICA DE LOGIN
         window.fazerLogin = function() {
             const email = document.getElementById('email').value;
             const senha = document.getElementById('senha').value;
@@ -250,12 +209,12 @@
             const erro = document.getElementById('erroMsg');
 
             if(!email || !senha) {
-                erro.innerText = "Preencha todos os campos.";
+                erro.innerText = "Preencha tudo.";
                 erro.style.display = "block";
                 return;
             }
 
-            btn.innerText = "Autenticando...";
+            btn.innerText = "Verificando...";
             btn.disabled = true;
             erro.style.display = "none";
 
@@ -266,12 +225,11 @@
                 .catch((error) => {
                     btn.innerText = "Acessar Painel";
                     btn.disabled = false;
-                    erro.innerText = "Acesso negado. Verifique os seus dados.";
+                    erro.innerText = "Acesso negado. Verifique os dados.";
                     erro.style.display = "block";
                 });
         }
 
-        // LÓGICA DE CAPTURA DE LEADS (PARA VENDER O SEU SISTEMA)
         window.enviarLead = async function() {
             const nome = document.getElementById('leadNome').value;
             const empresa = document.getElementById('leadEmpresa').value;
@@ -279,14 +237,13 @@
             const btn = document.getElementById('btnLead');
 
             if(!nome || !empresa || !zap) {
-                return alert("Por favor, preencha todos os campos para continuarmos!");
+                return alert("Preencha todos os campos, por favor.");
             }
 
-            btn.innerText = "Enviando solicitação...";
+            btn.innerText = "Enviando...";
             btn.disabled = true;
 
             try {
-                // Salva o interesse de contrato na nuvem (Firestore)
                 await addDoc(collection(db, "interessados_contrato"), {
                     nome: nome,
                     empresa: empresa,
@@ -298,23 +255,20 @@
                 document.getElementById('leadNome').value = '';
                 document.getElementById('leadEmpresa').value = '';
                 document.getElementById('leadZap').value = '';
-                
                 document.getElementById('leadSucesso').style.display = 'block';
                 btn.style.display = 'none';
                 
             } catch(e) {
-                alert("Ocorreu um erro. Tente nos chamar direto no WhatsApp!");
-                btn.innerText = "Quero Vender Mais 🚀";
+                alert("Ocorreu um erro ao enviar. Tente novamente mais tarde.");
+                btn.innerText = "Quero Conhecer 🚀";
                 btn.disabled = false;
             }
         }
 
-        // FUNÇÕES DA INTERFACE
         window.abrirModalLogin = () => document.getElementById('modalLogin').style.display = 'flex';
         window.fecharModalLogin = () => document.getElementById('modalLogin').style.display = 'none';
         window.rolarParaCadastro = () => document.getElementById('cadastro').scrollIntoView({ behavior: 'smooth' });
 
-        // Permitir login com a tecla Enter
         document.getElementById('senha').addEventListener('keypress', function (e) {
             if (e.key === 'Enter') window.fazerLogin();
         });
