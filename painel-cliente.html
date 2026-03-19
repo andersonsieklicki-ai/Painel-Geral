@@ -12,75 +12,50 @@
         .card { background: white; border-radius: 8px; padding: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-top: 4px solid var(--primary); }
         .card.full-width { grid-column: span 2; }
         .card h3 { margin-top: 0; color: var(--primary); display: flex; justify-content: space-between; align-items: center; }
-        .card p { font-size: 14px; color: #666; line-height: 1.5; }
         .btn { background-color: var(--primary); color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 14px; transition: background 0.3s; }
         .btn:hover { background-color: #002266; }
-        .btn:disabled { background-color: #999; cursor: not-allowed; }
         .btn-success { background-color: var(--success); }
-        .btn-success:hover { background-color: #218838; }
         .btn-outline { background-color: transparent; color: var(--primary); border: 1px solid var(--primary); }
         .btn-danger { background-color: #dc3545; color: white; border: none; }
         .status-box { display: flex; align-items: center; justify-content: space-between; background-color: #e8f5e9; padding: 15px; border-radius: 8px; border: 1px solid #c8e6c9; margin-bottom: 20px; }
         .status-indicator { display: inline-block; width: 12px; height: 12px; background-color: var(--success); border-radius: 50%; margin-right: 8px; }
-        
         .crm-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #ddd; }
         .search-box { flex: 1; min-width: 250px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; }
-        
         .table-container { overflow-y: auto; max-height: 500px; border: 1px solid #ddd; border-radius: 5px; }
         table { width: 100%; border-collapse: collapse; font-size: 14px; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background-color: #f8f9fa; color: #333; position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 2px -1px rgba(0,0,0,0.1); }
-        tr:hover { background-color: #f1f5f9; }
-        .tag { font-size: 11px; padding: 4px 8px; border-radius: 12px; color: white; font-weight: bold; display: inline-block; margin: 2px; }
-        .tag-novo { background-color: #6c757d; }
-        
+        th { background-color: #f8f9fa; position: sticky; top: 0; z-index: 10; }
+        .tag { font-size: 11px; padding: 4px 8px; border-radius: 12px; color: white; font-weight: bold; display: inline-block; margin: 2px; background-color: #6c757d; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: white; padding: 30px; border-radius: 8px; width: 500px; max-width: 90%; max-height: 90vh; overflow-y: auto; position: relative; }
-        .info-disparo { font-size: 12px; color: #dc3545; background: #f8d7da; padding: 10px; border-radius: 4px; margin-bottom: 15px; }
-        .tabs { display: flex; border-bottom: 2px solid #ccc; margin-bottom: 15px; }
-        .tab-btn { flex: 1; background: none; border: none; padding: 10px; font-size: 14px; font-weight: bold; cursor: pointer; color: #666; }
-        .tab-btn.active { color: var(--primary); border-bottom: 3px solid var(--primary); margin-bottom: -2px; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .modal textarea, .modal input[type="text"] { width: 100%; padding: 10px; margin: 5px 0 15px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: inherit; }
-        .lista-selecao { border: 1px solid #ccc; border-radius: 4px; padding: 10px; max-height: 120px; overflow-y: auto; margin-bottom: 15px; background: #f9f9f9; display: flex; flex-direction: column; gap: 8px;}
-        .progress-wrapper { background: #e9ecef; border-radius: 10px; height: 25px; width: 100%; overflow: hidden; margin: 20px 0; box-shadow: inset 0 1px 3px rgba(0,0,0,0.2); }
+        .modal-content { background: white; padding: 30px; border-radius: 8px; width: 500px; max-width: 90%; }
+        .progress-wrapper { background: #e9ecef; border-radius: 10px; height: 25px; width: 100%; overflow: hidden; margin: 20px 0; }
         .progress-fill { background: var(--success); width: 0%; height: 100%; transition: width 0.4s ease; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: bold; }
-        
-        .upload-box { border: 2px dashed #ccc; padding: 15px; border-radius: 6px; background: #fafafa; margin-bottom: 15px; text-align: center; transition: border-color 0.3s; }
-        .upload-box:hover { border-color: var(--primary); }
-        .upload-box input[type="file"] { width: 100%; cursor: pointer; font-size: 13px; }
-
+        .upload-box { border: 2px dashed #ccc; padding: 15px; border-radius: 6px; text-align: center; margin-bottom: 15px; }
         @media (max-width: 768px) { .container { grid-template-columns: 1fr; } .card.full-width { grid-column: span 1; } }
     </style>
 </head>
 <body>
 
     <div class="navbar">
-        <h2>Meu Painel - <span id="nomeCliente">Carregando...</span> <span id="tagPlano" style="font-size: 12px; background: rgba(255,255,255,0.2); padding: 4px 8px; border-radius: 12px; margin-left: 10px; font-weight: normal;"></span></h2>
-        <div>
-            <span style="font-size: 14px;">Status: Logado</span> | <a href="#" onclick="fazerLogout()" style="color: white; text-decoration: none; margin-left: 10px; font-weight: bold;">Sair</a>
-        </div>
+        <h2>Meu Painel - <span id="nomeCliente">Carregando...</span> <span id="tagPlano" style="font-size: 12px; opacity: 0.8;"></span></h2>
+        <div><a href="#" onclick="fazerLogout()" style="color: white; font-weight: bold; text-decoration: none;">Sair</a></div>
     </div>
 
     <div class="container">
         <div class="card">
             <h3>🤖 Conexão do WhatsApp</h3>
             <div class="status-box" id="area-conexao">
-                <div><span class="status-indicator" style="background-color: #ccc;"></span><strong>Verificando status...</strong></div>
+                <div><span class="status-indicator"></span><strong>Verificando status...</strong></div>
             </div>
-            <p id="desc-conexao">Analisando o status do seu robô no servidor...</p>
-            
-            <div id="area-qr-code" style="text-align: center; margin-top: 20px; display: none; border-top: 1px solid #eee; padding-top: 15px;">
-                <h4 id="status-texto-qr" style="color: var(--primary); margin-top: 0;">Gerando código...</h4>
-                <img id="qrcode-imagem" src="" alt="QR Code" style="width: 220px; height: 220px; display: none; margin: 10px auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+            <div id="area-qr-code" style="text-align: center; display: none;">
+                <h4 id="status-texto-qr">Gerando código...</h4>
+                <img id="qrcode-imagem" style="width: 200px; margin: 10px auto; display: none;">
             </div>
         </div>
 
         <div class="card">
             <h3>📢 Central de Promoções</h3>
-            <p>Crie campanhas direcionadas para sua base de clientes usando nossas etiquetas de inteligência.</p>
-            <button class="btn btn-success" style="width: 100%; margin-top: 15px;" onclick="abrirModalDisparo()">🚀 Criar Nova Campanha</button>
+            <button class="btn btn-success" style="width: 100%;" onclick="abrirModalDisparo()">🚀 Criar Nova Campanha</button>
         </div>
 
         <div class="card full-width">
@@ -94,9 +69,8 @@
             
             <div class="crm-controls">
                 <input type="text" id="buscaContato" class="search-box" placeholder="🔍 Buscar por nome ou número..." onkeyup="renderizarTabela()">
-                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                    <button class="btn btn-outline" onclick="etiquetarSelecionados()" style="background: white;">🏷️ Etiquetar Seleção</button>
-                    <button class="btn btn-outline" onclick="apagarSelecionados()" style="background: white; color: #dc3545; border-color: #dc3545;">🗑️ Apagar Seleção</button>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn btn-outline" onclick="etiquetarSelecionados()">🏷️ Etiquetar</button>
                     <button class="btn btn-danger" onclick="apagarTodos()">🗑️ Apagar Todos</button>
                 </div>
             </div>
@@ -113,7 +87,7 @@
                         </tr>
                     </thead>
                     <tbody id="tabelaContatos">
-                        <tr><td colspan="5" style="text-align: center; color: #999;">Nenhum contato importado ainda.</td></tr>
+                        <tr><td colspan="5" style="text-align: center;">Nenhum contato importado.</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -122,56 +96,31 @@
 
     <div class="modal" id="modalImportar">
         <div class="modal-content">
-            <h2 style="margin-top: 0; color: var(--primary);">Importar Contatos</h2>
-            <p>Selecione um arquivo <strong>.csv</strong> ou <strong>.vcf</strong>.</p>
-            <input type="file" accept=".csv, .vcf" id="arquivoCsv" style="width: 100%; padding: 10px; margin: 5px 0 15px 0; border: 1px solid #ccc; border-radius: 4px;">
-            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+            <h3>Importar Contatos</h3>
+            <input type="file" id="arquivoCsv" accept=".csv, .vcf" style="margin-bottom: 15px;">
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
                 <button class="btn btn-outline" onclick="fecharModalImportar()">Cancelar</button>
-                <button class="btn" id="btnSalvarImportacao" onclick="iniciarImportacao()">Salvar Contatos</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal" id="modalTag">
-        <div class="modal-content" style="width: 400px;">
-            <h2 style="margin-top: 0; color: var(--primary);">🏷️ Adicionar Etiqueta</h2>
-            <input type="text" id="nomeNovaTag" placeholder="Ex: Promoção Mães, VIP, etc...">
-            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px;">
-                <button class="btn btn-outline" onclick="fecharModalTag()">Cancelar</button>
-                <button class="btn" onclick="salvarTagMassa()">Aplicar Tag</button>
+                <button class="btn" onclick="iniciarImportacao()">Salvar</button>
             </div>
         </div>
     </div>
 
     <div class="modal" id="modalDisparo">
         <div class="modal-content">
-            <h2 style="margin-top: 0; color: var(--primary);">Criar Nova Campanha</h2>
+            <h3>🚀 Disparar Campanha</h3>
             <div id="form-disparo">
-                <div class="info-disparo">⚠️ Envio humanizado ativado.</div>
-                <div class="tabs">
-                    <button class="tab-btn active" onclick="trocarAba('tags')" id="btn-tags">🏷️ Etiquetas</button>
-                    <button class="tab-btn" onclick="trocarAba('avulso')" id="btn-avulso">✏️ Digitar</button>
-                </div>
-                <div id="aba-tags" class="tab-content active">
-                    <div class="lista-selecao" id="listaTagsDisparo"></div>
-                </div>
-                <div id="aba-avulso" class="tab-content">
-                    <textarea id="listaNumeros" rows="3" placeholder="Ex: 5546999999999"></textarea>
-                </div>
-                <label><strong>Anexar Mídia:</strong></label>
                 <div class="upload-box">
-                    <input type="file" id="arquivoMidia" accept="image/*, application/pdf, audio/*">
+                    <input type="file" id="arquivoMidia" accept="image/*, application/pdf">
                 </div>
-                <label><strong>Legenda:</strong></label>
-                <textarea id="mensagemPromo" rows="4" placeholder="Sua mensagem..."></textarea>
-                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px;">
+                <textarea id="mensagemPromo" rows="4" placeholder="Sua mensagem..." style="width: 100%; padding: 10px; box-sizing: border-box;"></textarea>
+                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px;">
                     <button class="btn btn-outline" onclick="fecharModalDisparo()">Cancelar</button>
-                    <button class="btn btn-success" onclick="iniciarDisparo()">🚀 Iniciar</button>
+                    <button class="btn btn-success" onclick="iniciarDisparo()">Enviar</button>
                 </div>
             </div>
             <div id="tela-progresso" style="display: none; text-align: center;">
                 <div class="progress-wrapper"><div id="barra-progresso" class="progress-fill">0%</div></div>
-                <div id="texto-contagem">Enviando...</div>
+                <div id="texto-contagem">Processando...</div>
             </div>
         </div>
     </div>
@@ -197,140 +146,69 @@
 
         window.listaContatos = [];
         window.idClienteLogado = ""; 
-        window.planoClienteLogado = "basico"; 
-        window.nomeLojista = "Nossa Loja";
+        window.nomeLojista = "";
         window.zapLojista = "";
 
-        // 💾 Memória Local
+        // 💾 PERSISTÊNCIA E MEMÓRIA
         window.salvarContatosLocal = function() {
             if(window.idClienteLogado) localStorage.setItem('crm_' + window.idClienteLogado, JSON.stringify(window.listaContatos));
         }
+
         window.carregarContatosLocal = function() {
             if(window.idClienteLogado) {
-                const dadosSalvos = localStorage.getItem('crm_' + window.idClienteLogado);
-                if(dadosSalvos) { window.listaContatos = JSON.parse(dadosSalvos); renderizarTabela(); }
+                const salvos = localStorage.getItem('crm_' + window.idClienteLogado);
+                if(salvos) { window.listaContatos = JSON.parse(salvos); renderizarTabela(); }
             }
         }
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                const docRef = doc(db, "empresas", user.uid);
-                const docSnap = await getDoc(docRef);
+                const docSnap = await getDoc(doc(db, "empresas", user.uid));
                 if (docSnap.exists()) {
                     const dados = docSnap.data();
+                    window.idClienteLogado = user.uid;
+                    window.nomeLojista = dados.nomeEmpresa;
+                    window.zapLojista = dados.whatsappLojista || "";
                     document.getElementById('nomeCliente').innerText = dados.nomeEmpresa;
-                    window.idClienteLogado = user.uid; 
-                    window.planoClienteLogado = dados.plano || 'basico'; 
-                    window.nomeLojista = dados.nomeEmpresa || "Nossa Loja";
-                    window.zapLojista = dados.whatsappLojista || ""; 
                     window.carregarContatosLocal();
                     
                     if (dados.plano === 'basico') {
-                        document.getElementById('tagPlano').innerText = "🥉 Plano Básico";
-                        document.getElementById('area-conexao').innerHTML = `<div><span class="status-indicator"></span><strong>Conectado à Central</strong></div>`;
-                    } else if (dados.plano === 'premium') {
-                        document.getElementById('tagPlano').innerText = "🥇 Plano Premium";
-                        document.getElementById('area-conexao').innerHTML = `<div><span class="status-indicator" style="background-color: #ffc107;"></span><strong>Aguardando Conexão</strong></div><button class="btn btn-outline" id="btnGerarQR" onclick="conectarRoboPremium()">Conectar WhatsApp</button>`;
+                        document.getElementById('area-conexao').innerHTML = `<div><span class=\"status-indicator\"></span><strong>Conectado à Central</strong></div>`;
+                    } else {
+                        document.getElementById('area-conexao').innerHTML = `<button class=\"btn\" onclick=\"conectarRoboPremium()\">Conectar WhatsApp</button>`;
                     }
                 }
             } else { window.location.href = "index.html"; }
         });
 
-        // 🚀 CONEXÃO PREMIUM (Corrigida)
-        window.conectarRoboPremium = async function() {
-            const idCliente = "teste-omni"; 
-            document.getElementById('area-qr-code').style.display = 'block';
-            document.getElementById('status-texto-qr').innerText = "Gerando QR Code...";
-            document.getElementById('btnGerarQR').disabled = true;
-
-            try {
-               await fetch('/api-oracle/api/saas/conectar', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'x-senha': '123321' },
-                    body: JSON.stringify({ idCliente: idCliente })
-                });
-
-                const docSaaS = doc(db, "clientes_premium", idCliente);
-                onSnapshot(docSaaS, (docSnap) => {
-                    if (docSnap.exists()) {
-                        const dadosSaaS = docSnap.data();
-                        const qrImagem = document.getElementById("qrcode-imagem");
-                        const statusTexto = document.getElementById("status-texto-qr");
-                        if (dadosSaaS.qrCode) {
-                            qrImagem.src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(dadosSaaS.qrCode)}`;
-                            qrImagem.style.display = "block";
-                            statusTexto.innerText = "📱 Escaneie o código:";
-                        } else if (dadosSaaS.status === 'online') {
-                            qrImagem.style.display = "none";
-                            statusTexto.innerText = "✅ Robô Operacional!";
-                        }
-                    }
-                });
-            } catch (error) { document.getElementById('btnGerarQR').disabled = false; }
-        };
-
-        // 🚀 DISPARO COM MÍDIA (Corrigido)
-        window.iniciarDisparo = async function() {
-            const msg = document.getElementById('mensagemPromo').value;
-            const inputMidia = document.getElementById('arquivoMidia');
-            const arquivo = inputMidia.files[0];
+        // 🔍 RENDERIZAÇÃO COM BUSCA E ORDEM ALFABÉTICA
+        window.renderizarTabela = function() {
+            const tbody = document.getElementById('tabelaContatos');
+            const termo = document.getElementById('buscaContato').value.toLowerCase();
             
-            if(!msg && !arquivo) return alert("⚠️ Digite uma mensagem ou anexe uma mídia!");
+            // Filtro e Ordenação
+            let filtrados = window.listaContatos.filter(c => 
+                c.nome.toLowerCase().includes(termo) || c.telefone.includes(termo)
+            );
 
-            let midiaBase64 = null, midiaNome = "", midiaMime = "";
-            if (arquivo) {
-                const reader = new FileReader();
-                midiaBase64 = await new Promise((resolve) => {
-                    reader.onload = (e) => resolve(e.target.result.split(',')[1]);
-                    reader.readAsDataURL(arquivo);
-                });
-                midiaNome = arquivo.name; midiaMime = arquivo.type;
+            filtrados.sort((a, b) => a.nome.localeCompare(b.nome));
+
+            if(filtrados.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Nenhum contato encontrado.</td></tr>';
+                return;
             }
 
-            let numerosParaEnvio = [];
-            if (document.getElementById('aba-tags').classList.contains('active')) {
-                const tags = Array.from(document.querySelectorAll('#listaTagsDisparo input:checked')).map(cb => cb.value);
-                if(tags.includes("TODOS_OS_CONTATOS")) numerosParaEnvio = window.listaContatos.map(c => c.telefone);
-                else numerosParaEnvio = window.listaContatos.filter(c => c.tags.some(t => tags.includes(t))).map(c => c.telefone);
-            } else {
-                numerosParaEnvio = document.getElementById('listaNumeros').value.split('\n').filter(l => l.trim() !== '');
-            }
-
-            if (numerosParaEnvio.length === 0) return alert("⚠️ Lista vazia!");
-
-            document.getElementById('form-disparo').style.display = 'none';
-            document.getElementById('tela-progresso').style.display = 'block';
-
-            try {
-                const resposta = await fetch('/api-oracle/api/saas/disparar', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'x-senha': '123321' },
-                    body: JSON.stringify({
-                        idCliente: window.idClienteLogado,
-                        plano: window.planoClienteLogado,
-                        nomeEmpresa: window.nomeLojista,
-                        zapLojista: window.zapLojista,
-                        numeros: numerosParaEnvio,
-                        mensagem: msg,
-                        midia: midiaBase64,
-                        midiaNome: midiaNome,
-                        midiaMime: midiaMime
-                    })
-                });
-                
-                let env = 0; 
-                const tot = numerosParaEnvio.length; 
-                let sim = setInterval(() => {
-                    env++; 
-                    let porcentagem = Math.round((env / tot) * 100);
-                    document.getElementById('barra-progresso').style.width = porcentagem + '%';
-                    document.getElementById('barra-progresso').innerText = porcentagem + '%';
-                    if(env >= tot) { clearInterval(sim); alert("✅ Disparo Concluído!"); fecharModalDisparo(); }
-                }, 10000);
-            } catch (error) { fecharModalDisparo(); }
+            tbody.innerHTML = filtrados.map(c => `
+                <tr>
+                    <td><input type="checkbox" class="check-contato" value="${c.id}"></td>
+                    <td>${c.nome}</td>
+                    <td>${c.telefone}</td>
+                    <td><span class="tag">🏷️ ${c.tags[0] || 'Novo'}</span></td>
+                    <td><button class="btn btn-outline" style="padding: 2px 5px;" onclick="apagarContato('${c.id}')">🗑️</button></td>
+                </tr>
+            `).join('');
         }
 
-        // Funções de Tabela e Interface (Mantidas do original)
         window.iniciarImportacao = function() {
             const input = document.getElementById('arquivoCsv');
             const file = input.files[0];
@@ -340,28 +218,85 @@
                 const linhas = e.target.result.split('\n').slice(1);
                 linhas.forEach(l => {
                     const col = l.split(/[,;]/);
-                    if(col.length >= 2) window.listaContatos.push({ id: Date.now()+Math.random(), nome: col[0].trim(), telefone: col[1].replace(/\D/g,''), tags: ['CSV'] });
+                    if(col.length >= 2) window.listaContatos.push({ 
+                        id: 'ctt_' + Math.random().toString(36).substr(2, 9), 
+                        nome: col[0].trim(), 
+                        telefone: col[1].replace(/\D/g, ''), 
+                        tags: ['Importado'] 
+                    });
                 });
-                renderizarTabela(); window.salvarContatosLocal(); fecharModalImportar();
+                renderizarTabela();
+                window.salvarContatosLocal();
+                fecharModalImportar();
             };
             reader.readAsText(file);
         }
 
-        window.renderizarTabela = function() {
-            const tbody = document.getElementById('tabelaContatos');
-            tbody.innerHTML = window.listaContatos.map(c => `<tr><td><input type="checkbox" class="check-contato" value="${c.id}"></td><td>${c.nome}</td><td>${c.telefone}</td><td><span class="tag tag-novo">🏷️ ${c.tags[0]}</span></td><td><button class="btn btn-outline" onclick="apagarContato('${c.id}')">🗑️</button></td></tr>`).join('');
+        // 🚀 DISPARO COM MÍDIA (BASE64)
+        window.iniciarDisparo = async function() {
+            const msg = document.getElementById('mensagemPromo').value;
+            const inputMidia = document.getElementById('arquivoMidia');
+            const arquivo = inputMidia.files[0];
+            
+            if(!msg && !arquivo) return alert("Preencha a mensagem ou anexe um arquivo!");
+
+            let midiaBase64 = null, midiaNome = "", midiaMime = "";
+            if (arquivo) {
+                const reader = new FileReader();
+                midiaBase64 = await new Promise((res) => {
+                    reader.onload = (e) => res(e.target.result.split(',')[1]);
+                    reader.readAsDataURL(arquivo);
+                });
+                midiaNome = arquivo.name;
+                midiaMime = arquivo.type;
+            }
+
+            const numeros = window.listaContatos.map(c => c.telefone);
+            if(numeros.length === 0) return alert("Importe contatos primeiro!");
+
+            document.getElementById('form-disparo').style.display = 'none';
+            document.getElementById('tela-progresso').style.display = 'block';
+
+            try {
+                await fetch('/api-oracle/api/saas/disparar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'x-senha': '123321' },
+                    body: JSON.stringify({
+                        idCliente: window.idClienteLogado,
+                        nomeEmpresa: window.nomeLojista,
+                        zapLojista: window.zapLojista,
+                        numeros: numeros,
+                        mensagem: msg,
+                        midia: midiaBase64,
+                        midiaNome: midiaNome,
+                        midiaMime: midiaMime,
+                        plano: 'basico'
+                    })
+                });
+
+                // Simulação de progresso visual (10s por contato como na Oracle)
+                let env = 0;
+                const total = numeros.length;
+                let sim = setInterval(() => {
+                    env++;
+                    let porc = Math.round((env / total) * 100);
+                    document.getElementById('barra-progresso').style.width = porc + '%';
+                    document.getElementById('barra-progresso').innerText = porc + '%';
+                    document.getElementById('texto-contagem').innerText = `Enviando ${env} de ${total}`;
+                    if(env >= total) { clearInterval(sim); alert("Campanha iniciada com sucesso!"); fecharModalDisparo(); }
+                }, 10000);
+            } catch (e) { alert("Erro ao conectar com a Oracle."); fecharModalDisparo(); }
         }
 
-        window.apagarContato = (id) => { window.listaContatos = window.listaContatos.filter(c => c.id != id); renderizarTabela(); window.salvarContatosLocal(); }
-        window.apagarTodos = () => { window.listaContatos = []; renderizarTabela(); window.salvarContatosLocal(); }
-        window.alternarTodosChecks = () => { const m = document.getElementById('checkTodos'); document.querySelectorAll('.check-contato').forEach(c => c.checked = m.checked); }
+        // Funções de UI
+        window.apagarContato = (id) => { window.listaContatos = window.listaContatos.filter(c => c.id !== id); renderizarTabela(); window.salvarContatosLocal(); }
+        window.apagarTodos = () => { if(confirm("Apagar tudo?")) { window.listaContatos = []; renderizarTabela(); window.salvarContatosLocal(); } }
         window.abrirModalImportar = () => document.getElementById('modalImportar').style.display = 'flex';
         window.fecharModalImportar = () => document.getElementById('modalImportar').style.display = 'none';
-        window.abrirModalDisparo = () => { atualizarListaTagsDisparo(); document.getElementById('modalDisparo').style.display = 'flex'; document.getElementById('form-disparo').style.display = 'block'; document.getElementById('tela-progresso').style.display = 'none'; }
+        window.abrirModalDisparo = () => { document.getElementById('modalDisparo').style.display = 'flex'; document.getElementById('form-disparo').style.display = 'block'; document.getElementById('tela-progresso').style.display = 'none'; }
         window.fecharModalDisparo = () => document.getElementById('modalDisparo').style.display = 'none';
-        window.trocarAba = (a) => { ['tags', 'avulso'].forEach(i => { document.getElementById('aba-'+i).classList.remove('active'); }); document.getElementById('aba-'+a).classList.add('active'); }
         window.fazerLogout = () => signOut(auth).then(() => window.location.href = "index.html");
-        window.atualizarListaTagsDisparo = () => { document.getElementById('listaTagsDisparo').innerHTML = '<label><input type="checkbox" value="TODOS_OS_CONTATOS"> 📢 Todos</label>'; }
+        window.alternarTodosChecks = () => { const m = document.getElementById('checkTodos'); document.querySelectorAll('.check-contato').forEach(c => c.checked = m.checked); }
     </script>
 </body>
 </html>
