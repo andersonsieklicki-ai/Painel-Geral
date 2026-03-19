@@ -216,6 +216,10 @@
                 if (docSnap.exists()) {
                     const dados = docSnap.data();
                     document.getElementById('nomeCliente').innerText = dados.nomeEmpresa;
+                    window.idClienteLogado = user.uid; 
+                    window.planoClienteLogado = dados.plano || 'basico'; 
+                    window.nomeLojista = dados.nomeEmpresa || "Nossa Loja";
+                    window.zapLojista = dados.whatsappLojista || "";
                     
                     if (dados.plano === 'basico') {
                         document.getElementById('tagPlano').innerText = "🥉 Plano Básico";
@@ -438,7 +442,11 @@
         window.apagarTodos = function() {
             if(window.listaContatos.length === 0) return alert("⚠️ A lista já está vazia.");
             if(confirm("🚨 ATENÇÃO: Apagar TODOS os contatos?")) {
-                window.listaContatos = [];
+               window.listaContatos = [];
+        window.idClienteLogado = ""; 
+        window.planoClienteLogado = "basico"; 
+        window.nomeLojista = "Nossa Loja";
+        window.zapLojista = "";
                 document.getElementById('checkTodos').checked = false;
                 renderizarTabela();
             }
@@ -524,16 +532,18 @@
             
             try {
                 // Envia o pacote (Payload) para a API da Oracle
-                const resposta = await fetch('/api-oracle/api/saas/disparar', {
+          const resposta = await fetch('/api-oracle/api/saas/disparar', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'x-senha': '123321' },
                     body: JSON.stringify({
-                        idCliente: "teste-omni", // O ID do cliente conectado
+                        idCliente: window.idClienteLogado,
+                        plano: window.planoClienteLogado,
+                        nomeEmpresa: window.nomeLojista,
+                        zapLojista: window.zapLojista,
                         numeros: numerosParaEnvio,
                         mensagem: msg
                     })
                 });
-
                 const dados = await resposta.json();
                 
                 if (dados.erro) {
