@@ -208,7 +208,25 @@
         const db = getFirestore(app);
 
         window.listaContatos = [];
+        // ==========================================
+        // 💾 SISTEMA DE MEMÓRIA (Salva no Navegador)
+        // ==========================================
+        window.salvarContatosLocal = function() {
+            if(window.idClienteLogado) {
+                // Salva a lista convertendo para texto, separada por cliente
+                localStorage.setItem('crm_' + window.idClienteLogado, JSON.stringify(window.listaContatos));
+            }
+        }
 
+        window.carregarContatosLocal = function() {
+            if(window.idClienteLogado) {
+                const dadosSalvos = localStorage.getItem('crm_' + window.idClienteLogado);
+                if(dadosSalvos) {
+                    window.listaContatos = JSON.parse(dadosSalvos); // Transforma de volta em lista
+                    renderizarTabela();
+                }
+            }
+        }
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 const docRef = doc(db, "empresas", user.uid);
@@ -216,10 +234,14 @@
                 if (docSnap.exists()) {
                     const dados = docSnap.data();
                     document.getElementById('nomeCliente').innerText = dados.nomeEmpresa;
+                   // Suas variáveis já existentes...
                     window.idClienteLogado = user.uid; 
                     window.planoClienteLogado = dados.plano || 'basico'; 
                     window.nomeLojista = dados.nomeEmpresa || "Nossa Loja";
-                    window.zapLojista = dados.whatsappLojista || "";
+                    window.zapLojista = dados.whatsappLojista || ""; 
+                    
+                    // 👉 NOVO: CARREGA OS CONTATOS SALVOS NA HORA QUE LOGA!
+                    window.carregarContatosLocal();
                     
                     if (dados.plano === 'basico') {
                         document.getElementById('tagPlano').innerText = "🥉 Plano Básico";
