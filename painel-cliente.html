@@ -245,7 +245,7 @@
 
             try {
                 // 1. Manda o comando POST para a sua VPS (Oracle) ligar o WhatsApp
-                await fetch('http://141.148.49.219:3000/api/saas/conectar', {
+               await fetch('/api-oracle/api/saas/conectar', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'x-senha': '123321' },
                     body: JSON.stringify({ idCliente: idCliente })
