@@ -531,9 +531,25 @@
 
       window.iniciarDisparo = async function() {
             const msg = document.getElementById('mensagemPromo').value;
-            const arquivo = document.getElementById('arquivoMidia').files[0];
+            const inputMidia = document.getElementById('arquivoMidia');
+            const arquivo = inputMidia.files[0];
             
             if(!msg && !arquivo) return alert("⚠️ Digite uma mensagem ou anexe uma mídia!");
+
+            let midiaBase64 = null;
+            let midiaNome = "";
+            let midiaMime = "";
+
+            // 👉 CONVERSOR DE MÍDIA PARA BASE64
+            if (arquivo) {
+                const reader = new FileReader();
+                midiaBase64 = await new Promise((resolve) => {
+                    reader.onload = (e) => resolve(e.target.result.split(',')[1]);
+                    reader.readAsDataURL(arquivo);
+                });
+                midiaNome = arquivo.name;
+                midiaMime = arquivo.type;
+            }
 
             // 1. EXTRAIR OS NÚMEROS DAS ETIQUETAS OU DA CAIXA DE TEXTO
             let numerosParaEnvio = [];
