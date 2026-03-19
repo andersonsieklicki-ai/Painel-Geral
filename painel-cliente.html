@@ -8,18 +8,15 @@
         :root { --primary: #003399; --secondary: #f4f7f6; --success: #28a745; --text-dark: #2c3e50; --card-bg: #ffffff; }
         body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background-color: var(--secondary); margin: 0; padding: 0; color: var(--text-dark); }
         
-        /* Navbar Responsiva */
         .navbar { background-color: var(--primary); color: white; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); flex-wrap: wrap; gap: 10px; }
         .navbar h2 { margin: 0; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;}
         .tag-plano { font-size: 0.75rem; background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 20px; font-weight: 500; letter-spacing: 0.5px; }
         
-        /* Grid Layout */
         .container { max-width: 1200px; margin: 30px auto; padding: 0 15px; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
         .card { background: var(--card-bg); border-radius: 12px; padding: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border-top: 4px solid var(--primary); transition: transform 0.2s; }
         .card.full-width { grid-column: 1 / -1; }
         .card h3 { margin-top: 0; color: var(--primary); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
         
-        /* Botões */
         .btn { background-color: var(--primary); color: white; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 5px; justify-content: center; }
         .btn:hover { background-color: #002266; transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0,51,153,0.2); }
         .btn:active { transform: translateY(0); }
@@ -30,14 +27,12 @@
         .btn-danger { background-color: #fff; color: #dc3545; border: 1px solid #dc3545; }
         .btn-danger:hover { background-color: #dc3545; color: #fff; }
         
-        /* Status & Inputs */
         .status-box { display: flex; align-items: center; background-color: #f8f9fa; padding: 15px; border-radius: 10px; border: 1px solid #e9ecef; margin-bottom: 15px; font-weight: 500; }
         .status-indicator { display: inline-block; width: 12px; height: 12px; background-color: var(--success); border-radius: 50%; margin-right: 10px; box-shadow: 0 0 5px var(--success); }
         .crm-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; background: #f8f9fa; padding: 15px; border-radius: 10px; }
         .search-box { flex: 1; min-width: 250px; padding: 12px; border: 1px solid #ced4da; border-radius: 8px; font-size: 0.9rem; outline: none; transition: border-color 0.3s; }
         .search-box:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,51,153,0.1); }
         
-        /* Tabela Responsiva */
         .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 8px; border: 1px solid #eee; }
         table { width: 100%; border-collapse: collapse; font-size: 0.9rem; white-space: nowrap; }
         th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
@@ -45,12 +40,10 @@
         tr:hover { background-color: #f1f5f9; }
         .tag { font-size: 0.7rem; padding: 5px 10px; border-radius: 20px; color: white; font-weight: 600; display: inline-block; margin: 2px; background-color: #6c757d; }
         
-        /* Modais */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); justify-content: center; align-items: center; z-index: 1000; padding: 20px; box-sizing: border-box; }
         .modal-content { background: white; padding: 30px; border-radius: 15px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
         .modal textarea, .modal input[type="text"] { width: 100%; padding: 12px; margin: 8px 0 15px 0; border: 1px solid #ced4da; border-radius: 8px; box-sizing: border-box; font-family: inherit; resize: vertical; }
         
-        /* Tabs & Upload */
         .tabs { display: flex; border-bottom: 2px solid #eee; margin-bottom: 20px; }
         .tab-btn { flex: 1; background: none; border: none; padding: 12px; font-size: 0.95rem; font-weight: 600; cursor: pointer; color: #6c757d; transition: all 0.3s; }
         .tab-btn.active { color: var(--primary); border-bottom: 3px solid var(--primary); margin-bottom: -2px; }
@@ -60,11 +53,9 @@
         .upload-box { border: 2px dashed #ced4da; padding: 20px; border-radius: 10px; background: #fdfdfd; margin-bottom: 15px; text-align: center; transition: all 0.3s; cursor: pointer; }
         .upload-box:hover { border-color: var(--primary); background: #f0f4f8; }
         
-        /* Progresso */
         .progress-wrapper { background: #e9ecef; border-radius: 20px; height: 20px; width: 100%; overflow: hidden; margin: 20px 0; }
         .progress-fill { background: var(--success); width: 0%; height: 100%; transition: width 0.4s ease; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.75rem; font-weight: bold; }
         
-        /* Mobile Adjustments */
         @media (max-width: 768px) { 
             .crm-controls { flex-direction: column; align-items: stretch; }
             .btn { width: 100%; justify-content: center; }
@@ -202,7 +193,6 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        // IMPORTANTE: setDoc adicionado para sincronizar CRM com a nuvem
         import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -226,17 +216,14 @@
         window.zapLojista = "";
 
         // ==========================================
-        // 💾 PERSISTÊNCIA: NAVEGADOR + NUVEM (NOVIDADE!)
+        // 💾 PERSISTÊNCIA E PREVENÇÃO DE DUPLICAÇÃO
         // ==========================================
         window.salvarContatosLocal = async function() {
             if(window.idClienteLogado) {
-                // 1. Salva no navegador para carregar instantaneamente no F5
                 localStorage.setItem('crm_' + window.idClienteLogado, JSON.stringify(window.listaContatos));
-                
-                // 2. Sincroniza com o Firebase para o robô ler quando você mandar comando pelo WhatsApp
                 try {
                     await setDoc(doc(db, "crm_clientes", window.idClienteLogado), { contatos: window.listaContatos });
-                } catch(e) { console.error("Aviso: Sincronização em nuvem falhou, mas está salvo localmente."); }
+                } catch(e) {}
             }
         }
 
@@ -247,6 +234,109 @@
             }
         }
 
+        // ==========================================
+        // 🚀 O SEGREDO: TRADUTOR DE VCF ANDROID
+        // ==========================================
+        function decodificarNome(str) {
+            try {
+                if(str.includes('=')) {
+                    // Remove as quebras de linha escondidas do Quoted-Printable
+                    let limpo = str.replace(/=\r?\n/g, '');
+                    // Transforma os Hexadecimais para o JavaScript ler
+                    limpo = limpo.replace(/=([A-F0-9]{2})/gi, '%$1'); 
+                    return decodeURIComponent(limpo);
+                }
+                return str;
+            } catch(e) { 
+                return str.replace(/=([A-F0-9]{2})/gi, ''); // Fallback limpo caso falhe
+            } 
+        }
+
+        function formatarTelefoneBR(telefone) {
+            let num = telefone.replace(/\D/g, ''); 
+            if (num.startsWith('55') && num.length >= 12) num = num.substring(2); 
+            if (num.startsWith('0')) {
+                if (num.length >= 13) num = num.substring(3);
+                else if (num.length === 11 || num.length === 12) num = num.substring(1); 
+            }
+            if (num.length === 10) num = num.substring(0, 2) + '9' + num.substring(2);
+            return num || null;
+        }
+
+        window.iniciarImportacao = function() {
+            const input = document.getElementById('arquivoCsv');
+            const file = input.files[0];
+            if(!file) return alert("⚠️ Selecione um arquivo!");
+
+            const extensao = file.name.split('.').pop().toLowerCase();
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                const conteudo = e.target.result;
+                let contatosLidos = 0;
+                let duplicados = 0;
+
+                if (extensao === 'csv') {
+                    const linhas = conteudo.split('\n');
+                    for(let i = 1; i < linhas.length; i++) { 
+                        const linha = linhas[i].trim();
+                        if(!linha) continue;
+                        const colunas = linha.split(/[,;]/); 
+                        if(colunas.length >= 2) {
+                            let telLimpo = formatarTelefoneBR(colunas[1]);
+                            if (telLimpo) {
+                                // 🚫 BLOQUEIO ANTI-DUPLICAÇÃO
+                                if (!window.listaContatos.find(c => c.telefone === telLimpo)) {
+                                    window.listaContatos.push({ id: 'ctt_' + Math.random().toString(36).substr(2, 9), nome: colunas[0].trim(), telefone: telLimpo, tags: ['CSV'] });
+                                    contatosLidos++;
+                                } else { duplicados++; }
+                            }
+                        }
+                    }
+                } else if (extensao === 'vcf') {
+                    // 1. Unimos as linhas que o Android quebrou ANTES de dividir por cartões!
+                    let rawContent = conteudo.replace(/=\r?\n/g, ''); 
+                    const vcards = rawContent.split(/BEGIN:VCARD/i);
+                    
+                    for(let i = 1; i < vcards.length; i++) {
+                        const card = vcards[i];
+                        if(!card.trim()) continue;
+
+                        const nomeMatch = card.match(/FN[^:]*:(.*)/i);
+                        const telMatch = card.match(/TEL[^:]*:(.*)/i);
+
+                        if(nomeMatch && telMatch) {
+                            let nomePuro = decodificarNome(nomeMatch[1].trim());
+                            let telPuro = formatarTelefoneBR(telMatch[1].trim());
+                            
+                            if (telPuro) {
+                                // 🚫 BLOQUEIO ANTI-DUPLICAÇÃO
+                                if (!window.listaContatos.find(c => c.telefone === telPuro)) {
+                                    window.listaContatos.push({ 
+                                        id: 'ctt_' + Math.random().toString(36).substr(2, 9), 
+                                        nome: nomePuro, 
+                                        telefone: telPuro, 
+                                        tags: ['Agenda VCF'] 
+                                    });
+                                    contatosLidos++;
+                                } else { duplicados++; }
+                            }
+                        }
+                    }
+                }
+
+                alert(`✅ Importação concluída!\n\n🔹 ${contatosLidos} novos adicionados.\n🔸 ${duplicados} contatos duplicados ignorados.`);
+                fecharModalImportar(); 
+                input.value = ''; 
+                renderizarTabela(); 
+                window.salvarContatosLocal();
+            };
+            reader.readAsText(file);
+        }
+
+        // ==========================================
+        // 🔄 RESTANTE DA ESTRUTURA INTACTA
+        // ==========================================
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 const docSnap = await getDoc(doc(db, "empresas", user.uid));
@@ -258,7 +348,7 @@
                     window.zapLojista = dados.whatsappLojista || "";
                     document.getElementById('nomeCliente').innerText = dados.nomeEmpresa;
                     
-                    window.carregarContatosLocal(); // Carrega contatos na hora do login
+                    window.carregarContatosLocal(); 
                     
                     if (dados.plano === 'basico') {
                         document.getElementById('tagPlano').innerText = "🥉 Plano Básico";
@@ -273,7 +363,6 @@
             } else { window.location.href = "index.html"; }
         });
 
-        // 🚀 CONEXÃO ORACLE
         window.conectarRoboPremium = async function() {
             const idCliente = "teste-omni"; 
             document.getElementById('area-qr-code').style.display = 'block';
@@ -309,13 +398,12 @@
             } catch (error) { document.getElementById('status-texto-qr').innerText = "❌ Erro ao iniciar servidor."; }
         };
 
-        // 🔍 CRM: RENDERIZAR E ORDENAR ALFABETICAMENTE
         window.renderizarTabela = function() {
             const tbody = document.getElementById('tabelaContatos');
             const termo = document.getElementById('buscaContato').value.toLowerCase();
             
             let filtrados = window.listaContatos.filter(c => c.nome.toLowerCase().includes(termo) || c.telefone.includes(termo));
-            filtrados.sort((a, b) => a.nome.localeCompare(b.nome)); // Ordem Alfabética
+            filtrados.sort((a, b) => a.nome.localeCompare(b.nome)); 
 
             if(filtrados.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px; color: #666;">Nenhum contato encontrado.</td></tr>';
@@ -333,7 +421,6 @@
             `).join('');
         }
 
-        // 🚀 DISPARO COM MÍDIA BLINDADO (LIMITE 15MB)
         window.iniciarDisparo = async function() {
             const msg = document.getElementById('mensagemPromo').value;
             const inputMidia = document.getElementById('arquivoMidia');
@@ -343,11 +430,8 @@
 
             let midiaBase64 = null, midiaNome = "", midiaMime = "";
             if (arquivo) {
-                // 🛑 TRAVA DE SEGURANÇA DE TAMANHO (15MB MÁXIMO)
                 const tamanhoMB = arquivo.size / (1024 * 1024);
-                if (tamanhoMB > 15) {
-                    return alert("⚠️ Arquivo muito grande! O limite para envio via painel é de 15MB para não sobrecarregar o robô.");
-                }
+                if (tamanhoMB > 15) return alert("⚠️ Arquivo muito grande! O limite para envio via painel é de 15MB para não sobrecarregar o robô.");
 
                 const reader = new FileReader();
                 midiaBase64 = await new Promise((res) => {
@@ -386,7 +470,7 @@
                         numeros: numerosParaEnvio,
                         mensagem: msg,
                         midia: midiaBase64, midiaNome: midiaNome, midiaMime: midiaMime,
-                        plano: window.planoClienteLogado // Identifica básico ou premium
+                        plano: window.planoClienteLogado 
                     })
                 });
 
@@ -403,7 +487,7 @@
                     document.getElementById('barra-progresso').innerText = porc + '%';
                     document.getElementById('texto-contagem').innerText = `Enviando ${env} de ${tot}`;
                     if(env >= tot) { clearInterval(sim); alert("✅ Disparo Concluído com Sucesso!"); fecharModalDisparo(); }
-                }, 10000); // Ritmo humanizado
+                }, 10000); 
             } catch (e) { alert("❌ Falha na conexão com o servidor da Oracle."); fecharModalDisparo(); }
         }
 
@@ -417,19 +501,6 @@
             });
         }
 
-        // 🛠️ FUNÇÕES DE MANIPULAÇÃO (SEMPRE SALVANDO NO LOCALSTORAGE/NUVEM)
-        window.iniciarImportacao = function() {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const linhas = e.target.result.split('\n').slice(1);
-                linhas.forEach(l => {
-                    const col = l.split(/[,;]/);
-                    if(col.length >= 2) window.listaContatos.push({ id: 'ctt_'+Math.random().toString(36).substr(2,9), nome: col[0].trim(), telefone: col[1].replace(/\D/g,''), tags: ['Novo'] });
-                });
-                renderizarTabela(); window.salvarContatosLocal(); fecharModalImportar();
-            };
-            reader.readAsText(document.getElementById('arquivoCsv').files[0]);
-        }
         window.salvarTagMassa = function() {
             const tag = document.getElementById('nomeNovaTag').value.trim();
             if(!tag) return alert("Digite o nome da etiqueta!");
@@ -451,7 +522,6 @@
             const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([vcf], {type:'text/vcard'})); a.download = 'contatos.vcf'; a.click();
         }
 
-        // INTERFACE ACTIONS
         window.abrirModalImportar = () => document.getElementById('modalImportar').style.display='flex';
         window.fecharModalImportar = () => document.getElementById('modalImportar').style.display='none';
         window.abrirModalTag = () => document.getElementById('modalTag').style.display='flex';
