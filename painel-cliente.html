@@ -490,29 +490,73 @@
             todasTags.forEach(tag => { divTags.innerHTML += `<label><input type="checkbox" value="${tag}"> 🏷️ ${tag}</label>`; });
         }
 
-        window.iniciarDisparo = function() {
+       window.iniciarDisparo = function() {
             const msg = document.getElementById('mensagemPromo').value;
             const arquivo = document.getElementById('arquivoMidia').files[0];
             
             if(!msg && !arquivo) return alert("⚠️ Digite uma mensagem ou anexe uma mídia!");
+
+            // 1. DESCOBRIR A QUANTIDADE REAL DE ENVIOS
+            let totalEnvios = 0;
             
+            // Verifica qual aba está ativa (Tags ou Avulso)
+            const abaTagsEstaAtiva = document.getElementById('aba-tags').classList.contains('active');
+            
+            if (abaTagsEstaAtiva) {
+                // Pega todas as caixinhas marcadas na tela de etiquetas
+                const tagsMarcadas = Array.from(document.querySelectorAll('#listaTagsDisparo input:checked')).map(cb => cb.value);
+                
+                if(tagsMarcadas.length === 0) return alert("⚠️ Selecione pelo menos uma etiqueta ou a base toda!");
+                
+                if(tagsMarcadas.includes("TODOS_OS_CONTATOS")) {
+                    totalEnvios = window.listaContatos.length; // Envia para a base inteira
+                } else {
+                    // Conta quantos contatos tem pelo menos UMA das etiquetas selecionadas
+                    const contatosFiltrados = window.listaContatos.filter(c => c.tags.some(t => tagsMarcadas.includes(t)));
+                    totalEnvios = contatosFiltrados.length;
+                }
+            } else {
+                // Aba Avulso (Lê a caixa de texto)
+                const linhasDigitadas = document.getElementById('listaNumeros').value.split('\n');
+                // Filtra para não contar linhas vazias
+                const numerosValidos = linhasDigitadas.filter(linha => linha.trim() !== '');
+                totalEnvios = numerosValidos.length;
+            }
+
+            // Trava de segurança se der zero
+            if (totalEnvios === 0) {
+                return alert("⚠️ Nenhum contato válido foi encontrado. Verifique se há clientes com essa etiqueta.");
+            }
+
+            // 2. INICIA A TELA DE PROGRESSO REAL
             document.getElementById('form-disparo').style.display = 'none';
             document.getElementById('tela-progresso').style.display = 'block';
             
-            let env = 0; const tot = 5;
+            let env = 0; 
+            const tot = totalEnvios; // 👉 AQUI ESTÁ A MÁGICA: USA O TOTAL REAL!
+            
+            // Animação de envio
             let sim = setInterval(() => {
-                env++; document.getElementById('barra-progresso').style.width = (env/tot*100) + '%';
-                document.getElementById('barra-progresso').innerText = (env/tot*100) + '%';
-                document.getElementById('texto-contagem').innerText = `Simulando ${env} de ${tot}`;
+                env++; 
+                
+                // Calcula a porcentagem real
+                let porcentagem = Math.round((env / tot) * 100);
+                
+                document.getElementById('barra-progresso').style.width = porcentagem + '%';
+                document.getElementById('barra-progresso').innerText = porcentagem + '%';
+                
+                // Muda o texto para "Enviando" em vez de "Simulando"
+                document.getElementById('texto-contagem').innerText = `Enviando ${env} de ${tot} contatos`;
+                
                 if(env >= tot) { 
                     clearInterval(sim); 
                     setTimeout(() => { 
-                        alert("✅ Campanha enviada para o servidor com sucesso!"); 
+                        alert(`✅ Campanha finalizada com sucesso!\nA ordem de envio para ${tot} contato(s) foi despachada para o servidor.`); 
                         fecharModalDisparo(); 
                         document.getElementById('barra-progresso').style.width = '0%'; 
                     }, 500); 
                 }
-            }, 800);
+            }, 800); // Aguarda 800ms por contato para dar o efeito visual
         }
     </script>
     <script>
