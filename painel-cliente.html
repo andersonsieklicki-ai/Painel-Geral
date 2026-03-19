@@ -19,19 +19,19 @@
         
         .btn { background-color: var(--primary); color: white; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 5px; justify-content: center; }
         .btn:hover { background-color: #002266; transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0,51,153,0.2); }
-        .btn:active { transform: translateY(0); }
         .btn-success { background-color: var(--success); }
-        .btn-success:hover { background-color: #218838; box-shadow: 0 4px 8px rgba(40,167,69,0.2); }
+        .btn-success:hover { background-color: #218838; }
         .btn-outline { background-color: transparent; color: var(--primary); border: 1px solid var(--primary); }
         .btn-outline:hover { background-color: var(--primary); color: white; }
         .btn-danger { background-color: #fff; color: #dc3545; border: 1px solid #dc3545; }
         .btn-danger:hover { background-color: #dc3545; color: #fff; }
+        .btn-warning { background-color: #ffc107; color: #000; border: none; }
+        .btn-warning:hover { background-color: #e0a800; }
         
         .status-box { display: flex; align-items: center; background-color: #f8f9fa; padding: 15px; border-radius: 10px; border: 1px solid #e9ecef; margin-bottom: 15px; font-weight: 500; }
         .status-indicator { display: inline-block; width: 12px; height: 12px; background-color: var(--success); border-radius: 50%; margin-right: 10px; box-shadow: 0 0 5px var(--success); }
         .crm-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; background: #f8f9fa; padding: 15px; border-radius: 10px; }
         .search-box { flex: 1; min-width: 250px; padding: 12px; border: 1px solid #ced4da; border-radius: 8px; font-size: 0.9rem; outline: none; transition: border-color 0.3s; }
-        .search-box:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,51,153,0.1); }
         
         .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 8px; border: 1px solid #eee; }
         table { width: 100%; border-collapse: collapse; font-size: 0.9rem; white-space: nowrap; }
@@ -39,6 +39,7 @@
         th { background-color: #f8f9fa; color: #495057; font-weight: 600; }
         tr:hover { background-color: #f1f5f9; }
         .tag { font-size: 0.7rem; padding: 5px 10px; border-radius: 20px; color: white; font-weight: 600; display: inline-block; margin: 2px; background-color: #6c757d; }
+        .input-nasc { width: 60px; padding: 5px; border: 1px solid #ccc; border-radius: 4px; text-align: center; }
         
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); justify-content: center; align-items: center; z-index: 1000; padding: 20px; box-sizing: border-box; }
         .modal-content { background: white; padding: 30px; border-radius: 15px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
@@ -59,8 +60,6 @@
         @media (max-width: 768px) { 
             .crm-controls { flex-direction: column; align-items: stretch; }
             .btn { width: 100%; justify-content: center; }
-            .card h3 { flex-direction: column; align-items: flex-start; }
-            .card h3 div { width: 100%; display: flex; gap: 10px; margin-top: 10px; }
         }
     </style>
 </head>
@@ -86,15 +85,18 @@
         </div>
 
         <div class="card">
-            <h3>📢 Central de Promoções</h3>
-            <p style="color: #6c757d; font-size: 0.9rem;">Envie mensagens em massa com fotos e PDFs para suas etiquetas.</p>
-            <button class="btn btn-success" style="width: 100%; margin-top: 15px; padding: 12px;" onclick="abrirModalDisparo()">🚀 Criar Nova Campanha</button>
+            <h3>📢 Marketing & Automação</h3>
+            <p style="color: #6c757d; font-size: 0.9rem;">Dispare campanhas ou configure mensagens automáticas de aniversário.</p>
+            <div style="display: flex; gap: 10px; flex-direction: column; margin-top: 15px;">
+                <button class="btn btn-success" style="width: 100%; padding: 12px;" onclick="abrirModalDisparo()">🚀 Criar Nova Campanha</button>
+                <button class="btn btn-warning" style="width: 100%; padding: 12px;" onclick="abrirModalAniversario()">🎁 Configurar Mensagem de Aniversário</button>
+            </div>
         </div>
 
         <div class="card full-width">
             <h3>
                 👥 Meus Contatos (CRM)
-                <div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;">
                     <button class="btn btn-outline" onclick="exportarVCF()">⬇️ Exportar</button>
                     <button class="btn" onclick="abrirModalImportar()">⬆️ Importar</button>
                 </div>
@@ -115,12 +117,13 @@
                             <th style="width: 40px;"><input type="checkbox" id="checkTodos" onclick="alternarTodosChecks()"></th>
                             <th>Nome do Cliente</th>
                             <th>WhatsApp</th>
+                            <th>Nascimento</th>
                             <th>Etiquetas (Tags)</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody id="tabelaContatos">
-                        <tr><td colspan="5" style="text-align: center; color: #999; padding: 20px;">Nenhum contato importado ainda.</td></tr>
+                        <tr><td colspan="6" style="text-align: center; color: #999; padding: 20px;">Nenhum contato importado ainda.</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -142,10 +145,41 @@
     <div class="modal" id="modalTag">
         <div class="modal-content" style="width: 400px;">
             <h2 style="margin-top: 0; color: var(--primary);">🏷️ Etiquetar Contatos</h2>
+            
+            <div id="areaTagsExistentes" style="margin-bottom: 15px; display: none;">
+                <label style="font-size: 0.85rem; font-weight: bold; color: #666; display: block; margin-bottom: 5px;">Selecione uma etiqueta salva:</label>
+                <div id="botoesTagsSalvas" style="display: flex; flex-wrap: wrap; gap: 5px;">
+                    </div>
+            </div>
+
+            <label style="font-size: 0.85rem; font-weight: bold; color: #666; display: block; margin-bottom: 5px;">Ou crie uma etiqueta nova:</label>
             <input type="text" id="nomeNovaTag" placeholder="Ex: VIP, Promoção Mães, Leads...">
+            
             <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px;">
                 <button class="btn btn-danger" onclick="fecharModalTag()">Cancelar</button>
                 <button class="btn" onclick="salvarTagMassa()">Aplicar Etiqueta</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="modalAniversario">
+        <div class="modal-content">
+            <h2 style="margin-top: 0; color: var(--primary);">🎁 Automação de Aniversário</h2>
+            <p style="font-size: 0.85rem; color: #666;">O robô enviará esta mensagem automaticamente todos os dias de manhã para os clientes que fazem aniversário na data.</p>
+            
+            <label style="font-size: 0.9rem; font-weight: 600;">Imagem/Logo da Empresa (Opcional):</label>
+            <div class="upload-box">
+                <span style="font-size: 0.8rem; color: #666; display: block; margin-bottom: 8px;">📎 Envie uma Imagem bonita (.jpg, .png)</span>
+                <input type="file" id="arquivoMidiaAniversario" accept="image/*" style="width: 100%;">
+            </div>
+
+            <label style="font-size: 0.9rem; font-weight: 600;">Texto de Parabéns:</label>
+            <p style="font-size: 0.75rem; color: #dc3545; margin-top: 0;">Dica: Use <b>{nome}</b> no texto para o robô trocar pelo nome do cliente.</p>
+            <textarea id="textoAniversario" rows="4" placeholder="Ex: Parabéns {nome}! A pH Cosméticos deseja a você um dia incrível..."></textarea>
+            
+            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px;">
+                <button class="btn btn-danger" onclick="fecharModalAniversario()">Cancelar</button>
+                <button class="btn btn-success" id="btnSalvarAniversario" onclick="salvarConfigAniversario()">Salvar Automação</button>
             </div>
         </div>
     </div>
@@ -209,6 +243,7 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        // Variáveis Globais de Estado
         window.listaContatos = [];
         window.idClienteLogado = ""; 
         window.planoClienteLogado = "basico"; 
@@ -216,322 +251,796 @@
         window.zapLojista = "";
 
         // ==========================================
-        // 💾 PERSISTÊNCIA E PREVENÇÃO DE DUPLICAÇÃO
+        // 💾 PERSISTÊNCIA: SALVAR E CARREGAR DADOS (DESCOMPACTADO)
         // ==========================================
         window.salvarContatosLocal = async function() {
-            if(window.idClienteLogado) {
+            if (window.idClienteLogado) {
+                // Salva no navegador para carregar rápido
                 localStorage.setItem('crm_' + window.idClienteLogado, JSON.stringify(window.listaContatos));
+                
+                // Salva na Nuvem Firebase
                 try {
-                    await setDoc(doc(db, "crm_clientes", window.idClienteLogado), { contatos: window.listaContatos });
-                } catch(e) {}
+                    await setDoc(doc(db, "crm_clientes", window.idClienteLogado), { 
+                        contatos: window.listaContatos 
+                    });
+                } catch (erro) {
+                    console.error("Falha ao salvar na nuvem, mas salvo localmente.");
+                }
             }
         }
 
         window.carregarContatosLocal = function() {
-            if(window.idClienteLogado) {
-                const salvos = localStorage.getItem('crm_' + window.idClienteLogado);
-                if(salvos) { window.listaContatos = JSON.parse(salvos); renderizarTabela(); }
+            if (window.idClienteLogado) {
+                const dadosSalvos = localStorage.getItem('crm_' + window.idClienteLogado);
+                if (dadosSalvos) {
+                    window.listaContatos = JSON.parse(dadosSalvos);
+                    renderizarTabela();
+                }
             }
         }
 
         // ==========================================
-        // 🚀 O SEGREDO: TRADUTOR DE VCF ANDROID
+        // 👤 AUTENTICAÇÃO E CONEXÃO DO USUÁRIO
         // ==========================================
-        function decodificarNome(str) {
-            try {
-                if(str.includes('=')) {
-                    // Remove as quebras de linha escondidas do Quoted-Printable
-                    let limpo = str.replace(/=\r?\n/g, '');
-                    // Transforma os Hexadecimais para o JavaScript ler
-                    limpo = limpo.replace(/=([A-F0-9]{2})/gi, '%$1'); 
-                    return decodeURIComponent(limpo);
-                }
-                return str;
-            } catch(e) { 
-                return str.replace(/=([A-F0-9]{2})/gi, ''); // Fallback limpo caso falhe
-            } 
-        }
-
-        function formatarTelefoneBR(telefone) {
-            let num = telefone.replace(/\D/g, ''); 
-            if (num.startsWith('55') && num.length >= 12) num = num.substring(2); 
-            if (num.startsWith('0')) {
-                if (num.length >= 13) num = num.substring(3);
-                else if (num.length === 11 || num.length === 12) num = num.substring(1); 
-            }
-            if (num.length === 10) num = num.substring(0, 2) + '9' + num.substring(2);
-            return num || null;
-        }
-
-        window.iniciarImportacao = function() {
-            const input = document.getElementById('arquivoCsv');
-            const file = input.files[0];
-            if(!file) return alert("⚠️ Selecione um arquivo!");
-
-            const extensao = file.name.split('.').pop().toLowerCase();
-            const reader = new FileReader();
-
-            reader.onload = function(e) {
-                const conteudo = e.target.result;
-                let contatosLidos = 0;
-                let duplicados = 0;
-
-                if (extensao === 'csv') {
-                    const linhas = conteudo.split('\n');
-                    for(let i = 1; i < linhas.length; i++) { 
-                        const linha = linhas[i].trim();
-                        if(!linha) continue;
-                        const colunas = linha.split(/[,;]/); 
-                        if(colunas.length >= 2) {
-                            let telLimpo = formatarTelefoneBR(colunas[1]);
-                            if (telLimpo) {
-                                // 🚫 BLOQUEIO ANTI-DUPLICAÇÃO
-                                if (!window.listaContatos.find(c => c.telefone === telLimpo)) {
-                                    window.listaContatos.push({ id: 'ctt_' + Math.random().toString(36).substr(2, 9), nome: colunas[0].trim(), telefone: telLimpo, tags: ['CSV'] });
-                                    contatosLidos++;
-                                } else { duplicados++; }
-                            }
-                        }
-                    }
-                } else if (extensao === 'vcf') {
-                    // 1. Unimos as linhas que o Android quebrou ANTES de dividir por cartões!
-                    let rawContent = conteudo.replace(/=\r?\n/g, ''); 
-                    const vcards = rawContent.split(/BEGIN:VCARD/i);
-                    
-                    for(let i = 1; i < vcards.length; i++) {
-                        const card = vcards[i];
-                        if(!card.trim()) continue;
-
-                        const nomeMatch = card.match(/FN[^:]*:(.*)/i);
-                        const telMatch = card.match(/TEL[^:]*:(.*)/i);
-
-                        if(nomeMatch && telMatch) {
-                            let nomePuro = decodificarNome(nomeMatch[1].trim());
-                            let telPuro = formatarTelefoneBR(telMatch[1].trim());
-                            
-                            if (telPuro) {
-                                // 🚫 BLOQUEIO ANTI-DUPLICAÇÃO
-                                if (!window.listaContatos.find(c => c.telefone === telPuro)) {
-                                    window.listaContatos.push({ 
-                                        id: 'ctt_' + Math.random().toString(36).substr(2, 9), 
-                                        nome: nomePuro, 
-                                        telefone: telPuro, 
-                                        tags: ['Agenda VCF'] 
-                                    });
-                                    contatosLidos++;
-                                } else { duplicados++; }
-                            }
-                        }
-                    }
-                }
-
-                alert(`✅ Importação concluída!\n\n🔹 ${contatosLidos} novos adicionados.\n🔸 ${duplicados} contatos duplicados ignorados.`);
-                fecharModalImportar(); 
-                input.value = ''; 
-                renderizarTabela(); 
-                window.salvarContatosLocal();
-            };
-            reader.readAsText(file);
-        }
-
-        // ==========================================
-        // 🔄 RESTANTE DA ESTRUTURA INTACTA
-        // ==========================================
-        onAuthStateChanged(auth, async (user) => {
+        onAuthStateChanged(auth, async function(user) {
             if (user) {
                 const docSnap = await getDoc(doc(db, "empresas", user.uid));
+                
                 if (docSnap.exists()) {
-                    const dados = docSnap.data();
-                    window.idClienteLogado = user.uid;
-                    window.planoClienteLogado = dados.plano || 'basico';
-                    window.nomeLojista = dados.nomeEmpresa;
-                    window.zapLojista = dados.whatsappLojista || "";
-                    document.getElementById('nomeCliente').innerText = dados.nomeEmpresa;
+                    const dadosDaEmpresa = docSnap.data();
                     
+                    window.idClienteLogado = user.uid;
+                    window.planoClienteLogado = dadosDaEmpresa.plano || 'basico';
+                    window.nomeLojista = dadosDaEmpresa.nomeEmpresa;
+                    window.zapLojista = dadosDaEmpresa.whatsappLojista || "";
+                    
+                    document.getElementById('nomeCliente').innerText = dadosDaEmpresa.nomeEmpresa;
+                    
+                    // Carrega a lista do cliente logado
                     window.carregarContatosLocal(); 
                     
-                    if (dados.plano === 'basico') {
+                    // Mostra o status correto baseado no plano
+                    if (dadosDaEmpresa.plano === 'basico') {
                         document.getElementById('tagPlano').innerText = "🥉 Plano Básico";
                         document.getElementById('area-conexao').innerHTML = `<div><span class="status-indicator"></span><strong>Conectado à Central</strong></div>`;
-                        document.getElementById('desc-conexao').innerText = "Você está usando nossa estrutura oficial.";
+                        document.getElementById('desc-conexao').innerText = "Você está usando nossa estrutura oficial de envios.";
                     } else {
                         document.getElementById('tagPlano').innerText = "🥇 Plano Premium";
                         document.getElementById('area-conexao').innerHTML = `<button class="btn" onclick="conectarRoboPremium()">📱 Conectar Meu WhatsApp</button>`;
-                        document.getElementById('desc-conexao').innerText = "Acesse o sistema com o seu número.";
+                        document.getElementById('desc-conexao').innerText = "Acesse o sistema com o seu número de atendimento.";
                     }
                 }
-            } else { window.location.href = "index.html"; }
+            } else {
+                window.location.href = "index.html";
+            }
         });
 
         window.conectarRoboPremium = async function() {
-            const idCliente = "teste-omni"; 
+            const idDoCliente = "teste-omni"; 
             document.getElementById('area-qr-code').style.display = 'block';
-            document.getElementById('status-texto-qr').innerText = "Iniciando motor na Oracle... Aguarde.";
+            document.getElementById('status-texto-qr').innerText = "Iniciando motor na Oracle... Aguarde por favor.";
             
             try {
                await fetch('/api-oracle/api/saas/conectar', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'x-senha': '123321' },
-                    body: JSON.stringify({ idCliente: idCliente })
+                    body: JSON.stringify({ idCliente: idDoCliente })
                 });
 
-                const docSaaS = doc(db, "clientes_premium", idCliente);
-                onSnapshot(docSaaS, (docSnap) => {
+                const referenciaDoc = doc(db, "clientes_premium", idDoCliente);
+                onSnapshot(referenciaDoc, function(docSnap) {
                     if (docSnap.exists()) {
-                        const dadosSaaS = docSnap.data();
+                        const dadosDoServidor = docSnap.data();
                         const qrImagem = document.getElementById("qrcode-imagem");
                         const statusTexto = document.getElementById("status-texto-qr");
 
-                        if (dadosSaaS.qrCode) {
-                            qrImagem.src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(dadosSaaS.qrCode)}`;
+                        if (dadosDoServidor.qrCode) {
+                            qrImagem.src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(dadosDoServidor.qrCode)}`;
                             qrImagem.style.display = "block";
-                            statusTexto.innerText = "📱 Escaneie o código abaixo:";
-                        } 
-                        else if (dadosSaaS.status === 'online') {
+                            statusTexto.innerText = "📱 Escaneie o código abaixo com o seu WhatsApp:";
+                        } else if (dadosDoServidor.status === 'online') {
                             qrImagem.style.display = "none";
-                            statusTexto.innerText = "✅ Robô Operacional!";
+                            statusTexto.innerText = "✅ Robô Operacional e Conectado!";
                             document.getElementById('area-conexao').innerHTML = `<div><span class="status-indicator"></span><strong>Sessão Autenticada</strong></div>`;
                             document.getElementById('desc-conexao').innerText = "Seu número está conectado à Inteligência Omnichannel.";
                         }
                     }
                 });
-            } catch (error) { document.getElementById('status-texto-qr').innerText = "❌ Erro ao iniciar servidor."; }
+            } catch (error) { 
+                document.getElementById('status-texto-qr').innerText = "❌ Erro de comunicação com o servidor."; 
+            }
         };
 
-        window.renderizarTabela = function() {
-            const tbody = document.getElementById('tabelaContatos');
-            const termo = document.getElementById('buscaContato').value.toLowerCase();
+        // ==========================================
+        // 📅 ATUALIZAÇÃO DA DATA DE NASCIMENTO (NOVO)
+        // ==========================================
+        window.atualizarNascimento = function(idDoContato, novaData) {
+            // Formata a data se o cara digitar sem barra (ex: 2005 -> 20/05)
+            let dataLimpa = novaData.replace(/\D/g, '');
+            if(dataLimpa.length >= 4) {
+                dataLimpa = dataLimpa.substring(0,2) + '/' + dataLimpa.substring(2,4);
+            }
             
-            let filtrados = window.listaContatos.filter(c => c.nome.toLowerCase().includes(termo) || c.telefone.includes(termo));
-            filtrados.sort((a, b) => a.nome.localeCompare(b.nome)); 
+            for (let i = 0; i < window.listaContatos.length; i++) {
+                if (window.listaContatos[i].id === idDoContato) {
+                    window.listaContatos[i].aniversario = dataLimpa;
+                    break;
+                }
+            }
+            window.salvarContatosLocal();
+        }
 
-            if(filtrados.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px; color: #666;">Nenhum contato encontrado.</td></tr>';
+        // ==========================================
+        // 🔍 RENDERIZAÇÃO DA TABELA (DESCOMPACTADA)
+        // ==========================================
+        window.renderizarTabela = function() {
+            const corpoDaTabela = document.getElementById('tabelaContatos');
+            const palavraBuscada = document.getElementById('buscaContato').value.toLowerCase();
+            
+            // 1. Filtrar a lista pela busca
+            let listaFiltrada = [];
+            for (let i = 0; i < window.listaContatos.length; i++) {
+                let contato = window.listaContatos[i];
+                let nomeMinusculo = contato.nome.toLowerCase();
+                let telefone = contato.telefone;
+                
+                if (nomeMinusculo.includes(palavraBuscada) || telefone.includes(palavraBuscada)) {
+                    listaFiltrada.push(contato);
+                }
+            }
+
+            // 2. Ordenar por ordem alfabética
+            listaFiltrada.sort(function(a, b) {
+                return a.nome.localeCompare(b.nome);
+            });
+
+            // 3. Verifica se a lista está vazia
+            if (listaFiltrada.length === 0) {
+                corpoDaTabela.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px; color: #666;">Nenhum contato encontrado na sua base.</td></tr>';
                 return;
             }
 
-            tbody.innerHTML = filtrados.map(c => `
-                <tr>
-                    <td><input type="checkbox" class="check-contato" value="${c.id}"></td>
-                    <td><strong>${c.nome}</strong></td>
-                    <td>${c.telefone}</td>
-                    <td>${c.tags.map(t => `<span class="tag">🏷️ ${t}</span>`).join('')}</td>
-                    <td><button class="btn btn-danger" style="padding: 5px 10px; font-size: 0.8rem;" onclick="apagarContato('${c.id}')">Excluir</button></td>
-                </tr>
-            `).join('');
+            // 4. Constrói o HTML gigante de forma organizada
+            let htmlFinal = '';
+            for (let i = 0; i < listaFiltrada.length; i++) {
+                let c = listaFiltrada[i];
+                
+                // Monta as tags visualmente
+                let htmlDasTags = '';
+                if (c.tags && c.tags.length > 0) {
+                    for (let t = 0; t < c.tags.length; t++) {
+                        htmlDasTags += `<span class="tag">🏷️ ${c.tags[t]}</span>`;
+                    }
+                }
+                
+                // Pega a data de nascimento se existir
+                let dataNasc = c.aniversario || '';
+
+                htmlFinal += `
+                    <tr>
+                        <td><input type="checkbox" class="check-contato" value="${c.id}"></td>
+                        <td><strong>${c.nome}</strong></td>
+                        <td>${c.telefone}</td>
+                        <td><input type="text" class="input-nasc" placeholder="DD/MM" value="${dataNasc}" onchange="atualizarNascimento('${c.id}', this.value)"></td>
+                        <td>${htmlDasTags}</td>
+                        <td>
+                            <button class="btn btn-danger" style="padding: 5px 10px; font-size: 0.8rem;" onclick="apagarContato('${c.id}')">Excluir</button>
+                        </td>
+                    </tr>
+                `;
+            }
+            
+            corpoDaTabela.innerHTML = htmlFinal;
         }
 
+        // ==========================================
+        // 🚀 LÓGICA DE DISPARO (BLINDADA E EXPANDIDA)
+        // ==========================================
         window.iniciarDisparo = async function() {
-            const msg = document.getElementById('mensagemPromo').value;
-            const inputMidia = document.getElementById('arquivoMidia');
-            const arquivo = inputMidia.files[0];
+            const campoMensagem = document.getElementById('mensagemPromo').value;
+            const campoMidia = document.getElementById('arquivoMidia');
+            const arquivoSelecionado = campoMidia.files[0];
             
-            if(!msg && !arquivo) return alert("⚠️ Digite uma mensagem ou anexe uma mídia!");
-
-            let midiaBase64 = null, midiaNome = "", midiaMime = "";
-            if (arquivo) {
-                const tamanhoMB = arquivo.size / (1024 * 1024);
-                if (tamanhoMB > 15) return alert("⚠️ Arquivo muito grande! O limite para envio via painel é de 15MB para não sobrecarregar o robô.");
-
-                const reader = new FileReader();
-                midiaBase64 = await new Promise((res) => {
-                    reader.onload = (e) => res(e.target.result.split(',')[1]);
-                    reader.readAsDataURL(arquivo);
-                });
-                midiaNome = arquivo.name; midiaMime = arquivo.type;
+            if (campoMensagem === "" && !arquivoSelecionado) {
+                return alert("⚠️ Você precisa digitar uma mensagem ou anexar um arquivo/foto!");
             }
 
+            let midiaBase64 = null;
+            let midiaNome = "";
+            let midiaMime = "";
+            
+            // 🛑 Lógica de processamento de Mídia
+            if (arquivoSelecionado) {
+                const tamanhoMB = arquivoSelecionado.size / (1024 * 1024);
+                if (tamanhoMB > 15) {
+                    return alert("⚠️ Este arquivo é muito pesado. O limite de segurança do servidor é 15MB. Por favor, diminua a qualidade da foto ou PDF.");
+                }
+
+                const leitor = new FileReader();
+                midiaBase64 = await new Promise(function(resolver) {
+                    leitor.onload = function(evento) {
+                        let resultadoCru = evento.target.result;
+                        let parteBase64 = resultadoCru.split(',')[1];
+                        resolver(parteBase64);
+                    };
+                    leitor.readAsDataURL(arquivoSelecionado);
+                });
+                
+                midiaNome = arquivoSelecionado.name; 
+                midiaMime = arquivoSelecionado.type;
+            }
+
+            // Lógica de Seleção de Números
             let numerosParaEnvio = [];
-            if(document.getElementById('aba-tags').classList.contains('active')) {
-                const tagsMarcadas = Array.from(document.querySelectorAll('#listaTagsDisparo input:checked')).map(cb => cb.value);
-                if(tagsMarcadas.length === 0) return alert("⚠️ Marque pelo menos uma etiqueta!");
-                if(tagsMarcadas.includes("TODOS_OS_CONTATOS")) {
-                    numerosParaEnvio = window.listaContatos.map(c => c.telefone);
+            const usandoAbaDeTags = document.getElementById('aba-tags').classList.contains('active');
+            
+            if (usandoAbaDeTags) {
+                const checkboxesMarcados = document.querySelectorAll('#listaTagsDisparo input:checked');
+                
+                if (checkboxesMarcados.length === 0) {
+                    return alert("⚠️ Marque pelo menos uma etiqueta na lista!");
+                }
+                
+                // Converte as caixas marcadas em um array de nomes de tags
+                let tagsSelecionadas = [];
+                for (let i = 0; i < checkboxesMarcados.length; i++) {
+                    tagsSelecionadas.push(checkboxesMarcados[i].value);
+                }
+
+                if (tagsSelecionadas.includes("TODOS_OS_CONTATOS")) {
+                    for (let i = 0; i < window.listaContatos.length; i++) {
+                        numerosParaEnvio.push(window.listaContatos[i].telefone);
+                    }
                 } else {
-                    numerosParaEnvio = window.listaContatos.filter(c => c.tags.some(t => tagsMarcadas.includes(t))).map(c => c.telefone);
+                    // Filtra apenas os contatos que têm a tag marcada
+                    for (let i = 0; i < window.listaContatos.length; i++) {
+                        let contato = window.listaContatos[i];
+                        let temATag = false;
+                        
+                        if (contato.tags) {
+                            for (let t = 0; t < contato.tags.length; t++) {
+                                if (tagsSelecionadas.includes(contato.tags[t])) {
+                                    temATag = true;
+                                    break;
+                                }
+                            }
+                        }
+                        
+                        if (temATag) {
+                            numerosParaEnvio.push(contato.telefone);
+                        }
+                    }
                 }
             } else {
-                numerosParaEnvio = document.getElementById('listaNumeros').value.split('\n').filter(l => l.trim() !== '');
+                // Caso ele esteja na aba de digitar avulso
+                const textoDigitado = document.getElementById('listaNumeros').value;
+                const linhasDeNumeros = textoDigitado.split('\n');
+                
+                for (let i = 0; i < linhasDeNumeros.length; i++) {
+                    let linhaLimpa = linhasDeNumeros[i].trim();
+                    if (linhaLimpa !== "") {
+                        numerosParaEnvio.push(linhaLimpa);
+                    }
+                }
             }
 
-            if(numerosParaEnvio.length === 0) return alert("⚠️ Nenhum contato válido para envio.");
+            if (numerosParaEnvio.length === 0) {
+                return alert("⚠️ Nenhum contato válido foi encontrado para este envio.");
+            }
 
+            // Preparação da Tela Visual
             document.getElementById('form-disparo').style.display = 'none';
             document.getElementById('tela-progresso').style.display = 'block';
 
             try {
-                const resposta = await fetch('/api-oracle/api/saas/disparar', {
+                const respostaServidor = await fetch('/api-oracle/api/saas/disparar', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'x-senha': '123321' },
+                    headers: { 
+                        'Content-Type': 'application/json', 
+                        'x-senha': '123321' 
+                    },
                     body: JSON.stringify({
                         idCliente: window.idClienteLogado,
                         nomeEmpresa: window.nomeLojista,
                         zapLojista: window.zapLojista,
                         numeros: numerosParaEnvio,
-                        mensagem: msg,
-                        midia: midiaBase64, midiaNome: midiaNome, midiaMime: midiaMime,
+                        mensagem: campoMensagem,
+                        midia: midiaBase64, 
+                        midiaNome: midiaNome, 
+                        midiaMime: midiaMime,
                         plano: window.planoClienteLogado 
                     })
                 });
 
-                const dados = await resposta.json();
-                if(dados.erro) {
-                    alert("❌ Recusado: " + dados.erro);
-                    fecharModalDisparo(); return;
+                const dadosDecodificados = await respostaServidor.json();
+                
+                if (dadosDecodificados.erro) {
+                    alert("❌ O servidor recusou o envio: " + dadosDecodificados.erro);
+                    fecharModalDisparo(); 
+                    return;
                 }
 
-                let env = 0; const tot = numerosParaEnvio.length;
-                let sim = setInterval(() => {
-                    env++; let porc = Math.round((env / tot) * 100);
-                    document.getElementById('barra-progresso').style.width = porc + '%';
-                    document.getElementById('barra-progresso').innerText = porc + '%';
-                    document.getElementById('texto-contagem').innerText = `Enviando ${env} de ${tot}`;
-                    if(env >= tot) { clearInterval(sim); alert("✅ Disparo Concluído com Sucesso!"); fecharModalDisparo(); }
+                // Barra de progresso humanizada
+                let contagemAtual = 0; 
+                const totalDeEnvios = numerosParaEnvio.length;
+                
+                let simuladorVisual = setInterval(function() {
+                    contagemAtual++; 
+                    let calculoPorcentagem = Math.round((contagemAtual / totalDeEnvios) * 100);
+                    
+                    document.getElementById('barra-progresso').style.width = calculoPorcentagem + '%';
+                    document.getElementById('barra-progresso').innerText = calculoPorcentagem + '%';
+                    document.getElementById('texto-contagem').innerText = `Enviando contato ${contagemAtual} de ${totalDeEnvios}`;
+                    
+                    if (contagemAtual >= totalDeEnvios) { 
+                        clearInterval(simuladorVisual); 
+                        alert("✅ Campanha processada com Sucesso pela Oracle!"); 
+                        fecharModalDisparo(); 
+                    }
                 }, 10000); 
-            } catch (e) { alert("❌ Falha na conexão com o servidor da Oracle."); fecharModalDisparo(); }
+                
+            } catch (erroDeRede) { 
+                alert("❌ Falha ao tentar conectar com a Inteligência na Oracle."); 
+                fecharModalDisparo(); 
+            }
         }
 
-        window.atualizarListaTagsDisparo = function() {
-            const div = document.getElementById('listaTagsDisparo');
-            div.innerHTML = '<label style="display:block; padding:8px; background:#fff; border-radius:5px;"><input type="checkbox" value="TODOS_OS_CONTATOS"> 📢 Todos os Contatos da Base</label>';
-            let tagsExistentes = new Set();
-            window.listaContatos.forEach(c => c.tags.forEach(t => tagsExistentes.add(t)));
-            tagsExistentes.forEach(tag => {
-                div.innerHTML += `<label style="display:block; padding:8px; background:#fff; border-radius:5px;"><input type="checkbox" value="${tag}"> 🏷️ ${tag}</label>`;
-            });
+        // ==========================================
+        // 🔄 TRADUTOR DE VCF ANDROID E IMPORTAÇÃO
+        // ==========================================
+        function decodificarNomeAndroid(textoMisturado) {
+            try {
+                if (textoMisturado.includes('=')) {
+                    let nomeLimpo = textoMisturado.replace(/=\r?\n/g, '');
+                    nomeLimpo = nomeLimpo.replace(/=([A-F0-9]{2})/gi, '%$1'); 
+                    return decodeURIComponent(nomeLimpo);
+                }
+                return textoMisturado;
+            } catch(erroInterno) { 
+                return textoMisturado.replace(/=([A-F0-9]{2})/gi, ''); 
+            } 
+        }
+
+        function limparTelefoneDoBrasil(telefoneOriginal) {
+            let apenasNumeros = telefoneOriginal.replace(/\D/g, ''); 
+            
+            if (apenasNumeros.startsWith('55') && apenasNumeros.length >= 12) {
+                apenasNumeros = apenasNumeros.substring(2); 
+            }
+            if (apenasNumeros.startsWith('0')) {
+                if (apenasNumeros.length >= 13) {
+                    apenasNumeros = apenasNumeros.substring(3);
+                } else if (apenasNumeros.length === 11 || apenasNumeros.length === 12) {
+                    apenasNumeros = apenasNumeros.substring(1); 
+                }
+            }
+            if (apenasNumeros.length === 10) {
+                apenasNumeros = apenasNumeros.substring(0, 2) + '9' + apenasNumeros.substring(2);
+            }
+            
+            if (apenasNumeros === "") return null;
+            return apenasNumeros;
+        }
+
+        window.iniciarImportacao = function() {
+            const campoArquivo = document.getElementById('arquivoCsv');
+            const arquivoSelecionado = campoArquivo.files[0];
+            
+            if (!arquivoSelecionado) {
+                return alert("⚠️ Por favor, selecione um arquivo primeiro!");
+            }
+
+            const extensaoDoArquivo = arquivoSelecionado.name.split('.').pop().toLowerCase();
+            const leitorDeArquivo = new FileReader();
+
+            leitorDeArquivo.onload = function(eventoDeCarga) {
+                const textoBruto = eventoDeCarga.target.result;
+                let contatosLidosComSucesso = 0;
+                let contatosDuplicadosBloqueados = 0;
+
+                if (extensaoDoArquivo === 'csv') {
+                    const linhasDoTexto = textoBruto.split('\n');
+                    for (let i = 1; i < linhasDoTexto.length; i++) { 
+                        const linhaAtual = linhasDoTexto[i].trim();
+                        if (linhaAtual === "") continue;
+                        
+                        const pedacos = linhaAtual.split(/[,;]/); 
+                        if (pedacos.length >= 2) {
+                            let telefonePerfeito = limparTelefoneDoBrasil(pedacos[1]);
+                            if (telefonePerfeito) {
+                                // Lógica anti-duplicação expandida
+                                let contatoJaExiste = false;
+                                for (let k = 0; k < window.listaContatos.length; k++) {
+                                    if (window.listaContatos[k].telefone === telefonePerfeito) {
+                                        contatoJaExiste = true;
+                                        break;
+                                    }
+                                }
+
+                                if (!contatoJaExiste) {
+                                    window.listaContatos.push({ 
+                                        id: 'ctt_' + Math.random().toString(36).substr(2, 9), 
+                                        nome: pedacos[0].trim(), 
+                                        telefone: telefonePerfeito, 
+                                        tags: ['CSV da Loja'] 
+                                    });
+                                    contatosLidosComSucesso++;
+                                } else { 
+                                    contatosDuplicadosBloqueados++; 
+                                }
+                            }
+                        }
+                    }
+                } 
+                else if (extensaoDoArquivo === 'vcf') {
+                    // Oculta quebras de linha estragadas do celular
+                    let textoProtegido = textoBruto.replace(/=\r?\n/g, ''); 
+                    const arrayDeCartoes = textoProtegido.split(/BEGIN:VCARD/i);
+                    
+                    for (let i = 1; i < arrayDeCartoes.length; i++) {
+                        const cartaoUnico = arrayDeCartoes[i];
+                        if (cartaoUnico.trim() === "") continue;
+
+                        const regexNome = cartaoUnico.match(/FN[^:]*:(.*)/i);
+                        const regexTelefone = cartaoUnico.match(/TEL[^:]*:(.*)/i);
+                        const regexNasc = cartaoUnico.match(/BDAY[^:]*:(\d{4}-)?(\d{2}-\d{2})/i); // Tenta achar aniversário
+
+                        if (regexNome && regexTelefone) {
+                            let nomeProntoParaUso = decodificarNomeAndroid(regexNome[1].trim());
+                            let telefoneProntoParaUso = limparTelefoneDoBrasil(regexTelefone[1].trim());
+                            
+                            let niver = "";
+                            if (regexNasc && regexNasc[2]) {
+                                let partesData = regexNasc[2].split('-'); // MM-DD
+                                niver = partesData[1] + '/' + partesData[0]; // DD/MM
+                            }
+                            
+                            if (telefoneProntoParaUso) {
+                                let contatoJaExiste = false;
+                                for (let k = 0; k < window.listaContatos.length; k++) {
+                                    if (window.listaContatos[k].telefone === telefoneProntoParaUso) {
+                                        contatoJaExiste = true;
+                                        break;
+                                    }
+                                }
+
+                                if (!contatoJaExiste) {
+                                    window.listaContatos.push({ 
+                                        id: 'ctt_' + Math.random().toString(36).substr(2, 9), 
+                                        nome: nomeProntoParaUso, 
+                                        telefone: telefoneProntoParaUso, 
+                                        aniversario: niver,
+                                        tags: ['Agenda do Celular'] 
+                                    });
+                                    contatosLidosComSucesso++;
+                                } else { 
+                                    contatosDuplicadosBloqueados++; 
+                                }
+                            }
+                        }
+                    }
+                }
+
+                alert(`✅ Relatório de Importação:\n\n🔹 ${contatosLidosComSucesso} novos contatos inseridos.\n🔸 ${contatosDuplicadosBloqueados} contatos duplicados ignorados pelo sistema de segurança.`);
+                fecharModalImportar(); 
+                campoArquivo.value = ''; 
+                renderizarTabela(); 
+                window.salvarContatosLocal();
+            };
+            
+            leitorDeArquivo.readAsText(arquivoSelecionado);
+        }
+
+        // ==========================================
+        // 🛠️ MÓDULO DE ETIQUETAS MELHORADO (MOSTRA AS EXISTENTES)
+        // ==========================================
+        window.abrirModalTag = function() {
+            // Verifica se a pessoa marcou as caixinhas antes
+            const listaChecada = document.querySelectorAll('.check-contato:checked');
+            if (listaChecada.length === 0) {
+                return alert("⚠️ Por favor, selecione pelo menos um contato marcando as caixinhas na tabela.");
+            }
+
+            document.getElementById('modalTag').style.display = 'flex';
+            
+            // 1. Extrai todas as tags já criadas na história do lojista
+            let tagsUnicasDoDono = new Set();
+            for (let i = 0; i < window.listaContatos.length; i++) {
+                let contato = window.listaContatos[i];
+                if (contato.tags) {
+                    for (let t = 0; t < contato.tags.length; t++) {
+                        tagsUnicasDoDono.add(contato.tags[t]);
+                    }
+                }
+            }
+
+            // 2. Transforma o Set num Array para desenhar os botões
+            let arrayDeTags = Array.from(tagsUnicasDoDono);
+            const containerDeBotoes = document.getElementById('botoesTagsSalvas');
+            const areaVisual = document.getElementById('areaTagsExistentes');
+            
+            containerDeBotoes.innerHTML = ''; // Limpa botões antigos
+
+            if (arrayDeTags.length > 0) {
+                areaVisual.style.display = 'block'; // Mostra a área
+                
+                for (let i = 0; i < arrayDeTags.length; i++) {
+                    let nomeDaTag = arrayDeTags[i];
+                    
+                    let botaoTag = document.createElement('button');
+                    botaoTag.className = 'btn btn-outline';
+                    botaoTag.style.padding = '6px 12px';
+                    botaoTag.style.fontSize = '0.8rem';
+                    botaoTag.innerText = "🏷️ " + nomeDaTag;
+                    
+                    // A mágica: clicar no botão preenche o campo de texto para salvar!
+                    botaoTag.onclick = function() {
+                        document.getElementById('nomeNovaTag').value = nomeDaTag;
+                    };
+                    
+                    containerDeBotoes.appendChild(botaoTag);
+                }
+            } else {
+                areaVisual.style.display = 'none'; // Se não tiver tags, esconde
+            }
         }
 
         window.salvarTagMassa = function() {
-            const tag = document.getElementById('nomeNovaTag').value.trim();
-            if(!tag) return alert("Digite o nome da etiqueta!");
-            document.querySelectorAll('.check-contato:checked').forEach(cb => {
-                const c = window.listaContatos.find(cont => cont.id === cb.value);
-                if(c && !c.tags.includes(tag)) c.tags.push(tag);
-            });
-            renderizarTabela(); window.salvarContatosLocal(); fecharModalTag(); document.getElementById('checkTodos').checked = false;
-        }
-        window.apagarContato = (id) => { if(confirm("Apagar este contato?")) { window.listaContatos = window.listaContatos.filter(c => c.id !== id); renderizarTabela(); window.salvarContatosLocal(); } }
-        window.apagarSelecionados = () => {
-            const ids = Array.from(document.querySelectorAll('.check-contato:checked')).map(cb => cb.value);
-            if(ids.length === 0) return alert("Selecione os contatos primeiro!");
-            if(confirm(`Apagar ${ids.length} contatos marcados?`)) { window.listaContatos = window.listaContatos.filter(c => !ids.includes(c.id)); renderizarTabela(); window.salvarContatosLocal(); document.getElementById('checkTodos').checked = false; }
-        }
-        window.apagarTodos = () => { if(confirm("🚨 Apagar TODOS os contatos da base permanentemente?")) { window.listaContatos = []; renderizarTabela(); window.salvarContatosLocal(); } }
-        window.exportarVCF = () => {
-            let vcf = window.listaContatos.map(c => `BEGIN:VCARD\nVERSION:3.0\nFN:${c.nome}\nTEL;TYPE=CELL:+55${c.telefone}\nEND:VCARD`).join('\n');
-            const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([vcf], {type:'text/vcard'})); a.download = 'contatos.vcf'; a.click();
+            const palavraDaTag = document.getElementById('nomeNovaTag').value.trim();
+            
+            if (palavraDaTag === "") {
+                return alert("⚠️ Você precisa escrever um nome ou selecionar uma etiqueta clicando nela!");
+            }
+            
+            const checksMarcados = document.querySelectorAll('.check-contato:checked');
+            
+            for (let i = 0; i < checksMarcados.length; i++) {
+                let idAlvo = checksMarcados[i].value;
+                
+                for (let k = 0; k < window.listaContatos.length; k++) {
+                    if (window.listaContatos[k].id === idAlvo) {
+                        let contatoEncontrado = window.listaContatos[k];
+                        
+                        if (!contatoEncontrado.tags) {
+                            contatoEncontrado.tags = [];
+                        }
+                        
+                        // Impede aplicar a mesma tag duas vezes na mesma pessoa
+                        if (!contatoEncontrado.tags.includes(palavraDaTag)) {
+                            contatoEncontrado.tags.push(palavraDaTag);
+                        }
+                        break;
+                    }
+                }
+            }
+            
+            renderizarTabela(); 
+            window.salvarContatosLocal(); 
+            fecharModalTag(); 
+            
+            // Desmarca todos da lista para não bugar o próximo uso
+            document.getElementById('checkTodos').checked = false;
+            window.alternarTodosChecks();
+            
+            alert(`✅ A etiqueta "${palavraDaTag}" foi adicionada aos clientes selecionados com sucesso!`);
         }
 
-        window.abrirModalImportar = () => document.getElementById('modalImportar').style.display='flex';
-        window.fecharModalImportar = () => document.getElementById('modalImportar').style.display='none';
-        window.abrirModalTag = () => document.getElementById('modalTag').style.display='flex';
-        window.fecharModalTag = () => { document.getElementById('modalTag').style.display='none'; document.getElementById('nomeNovaTag').value = ''; };
-        window.etiquetarSelecionados = () => { if(document.querySelectorAll('.check-contato:checked').length > 0) abrirModalTag(); else alert("Selecione contatos na tabela!"); }
-        window.abrirModalDisparo = () => { atualizarListaTagsDisparo(); document.getElementById('modalDisparo').style.display='flex'; document.getElementById('form-disparo').style.display='block'; document.getElementById('tela-progresso').style.display='none'; }
-        window.fecharModalDisparo = () => document.getElementById('modalDisparo').style.display='none';
-        window.trocarAba = (aba) => { ['tags', 'avulso'].forEach(id => { document.getElementById('aba-'+id).classList.remove('active'); document.getElementById('btn-'+id).classList.remove('active'); }); document.getElementById('aba-'+aba).classList.add('active'); document.getElementById('btn-'+aba).classList.add('active'); }
-        window.alternarTodosChecks = () => { const m = document.getElementById('checkTodos'); document.querySelectorAll('.check-contato').forEach(c => c.checked = m.checked); }
-        window.fazerLogout = () => signOut(auth).then(() => window.location.href="index.html");
+        // ==========================================
+        // 🎁 MÓDULO DE MENSAGEM DE ANIVERSÁRIO
+        // ==========================================
+        window.abrirModalAniversario = async function() {
+            document.getElementById('modalAniversario').style.display = 'flex';
+            
+            // Tenta puxar do banco o que o dono já salvou no passado
+            try {
+                const docConfig = await getDoc(doc(db, "configuracoes_loja", window.idClienteLogado));
+                if(docConfig.exists()) {
+                    let dados = docConfig.data();
+                    if(dados.msgAniversario) {
+                        document.getElementById('textoAniversario').value = dados.msgAniversario;
+                    }
+                }
+            } catch(e) {}
+        }
+
+        window.fecharModalAniversario = function() {
+            document.getElementById('modalAniversario').style.display = 'none';
+        }
+
+        window.salvarConfigAniversario = async function() {
+            const texto = document.getElementById('textoAniversario').value;
+            const inputFoto = document.getElementById('arquivoMidiaAniversario');
+            const btn = document.getElementById('btnSalvarAniversario');
+            
+            if(!texto) return alert("⚠️ Digite a mensagem de parabéns que o robô deve enviar.");
+
+            btn.innerText = "Salvando...";
+            btn.disabled = true;
+
+            let midiaBase64 = null;
+            let mime = null;
+            let nome = null;
+
+            if (inputFoto.files[0]) {
+                const tamanhoMB = inputFoto.files[0].size / (1024 * 1024);
+                if (tamanhoMB > 5) {
+                    btn.innerText = "Salvar Automação"; btn.disabled = false;
+                    return alert("⚠️ A imagem de aniversário deve ter no máximo 5MB.");
+                }
+
+                const leitor = new FileReader();
+                midiaBase64 = await new Promise((res) => {
+                    leitor.onload = (e) => res(e.target.result.split(',')[1]);
+                    leitor.readAsDataURL(inputFoto.files[0]);
+                });
+                mime = inputFoto.files[0].type;
+                nome = inputFoto.files[0].name;
+            }
+
+            try {
+                let pacote = { msgAniversario: texto };
+                if (midiaBase64) {
+                    pacote.imgAniversario = midiaBase64;
+                    pacote.mimeAniversario = mime;
+                    pacote.nomeAniversario = nome;
+                }
+
+                await setDoc(doc(db, "configuracoes_loja", window.idClienteLogado), pacote, { merge: true });
+                alert("✅ Automação de Aniversário salva com sucesso! O robô enviará todos os dias de manhã.");
+                fecharModalAniversario();
+            } catch(e) {
+                alert("❌ Falha ao salvar a automação na nuvem.");
+            }
+            btn.innerText = "Salvar Automação";
+            btn.disabled = false;
+        }
+
+        // ==========================================
+        // 🔄 PREPARATIVOS DE MOLDURA (UI)
+        // ==========================================
+        window.atualizarListaTagsDisparo = function() {
+            const divContenedor = document.getElementById('listaTagsDisparo');
+            
+            // O botão base que manda para todo mundo
+            let htmlParaGerar = '<label style="display:block; padding:10px; background:#fff; border-radius:5px; margin-bottom:5px; border: 1px solid #eee; font-weight:bold; cursor:pointer;"><input type="checkbox" value="TODOS_OS_CONTATOS"> 📢 Disparar para TODOS da Base</label>';
+            
+            // Acha as tags existentes
+            let conjuntoTags = new Set();
+            for (let i = 0; i < window.listaContatos.length; i++) {
+                if (window.listaContatos[i].tags) {
+                    for (let t = 0; t < window.listaContatos[i].tags.length; t++) {
+                        conjuntoTags.add(window.listaContatos[i].tags[t]);
+                    }
+                }
+            }
+            
+            // Desenha as opções
+            let arrayTagsUnicas = Array.from(conjuntoTags);
+            for (let i = 0; i < arrayTagsUnicas.length; i++) {
+                htmlParaGerar += `<label style="display:block; padding:10px; background:#fff; border-radius:5px; margin-bottom:5px; border: 1px solid #eee; cursor:pointer;"><input type="checkbox" value="${arrayTagsUnicas[i]}"> 🏷️ Enviar para ${arrayTagsUnicas[i]}</label>`;
+            }
+            
+            divContenedor.innerHTML = htmlParaGerar;
+        }
+
+        // ==========================================
+        // 🗑️ EXCLUSÃO E UTILIDADES (DESCOMPACTADAS)
+        // ==========================================
+        window.apagarContato = function(idUnicoDoContato) {
+            const confirmacao = confirm("Tem certeza absoluta que deseja apagar este contato?");
+            if (confirmacao === true) {
+                let novaLista = [];
+                for (let i = 0; i < window.listaContatos.length; i++) {
+                    if (window.listaContatos[i].id !== idUnicoDoContato) {
+                        novaLista.push(window.listaContatos[i]);
+                    }
+                }
+                window.listaContatos = novaLista;
+                renderizarTabela(); 
+                window.salvarContatosLocal(); 
+            }
+        }
+
+        window.apagarSelecionados = function() {
+            const caixasMarcadas = document.querySelectorAll('.check-contato:checked');
+            if (caixasMarcadas.length === 0) {
+                return alert("⚠️ Você precisa selecionar os contatos na tabela marcando a caixinha ao lado do nome.");
+            }
+            
+            const conf = confirm(`Você marcou ${caixasMarcadas.length} contatos. Deseja mesmo excluí-los?`);
+            if (conf === true) {
+                // Junta os IDs marcados
+                let idsMarcados = [];
+                for (let i = 0; i < caixasMarcadas.length; i++) {
+                    idsMarcados.push(caixasMarcadas[i].value);
+                }
+                
+                let novaListaRestante = [];
+                for (let i = 0; i < window.listaContatos.length; i++) {
+                    // Só adiciona na lista nova se NÃO estiver nos marcados
+                    if (!idsMarcados.includes(window.listaContatos[i].id)) {
+                        novaListaRestante.push(window.listaContatos[i]);
+                    }
+                }
+                
+                window.listaContatos = novaListaRestante;
+                renderizarTabela(); 
+                window.salvarContatosLocal(); 
+                document.getElementById('checkTodos').checked = false; 
+            }
+        }
+
+        window.exportarVCF = function() {
+            let textoGiganteVCF = "";
+            
+            for (let i = 0; i < window.listaContatos.length; i++) {
+                let c = window.listaContatos[i];
+                textoGiganteVCF += `BEGIN:VCARD\n`;
+                textoGiganteVCF += `VERSION:3.0\n`;
+                textoGiganteVCF += `FN:${c.nome}\n`;
+                textoGiganteVCF += `TEL;TYPE=CELL:+55${c.telefone}\n`;
+                textoGiganteVCF += `END:VCARD\n`;
+            }
+            
+            const blobDoVcard = new Blob([textoGiganteVCF], { type: 'text/vcard' });
+            const linkDownload = document.createElement('a');
+            linkDownload.href = URL.createObjectURL(blobDoVcard);
+            linkDownload.download = 'contatos_exportados_ph.vcf';
+            linkDownload.click();
+        }
+
+        // ==========================================
+        // 🚪 FUNÇÕES DE TELA (ABRIR E FECHAR MODAIS)
+        // ==========================================
+        window.abrirModalImportar = function() { 
+            document.getElementById('modalImportar').style.display = 'flex'; 
+        };
+        window.fecharModalImportar = function() { 
+            document.getElementById('modalImportar').style.display = 'none'; 
+        };
+        window.etiquetarSelecionados = function() { 
+            const boxes = document.querySelectorAll('.check-contato:checked');
+            if (boxes.length > 0) {
+                window.abrirModalTag(); 
+            } else {
+                alert("⚠️ Selecione contatos na tabela primeiro!"); 
+            }
+        };
+        window.fecharModalTag = function() { 
+            document.getElementById('modalTag').style.display = 'none'; 
+            document.getElementById('nomeNovaTag').value = ''; 
+        };
+        window.abrirModalDisparo = function() { 
+            window.atualizarListaTagsDisparo(); 
+            document.getElementById('modalDisparo').style.display = 'flex'; 
+            document.getElementById('form-disparo').style.display = 'block'; 
+            document.getElementById('tela-progresso').style.display = 'none'; 
+        };
+        window.fecharModalDisparo = function() { 
+            document.getElementById('modalDisparo').style.display = 'none'; 
+        };
+        window.trocarAba = function(nomeDaAba) { 
+            const abasPossiveis = ['tags', 'avulso'];
+            for (let i = 0; i < abasPossiveis.length; i++) {
+                let tabAtiva = abasPossiveis[i];
+                document.getElementById('aba-' + tabAtiva).classList.remove('active'); 
+                document.getElementById('btn-' + tabAtiva).classList.remove('active'); 
+            }
+            document.getElementById('aba-' + nomeDaAba).classList.add('active'); 
+            document.getElementById('btn-' + nomeDaAba).classList.add('active'); 
+        };
+        window.alternarTodosChecks = function() { 
+            const checkMestre = document.getElementById('checkTodos'); 
+            const caixinhas = document.querySelectorAll('.check-contato');
+            for (let i = 0; i < caixinhas.length; i++) {
+                caixinhas[i].checked = checkMestre.checked;
+            }
+        };
+        window.fazerLogout = function() { 
+            signOut(auth).then(function() {
+                window.location.href = "index.html";
+            });
+        };
     </script>
 </body>
 </html>
