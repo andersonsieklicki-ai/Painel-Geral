@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api-oracle/:match*",
+      "destination": "http://141.148.49.219:3000/:match*"
+    }
+  ]
+}
