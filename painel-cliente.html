@@ -47,7 +47,6 @@
         .progress-wrapper { background: #e9ecef; border-radius: 10px; height: 25px; width: 100%; overflow: hidden; margin: 20px 0; box-shadow: inset 0 1px 3px rgba(0,0,0,0.2); }
         .progress-fill { background: var(--success); width: 0%; height: 100%; transition: width 0.4s ease; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: bold; }
         
-        /* Estilo da caixa de upload de mídia */
         .upload-box { border: 2px dashed #ccc; padding: 15px; border-radius: 6px; background: #fafafa; margin-bottom: 15px; text-align: center; transition: border-color 0.3s; }
         .upload-box:hover { border-color: var(--primary); }
         .upload-box input[type="file"] { width: 100%; cursor: pointer; font-size: 13px; }
@@ -71,6 +70,11 @@
                 <div><span class="status-indicator" style="background-color: #ccc;"></span><strong>Verificando status...</strong></div>
             </div>
             <p id="desc-conexao">Analisando o status do seu robô no servidor...</p>
+            
+            <div id="area-qr-code" style="text-align: center; margin-top: 20px; display: none; border-top: 1px solid #eee; padding-top: 15px;">
+                <h4 id="status-texto-qr" style="color: var(--primary); margin-top: 0;">Gerando código...</h4>
+                <img id="qrcode-imagem" src="" alt="QR Code" style="width: 220px; height: 220px; display: none; margin: 10px auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+            </div>
         </div>
 
         <div class="card">
@@ -186,7 +190,8 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        // IMPORTANTE: Adicionado o onSnapshot na linha abaixo
+        import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyC4-2LavZt7iWPt2u71u-yRUYbIJu-Vzf0",
@@ -211,19 +216,72 @@
                 if (docSnap.exists()) {
                     const dados = docSnap.data();
                     document.getElementById('nomeCliente').innerText = dados.nomeEmpresa;
+                    
                     if (dados.plano === 'basico') {
                         document.getElementById('tagPlano').innerText = "🥉 Plano Básico";
                         document.getElementById('area-conexao').innerHTML = `<div><span class="status-indicator"></span><strong>Conectado à Central</strong></div>`;
                         document.getElementById('desc-conexao').innerText = "Você está usando o nosso número oficial para enviar avisos e comunicados.";
+                    
                     } else if (dados.plano === 'premium') {
                         document.getElementById('tagPlano').innerText = "🥇 Plano Premium";
-                        document.getElementById('area-conexao').innerHTML = `<div><span class="status-indicator" style="background-color: #ffc107;"></span><strong>Aguardando Conexão</strong></div><button class="btn btn-outline" onclick="alert('Gerando QR Code...')">Ler QR Code</button>`;
-                        document.getElementById('desc-conexao').innerText = "Mantenha o celular conectado. O robô puxará seus grupos automaticamente.";
+                        // AQUI ESTÁ O BOTÃO INTELIGENTE QUE CHAMA A NOVA FUNÇÃO
+                        document.getElementById('area-conexao').innerHTML = `<div><span class="status-indicator" style="background-color: #ffc107;"></span><strong>Aguardando Conexão</strong></div><button class="btn btn-outline" id="btnGerarQR" onclick="conectarRoboPremium()">Conectar WhatsApp</button>`;
+                        document.getElementById('desc-conexao').innerText = "Clique no botão acima para gerar seu QR Code exclusivo.";
                     }
                 }
             } else { window.location.href = "index.html"; }
         });
 
+        // ==========================================
+        // 🚀 NOVA FUNÇÃO: INTEGRAÇÃO COM A ORACLE (SaaS)
+        // ==========================================
+        window.conectarRoboPremium = async function() {
+            // Usamos o ID "teste-omni" que você criou no Firebase para validarmos agora
+            const idCliente = "teste-omni"; 
+            
+            document.getElementById('area-qr-code').style.display = 'block';
+            document.getElementById('status-texto-qr').innerText = "Iniciando motor na Oracle... Aguarde.";
+            document.getElementById('btnGerarQR').disabled = true;
+
+            try {
+                // 1. Manda o comando POST para a sua VPS (Oracle) ligar o WhatsApp
+                await fetch('http://141.148.49.219:3000/api/saas/conectar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'x-senha': '123321' },
+                    body: JSON.stringify({ idCliente: idCliente })
+                });
+
+                // 2. Fica escutando o Firebase em tempo real (onSnapshot)
+                const docSaaS = doc(db, "clientes_premium", idCliente);
+                onSnapshot(docSaaS, (docSnap) => {
+                    if (docSnap.exists()) {
+                        const dadosSaaS = docSnap.data();
+                        const qrImagem = document.getElementById("qrcode-imagem");
+                        const statusTexto = document.getElementById("status-texto-qr");
+
+                        if (dadosSaaS.qrCode) {
+                            // Converte o código gigante do Firebase em imagem de QR Code
+                            qrImagem.src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(dadosSaaS.qrCode)}`;
+                            qrImagem.style.display = "block";
+                            statusTexto.innerText = "📱 Escaneie o código abaixo com seu WhatsApp:";
+                        } 
+                        else if (dadosSaaS.status === 'online') {
+                            // Robô conectou com sucesso! Esconde o QR e muda a cor para verde
+                            qrImagem.style.display = "none";
+                            statusTexto.innerText = "✅ Robô Operacional!";
+                            document.getElementById('area-conexao').innerHTML = `<div><span class="status-indicator" style="background-color: var(--success);"></span><strong style="color: var(--success);">Sessão Autenticada</strong></div>`;
+                            document.getElementById('desc-conexao').innerText = "Seu número particular está conectado à nossa Inteligência Omnichannel.";
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error("Erro:", error);
+                document.getElementById('status-texto-qr').innerHTML = "❌ Erro ao conectar ao servidor.<br><small>Verifique se o seu navegador está permitindo 'Conteúdo Inseguro' (Mixed Content) para acessar a Oracle.</small>";
+                document.getElementById('btnGerarQR').disabled = false;
+            }
+        };
+
+        // ... O resto das suas funções originais de CRM continuam intactas aqui para baixo ...
         window.fazerLogout = function() { signOut(auth).then(() => { window.location.href = "index.html"; }); };
         
         window.abrirModalImportar = () => document.getElementById('modalImportar').style.display = 'flex';
@@ -235,7 +293,6 @@
             document.getElementById('modalDisparo').style.display = 'flex'; 
             document.getElementById('form-disparo').style.display = 'block'; 
             document.getElementById('tela-progresso').style.display = 'none'; 
-            // Limpa o input de mídia ao abrir
             document.getElementById('arquivoMidia').value = '';
         };
         window.fecharModalDisparo = () => document.getElementById('modalDisparo').style.display = 'none';
