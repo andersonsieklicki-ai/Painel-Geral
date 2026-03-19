@@ -8,139 +8,158 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
-        :root { --primary: #003399; --primary-dark: #002266; --secondary: #f4f7f6; --accent: #ffc107; --success: #28a745; --text-dark: #2c3e50; --text-light: #6c757d; }
-        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background-color: #ffffff; margin: 0; padding: 0; color: var(--text-dark); overflow-x: hidden; }
+        :root { 
+            --primary: #2563eb; 
+            --primary-dark: #1d4ed8; 
+            --secondary: #f8fafc; 
+            --accent: #f59e0b; 
+            --success: #10b981; 
+            --text-dark: #1e293b; 
+            --text-light: #64748b; 
+        }
         
-        /* 🟢 CABEÇALHO (MANTIDO) */
-        header { background-color: #ffffff; padding: 20px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
+        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background-color: var(--secondary); margin: 0; padding: 0; color: var(--text-dark); overflow-x: hidden; }
+        
+        /* 🟢 CABEÇALHO */
+        header { background-color: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 15px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
         .logo { font-size: 1.5rem; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 8px; }
-        .btn-login-header { background: transparent; border: 2px solid var(--primary); color: var(--primary); padding: 8px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .btn-login-header:hover { background: var(--primary); color: white; }
+        .btn-login-header { background: var(--primary); border: none; color: white; padding: 10px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2); }
+        .btn-login-header:hover { background: var(--primary-dark); transform: translateY(-2px); }
 
-        /* 🟢 HERO SECTION (A MUDANÇA DA IMAGEM) */
-        .hero { background: linear-gradient(135deg, var(--primary) 0%, #0055ff 100%); color: white; padding: 80px 5%; display: flex; align-items: center; justify-content: space-between; gap: 40px; min-height: 60vh; }
+        /* 🟢 HERO SECTION (FUNDO ADAPTADO PARA O ROBÔ HD) */
+        .hero { 
+            background: linear-gradient(135deg, #eef2ff 0%, #ffffff 100%); 
+            color: var(--text-dark); 
+            padding: 50px 5%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            gap: 40px; 
+            min-height: 70vh; 
+        }
         .hero-content { flex: 1; max-width: 600px; }
-        .hero h1 { font-size: 3rem; margin-bottom: 20px; line-height: 1.2; }
-        .hero p { font-size: 1.2rem; margin-bottom: 30px; opacity: 0.9; line-height: 1.5; }
-        .btn-cta { background: var(--accent); color: #000; font-size: 1.1rem; font-weight: bold; border: none; padding: 15px 30px; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 15px rgba(255, 193, 7, 0.4); transition: 0.3s; }
-        .btn-cta:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(255, 193, 7, 0.6); }
-        .hero-image { flex: 1; text-align: center; }
+        .hero h1 { font-size: 3.5rem; margin-bottom: 20px; line-height: 1.1; color: #0f172a; font-weight: 800; }
+        .hero p { font-size: 1.2rem; margin-bottom: 30px; color: var(--text-light); line-height: 1.6; }
+        .btn-cta { background: var(--primary); color: white; font-size: 1.1rem; font-weight: bold; border: none; padding: 18px 35px; border-radius: 10px; cursor: pointer; box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3); transition: 0.3s; }
+        .btn-cta:hover { transform: translateY(-3px); background: var(--primary-dark); box-shadow: 0 15px 25px rgba(37, 99, 235, 0.4); }
+        .hero-image { flex: 1.3; text-align: center; position: relative; }
         
-        /* 📸 A imagem bonita do robô que você pediu (AQUI ESTÁ) */
-        .hero-image img { max-width: 100%; height: auto; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+        /* 📸 Configuração perfeita para o seu robô HD flutuante */
+        .hero-image img { max-width: 100%; height: auto; border-radius: 20px; animation: flutuar 6s ease-in-out infinite; }
 
-        /* 🟢 BENEFÍCIOS (AJUSTES DE COPY QUE VOCÊ PEDIU) */
-        .features { padding: 80px 5%; background: var(--secondary); text-align: center; }
-        .features h2 { font-size: 2.2rem; color: var(--primary); margin-bottom: 10px; }
-        .features p.subtitle { color: var(--text-light); margin-bottom: 50px; font-size: 1.1rem; }
+        @keyframes flutuar {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* 🟢 BENEFÍCIOS */
+        .features { padding: 80px 5%; background: #ffffff; text-align: center; }
+        .features h2 { font-size: 2.5rem; color: #0f172a; margin-bottom: 10px; }
+        .features p.subtitle { color: var(--text-light); margin-bottom: 60px; font-size: 1.1rem; }
         
         .grid-features { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; }
-        .card-feature { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); transition: 0.3s; border-top: 4px solid transparent; }
-        .card-feature:hover { transform: translateY(-5px); border-top-color: var(--primary); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        .feature-icon { font-size: 3rem; margin-bottom: 20px; display: inline-block; }
-        .card-feature h3 { margin: 0 0 15px 0; color: var(--text-dark); }
-        .card-feature p { color: var(--text-light); line-height: 1.6; margin: 0; }
+        .card-feature { background: white; padding: 40px 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.04); transition: 0.3s; border: 1px solid #f1f5f9; text-align: left; }
+        .card-feature:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(37, 99, 235, 0.1); border-color: #bfdbfe; }
+        .feature-icon { font-size: 2.5rem; margin-bottom: 20px; display: inline-flex; align-items: center; justify-content: center; width: 70px; height: 70px; background: #eff6ff; color: var(--primary); border-radius: 15px; }
+        .card-feature h3 { margin: 0 0 15px 0; color: #0f172a; font-size: 1.3rem; }
+        .card-feature p { color: var(--text-light); line-height: 1.6; margin: 0; font-size: 0.95rem; }
 
-        /* 🟢 CAPTURA DE LEADS (VENDENDO O PEIXE) */
-        .lead-section { padding: 80px 5%; display: flex; align-items: center; justify-content: center; gap: 50px; background: white; }
+        /* 🟢 CAPTURA DE LEADS (VENDAS) */
+        .lead-section { padding: 80px 5%; display: flex; align-items: center; justify-content: center; gap: 60px; background: #f8fafc; }
         .lead-text { max-width: 500px; }
-        .lead-text h2 { font-size: 2.2rem; color: var(--primary); }
-        .lead-text p { font-size: 1.1rem; color: var(--text-light); line-height: 1.6; margin-bottom: 20px; }
-        .lead-form { background: var(--secondary); padding: 40px; border-radius: 15px; width: 100%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
-        .lead-form h3 { margin-top: 0; color: var(--text-dark); text-align: center; margin-bottom: 20px; }
+        .lead-text h2 { font-size: 2.5rem; color: #0f172a; margin-bottom: 20px; line-height: 1.2;}
+        .lead-text p { font-size: 1.1rem; color: var(--text-light); line-height: 1.7; margin-bottom: 20px; }
+        .lead-form { background: white; padding: 40px; border-radius: 20px; width: 100%; max-width: 420px; box-shadow: 0 20px 50px rgba(0,0,0,0.08); border: 1px solid #f1f5f9; }
+        .lead-form h3 { margin-top: 0; color: #0f172a; text-align: center; margin-bottom: 25px; font-size: 1.5rem; }
         
-        .input-group { margin-bottom: 15px; text-align: left; }
-        .input-group label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem; color: var(--text-dark); }
+        .input-group { margin-bottom: 20px; text-align: left; }
+        .input-group label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem; color: #475569; }
         
-        /* 📱 CORREÇÃO: ÍCONE WHATSAPP DENTRO DO CAMPO (AQUI ESTÁ) */
         .input-with-icon { position: relative; }
-        .input-with-icon i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #25D366; font-size: 1.2rem; }
-        .input-with-icon input { padding: 12px 15px 12px 45px !important; }
+        .input-with-icon i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #10b981; font-size: 1.2rem; }
+        .input-with-icon input { padding: 14px 15px 14px 45px !important; }
 
-        .input-group input { width: 100%; padding: 12px 15px; border: 1px solid #ced4da; border-radius: 8px; box-sizing: border-box; font-size: 1rem; transition: 0.3s; }
-        .input-group input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(0,51,153,0.1); }
+        .input-group input { width: 100%; padding: 14px 15px; border: 2px solid #e2e8f0; border-radius: 10px; box-sizing: border-box; font-size: 1rem; transition: 0.3s; background: #f8fafc; }
+        .input-group input:focus { border-color: var(--primary); outline: none; background: white; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); }
         
-        .btn-submit { background: var(--success); color: white; width: 100%; padding: 15px; border: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; cursor: pointer; transition: 0.3s; margin-top: 10px; }
-        .btn-submit:hover { background: #218838; }
+        .btn-submit { background: var(--success); color: white; width: 100%; padding: 16px; border: none; border-radius: 10px; font-weight: bold; font-size: 1.1rem; cursor: pointer; transition: 0.3s; margin-top: 10px; box-shadow: 0 10px 20px rgba(16, 185, 129, 0.2); }
+        .btn-submit:hover { background: #059669; transform: translateY(-2px); }
 
         /* 🟢 FOOTER */
-        footer { background: var(--text-dark); color: white; text-align: center; padding: 20px; font-size: 0.9rem; }
+        footer { background: #0f172a; color: #94a3b8; text-align: center; padding: 30px 20px; font-size: 0.9rem; }
 
-        /* 🟢 MODAL DE LOGIN (ÁREA DO CLIENTE) */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(3px); justify-content: center; align-items: center; z-index: 1000; padding: 20px; box-sizing: border-box; }
-        .modal-content { background: white; padding: 40px 30px; border-radius: 15px; width: 100%; max-width: 380px; text-align: center; position: relative; box-shadow: 0 15px 40px rgba(0,0,0,0.2); }
-        .btn-close { position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #999; }
-        .btn-close:hover { color: #333; }
-        .modal-content h2 { color: var(--primary); margin-top: 0; margin-bottom: 5px; }
-        .modal-content p { color: var(--text-light); margin-bottom: 25px; font-size: 0.95rem; }
-        .btn-login { background-color: var(--primary); color: white; border: none; padding: 14px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1rem; width: 100%; transition: background 0.3s; margin-top: 10px;}
+        /* 🟢 MODAL DE LOGIN */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(5px); justify-content: center; align-items: center; z-index: 1000; padding: 20px; box-sizing: border-box; }
+        .modal-content { background: white; padding: 40px 30px; border-radius: 20px; width: 100%; max-width: 400px; text-align: center; position: relative; box-shadow: 0 25px 50px rgba(0,0,0,0.25); }
+        .btn-close { position: absolute; top: 15px; right: 20px; background: none; border: none; font-size: 1.8rem; cursor: pointer; color: #94a3b8; transition: 0.2s; }
+        .btn-close:hover { color: #0f172a; }
+        .modal-content h2 { color: #0f172a; margin-top: 0; margin-bottom: 5px; font-size: 1.8rem; }
+        .modal-content p { color: var(--text-light); margin-bottom: 30px; font-size: 0.95rem; }
+        .btn-login { background-color: var(--primary); color: white; border: none; padding: 15px; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 1.1rem; width: 100%; transition: 0.3s; margin-top: 10px;}
         .btn-login:hover { background-color: var(--primary-dark); }
-        .error-msg { color: #dc3545; font-size: 0.85rem; margin-top: 15px; display: none; font-weight: bold; }
+        .error-msg { color: #ef4444; font-size: 0.9rem; margin-top: 15px; display: none; font-weight: 600; padding: 10px; background: #fef2f2; border-radius: 8px; border: 1px solid #fecaca; }
 
-        @media (max-width: 768px) {
+        @media (max-width: 900px) {
             .hero { flex-direction: column; text-align: center; padding: 60px 5%; }
-            .hero h1 { font-size: 2.2rem; }
-            .hero-image { display: none; }
-            .lead-section { flex-direction: column; padding: 50px 5%; text-align: center; }
-            .lead-text h2 { font-size: 1.8rem; }
+            .hero h1 { font-size: 2.5rem; }
+            .lead-section { flex-direction: column; padding: 60px 5%; text-align: center; }
+            .lead-text h2 { font-size: 2rem; }
             .lead-form { padding: 30px 20px; }
-            header { padding: 15px 5%; }
-            .logo { font-size: 1.2rem; }
         }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="logo">🚀 Omnichannel PRO</div>
+        <div class="logo"><i class="fa-solid fa-rocket"></i> Omnichannel PRO</div>
         <button class="btn-login-header" onclick="abrirModalLogin()">Entrar no Painel</button>
     </header>
 
     <section class="hero">
         <div class="hero-content">
             <h1>Organize e Venda Mais no WhatsApp</h1>
-            <p>Deixe o trabalho manual para trás. Nossa Central Omnichannel permite controlar clientes, enviar promoções massivas e gerir a Defesa Civil e Associação de Água, tudo em um só lugar.</p>
+            <p>Deixe o trabalho manual para trás. Nossa Central Omnichannel permite controlar clientes, enviar promoções e automatizar processos, economizando tempo e dinheiro.</p>
             <button class="btn-cta" onclick="rolarParaCadastro()">Quero Vender Mais e Perder Menos Tempo</button>
         </div>
         <div class="hero-image">
-            <img src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Robô Inteligente de Automação Omnichannel">
+            <img src="robo-premium.jpg" alt="Robô Inteligente de Automação Omnichannel PRO">
         </div>
     </section>
 
     <section class="features">
-        <h2>A ferramenta ideal para sua empresa ou associação</h2>
-        <p class="subtitle">Chega de perder tempo digitando ou gerenciando planilhas furadas.</p>
+        <h2>A ferramenta ideal para a sua operação</h2>
+        <p class="subtitle">Chega de perder tempo digitando manualmente ou gerenciando planilhas furadas.</p>
         
         <div class="grid-features">
             <div class="card-feature">
-                <span class="feature-icon">👥</span>
+                <span class="feature-icon"><i class="fa-solid fa-users"></i></span>
                 <h3>Melhor Controle de Seus Contatos</h3>
-                <p>Melhor controle de seus contatos, organização a todo vapor! Importe de planilhas CSV ou agenda VCF e etiquete por grupo (VIP, etc.).</p>
+                <p>Organização a todo vapor! Importe de planilhas CSV ou agenda VCF e etiquete por grupo (VIP, etc.) de forma simples e rápida.</p>
             </div>
             <div class="card-feature">
-                <span class="feature-icon">📸</span>
-                <h3>Envio de Mídias</h3>
+                <span class="feature-icon"><i class="fa-solid fa-paper-plane"></i></span>
+                <h3>Envio Inteligente de Mídias</h3>
                 <p>O robô simula a digitação como se fosse um humano para melhor interação! Possui pausas humanizadas automaticamente para blindar seu número.</p>
             </div>
             <div class="card-feature">
-                <span class="feature-icon">🎁</span>
+                <span class="feature-icon"><i class="fa-solid fa-cake-candles"></i></span>
                 <h3>Motor de Aniversário</h3>
-                <p>Nada melhor que ser lembrado por uma empresa que sabe o valor do seu cliente! Envio automático matinal com foto e texto.</p>
+                <p>Nada melhor que ser lembrado por uma empresa que sabe o valor do seu cliente! Envio automático matinal com foto e texto personalizado com o nome.</p>
             </div>
-            
-          <div class="card-feature">
-                <span class="feature-icon">💧</span>
+            <div class="card-feature">
+                <span class="feature-icon"><i class="fa-solid fa-hand-holding-droplet"></i></span>
                 <h3>Gestão de Água Comunitária</h3>
-                <p>Serviço de controle de <b>água potável</b> em comunidades, com emissão de faturas, pagamento via PIX e extrato do <b>histórico</b> de faturas em PDF gerado na hora! Autoatendimento via CPF e consulta de contas pendentes.</p>
+                <p>Serviço de controle de água potável em comunidades, com emissão de faturas, pagamento via PIX e extrato do histórico de faturas em PDF gerado na hora! Autoatendimento via CPF.</p>
             </div>
         </div>
     </section>
 
     <section class="lead-section" id="cadastro">
         <div class="lead-text">
-            <h2>Pronto para escalar a sua operação?</h2>
-            <p>Tire suas dúvidas e veja como a nossa Inteligência Omnichannel se adapta ao seu negócio ou associação.</p>
-            <p>Preencha os dados e entraremos em contato via WhatsApp.</p>
+            <h2>Pronto para escalar as suas vendas?</h2>
+            <p>Tire suas dúvidas e veja como a nossa Inteligência Omnichannel se adapta perfeitamente ao seu negócio ou associação.</p>
+            <p>Preencha os dados e a nossa equipa entrará em contato via WhatsApp para uma demonstração exclusiva.</p>
         </div>
         
         <div class="lead-form">
@@ -151,17 +170,17 @@
             </div>
             <div class="input-group">
                 <label>Nome da Empresa/Associação</label>
-                <input type="text" id="leadEmpresa" placeholder="Ex: Mercado São Luiz">
+                <input type="text" id="leadEmpresa" placeholder="Ex: pH Cosméticos">
             </div>
             
             <div class="input-group input-with-icon">
                 <label>Seu WhatsApp (com DDD)</label>
-                <i class="fab fa-whatsapp"></i>
+                <i class="fa-brands fa-whatsapp"></i>
                 <input type="tel" id="leadZap" placeholder="(46) 99999-0000">
             </div>
             
-            <button class="btn-submit" id="btnLead" onclick="enviarLead()">Quero Conhecer 🚀</button>
-            <p id="leadSucesso" style="display:none; color: var(--success); font-weight:bold; margin-top: 15px; text-align: center;">Tudo certo! Logo chamaremos.</p>
+            <button class="btn-submit" id="btnLead" onclick="enviarLead()">Quero Conhecer a Ferramenta 🚀</button>
+            <p id="leadSucesso" style="display:none; color: var(--success); font-weight:bold; margin-top: 15px; text-align: center; background: #d1fae5; padding: 10px; border-radius: 8px;">Tudo certo! Logo chamaremos no WhatsApp.</p>
         </div>
     </section>
 
@@ -173,7 +192,7 @@
         <div class="modal-content">
             <button class="btn-close" onclick="fecharModalLogin()">&times;</button>
             <h2>Acessar Painel</h2>
-            <p>Acesse o painel de lojista/administrador</p>
+            <p>Faça login para gerir o seu robô</p>
             
             <div class="input-group">
                 <label for="email">E-mail de Acesso</label>
@@ -184,8 +203,8 @@
                 <input type="password" id="senha" placeholder="••••••••">
             </div>
             
-            <button class="btn-login" id="btnLogin" onclick="fazerLogin()">Acessar Painel</button>
-            <div class="error-msg" id="erroMsg">Dados inválidos.</div>
+            <button class="btn-login" id="btnLogin" onclick="fazerLogin()">Acessar Painel Seguro</button>
+            <div class="error-msg" id="erroMsg"><i class="fa-solid fa-circle-exclamation"></i> Dados inválidos.</div>
         </div>
     </div>
 
@@ -221,23 +240,23 @@
             const erro = document.getElementById('erroMsg');
 
             if(!email || !senha) {
-                erro.innerText = "Preencha tudo.";
+                erro.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Preencha todos os campos.';
                 erro.style.display = "block";
                 return;
             }
 
-            btn.innerText = "Verificando...";
+            btn.innerText = "Autenticando...";
             btn.disabled = true;
             erro.style.display = "none";
 
             signInWithEmailAndPassword(auth, email, senha)
-                .then((userCredential) => {
+                .then(() => {
                     window.location.href = "painel-cliente.html";
                 })
-                .catch((error) => {
-                    btn.innerText = "Acessar Painel";
+                .catch(() => {
+                    btn.innerText = "Acessar Painel Seguro";
                     btn.disabled = false;
-                    erro.innerText = "Acesso negado. Verifique os dados.";
+                    erro.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Acesso negado. Verifique os dados.';
                     erro.style.display = "block";
                 });
         }
@@ -249,10 +268,10 @@
             const btn = document.getElementById('btnLead');
 
             if(!nome || !empresa || !zap) {
-                return alert("Preencha todos os campos, por favor.");
+                return alert("Preencha todos os campos do formulário!");
             }
 
-            btn.innerText = "Enviando...";
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Enviando...';
             btn.disabled = true;
 
             try {
@@ -272,7 +291,7 @@
                 
             } catch(e) {
                 alert("Ocorreu um erro ao enviar. Tente novamente mais tarde.");
-                btn.innerText = "Quero Conhecer 🚀";
+                btn.innerText = "Quero Conhecer a Ferramenta 🚀";
                 btn.disabled = false;
             }
         }
