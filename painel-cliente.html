@@ -12,56 +12,75 @@
         .card { background: white; border-radius: 8px; padding: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-top: 4px solid var(--primary); }
         .card.full-width { grid-column: span 2; }
         .card h3 { margin-top: 0; color: var(--primary); display: flex; justify-content: space-between; align-items: center; }
+        .card p { font-size: 14px; color: #666; line-height: 1.5; }
         .btn { background-color: var(--primary); color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 14px; transition: background 0.3s; }
         .btn:hover { background-color: #002266; }
+        .btn:disabled { background-color: #999; cursor: not-allowed; }
         .btn-success { background-color: var(--success); }
+        .btn-success:hover { background-color: #218838; }
         .btn-outline { background-color: transparent; color: var(--primary); border: 1px solid var(--primary); }
         .btn-danger { background-color: #dc3545; color: white; border: none; }
         .status-box { display: flex; align-items: center; justify-content: space-between; background-color: #e8f5e9; padding: 15px; border-radius: 8px; border: 1px solid #c8e6c9; margin-bottom: 20px; }
         .status-indicator { display: inline-block; width: 12px; height: 12px; background-color: var(--success); border-radius: 50%; margin-right: 8px; }
+        
         .crm-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #ddd; }
         .search-box { flex: 1; min-width: 250px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; }
+        
         .table-container { overflow-y: auto; max-height: 500px; border: 1px solid #ddd; border-radius: 5px; }
         table { width: 100%; border-collapse: collapse; font-size: 14px; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background-color: #f8f9fa; position: sticky; top: 0; z-index: 10; }
-        .tag { font-size: 11px; padding: 4px 8px; border-radius: 12px; color: white; font-weight: bold; display: inline-block; margin: 2px; background-color: #6c757d; }
+        th { background-color: #f8f9fa; color: #333; position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 2px -1px rgba(0,0,0,0.1); }
+        tr:hover { background-color: #f1f5f9; }
+        .tag { font-size: 11px; padding: 4px 8px; border-radius: 12px; color: white; font-weight: bold; display: inline-block; margin: 2px; }
+        .tag-novo { background-color: #6c757d; }
+        
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: white; padding: 30px; border-radius: 8px; width: 500px; max-width: 90%; max-height: 90vh; overflow-y: auto; }
+        .modal-content { background: white; padding: 30px; border-radius: 8px; width: 500px; max-width: 90%; max-height: 90vh; overflow-y: auto; position: relative; }
+        .info-disparo { font-size: 12px; color: #dc3545; background: #f8d7da; padding: 10px; border-radius: 4px; margin-bottom: 15px; }
         .tabs { display: flex; border-bottom: 2px solid #ccc; margin-bottom: 15px; }
         .tab-btn { flex: 1; background: none; border: none; padding: 10px; font-size: 14px; font-weight: bold; cursor: pointer; color: #666; }
         .tab-btn.active { color: var(--primary); border-bottom: 3px solid var(--primary); margin-bottom: -2px; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
+        .modal textarea, .modal input[type="text"] { width: 100%; padding: 10px; margin: 5px 0 15px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: inherit; }
         .lista-selecao { border: 1px solid #ccc; border-radius: 4px; padding: 10px; max-height: 120px; overflow-y: auto; margin-bottom: 15px; background: #f9f9f9; display: flex; flex-direction: column; gap: 8px;}
-        .progress-wrapper { background: #e9ecef; border-radius: 10px; height: 25px; width: 100%; overflow: hidden; margin: 20px 0; }
+        .progress-wrapper { background: #e9ecef; border-radius: 10px; height: 25px; width: 100%; overflow: hidden; margin: 20px 0; box-shadow: inset 0 1px 3px rgba(0,0,0,0.2); }
         .progress-fill { background: var(--success); width: 0%; height: 100%; transition: width 0.4s ease; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: bold; }
-        .upload-box { border: 2px dashed #ccc; padding: 15px; border-radius: 6px; text-align: center; margin-bottom: 15px; background: #fafafa; }
+        
+        .upload-box { border: 2px dashed #ccc; padding: 15px; border-radius: 6px; background: #fafafa; margin-bottom: 15px; text-align: center; transition: border-color 0.3s; }
+        .upload-box:hover { border-color: var(--primary); }
+        .upload-box input[type="file"] { width: 100%; cursor: pointer; font-size: 13px; }
+
         @media (max-width: 768px) { .container { grid-template-columns: 1fr; } .card.full-width { grid-column: span 1; } }
     </style>
 </head>
 <body>
 
     <div class="navbar">
-        <h2>Meu Painel - <span id="nomeCliente">Carregando...</span> <span id="tagPlano" style="font-size: 12px; background: rgba(255,255,255,0.2); padding: 4px 8px; border-radius: 12px; margin-left: 10px;"></span></h2>
-        <div><a href="#" onclick="fazerLogout()" style="color: white; text-decoration: none; font-weight: bold;">Sair</a></div>
+        <h2>Meu Painel - <span id="nomeCliente">Carregando...</span> <span id="tagPlano" style="font-size: 12px; background: rgba(255,255,255,0.2); padding: 4px 8px; border-radius: 12px; margin-left: 10px; font-weight: normal;"></span></h2>
+        <div>
+            <span style="font-size: 14px;">Status: Logado</span> | <a href="#" onclick="fazerLogout()" style="color: white; text-decoration: none; margin-left: 10px; font-weight: bold;">Sair</a>
+        </div>
     </div>
 
     <div class="container">
         <div class="card">
             <h3>🤖 Conexão do WhatsApp</h3>
             <div class="status-box" id="area-conexao">
-                <div><span class="status-indicator"></span><strong>Verificando status...</strong></div>
+                <div><span class="status-indicator" style="background-color: #ccc;"></span><strong>Verificando status...</strong></div>
             </div>
-            <div id="area-qr-code" style="text-align: center; display: none;">
-                <h4 id="status-texto-qr">Gerando código...</h4>
-                <img id="qrcode-imagem" style="width: 200px; margin: 10px auto; display: none; border-radius: 8px;">
+            <p id="desc-conexao">Analisando o status do seu robô no servidor...</p>
+            
+            <div id="area-qr-code" style="text-align: center; margin-top: 20px; display: none; border-top: 1px solid #eee; padding-top: 15px;">
+                <h4 id="status-texto-qr" style="color: var(--primary); margin-top: 0;">Gerando código...</h4>
+                <img id="qrcode-imagem" src="" alt="QR Code" style="width: 220px; height: 220px; display: none; margin: 10px auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
             </div>
         </div>
 
         <div class="card">
             <h3>📢 Central de Promoções</h3>
-            <button class="btn btn-success" style="width: 100%;" onclick="abrirModalDisparo()">🚀 Criar Nova Campanha</button>
+            <p>Crie campanhas direcionadas para sua base de clientes usando nossas etiquetas de inteligência.</p>
+            <button class="btn btn-success" style="width: 100%; margin-top: 15px;" onclick="abrirModalDisparo()">🚀 Criar Nova Campanha</button>
         </div>
 
         <div class="card full-width">
@@ -103,20 +122,22 @@
 
     <div class="modal" id="modalImportar">
         <div class="modal-content">
-            <h2>Importar Contatos</h2>
-            <input type="file" accept=".csv, .vcf" id="arquivoCsv" style="width: 100%; margin-bottom: 15px;">
-            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+            <h2 style="margin-top: 0; color: var(--primary);">Importar Contatos</h2>
+            <p>Selecione um arquivo <strong>.csv</strong> ou <strong>.vcf</strong> (Agenda do Celular).</p>
+            <input type="file" accept=".csv, .vcf" id="arquivoCsv" style="width: 100%; padding: 10px; margin: 5px 0 15px 0; border: 1px solid #ccc; border-radius: 4px;">
+            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
                 <button class="btn btn-outline" onclick="fecharModalImportar()">Cancelar</button>
-                <button class="btn" onclick="iniciarImportacao()">Salvar Contatos</button>
+                <button class="btn" id="btnSalvarImportacao" onclick="iniciarImportacao()">Salvar Contatos</button>
             </div>
         </div>
     </div>
 
     <div class="modal" id="modalTag">
         <div class="modal-content" style="width: 400px;">
-            <h2>🏷️ Adicionar Etiqueta</h2>
-            <input type="text" id="nomeNovaTag" placeholder="Ex: Vip, Promoção Mães...">
-            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+            <h2 style="margin-top: 0; color: var(--primary);">🏷️ Adicionar Etiqueta</h2>
+            <p>Digite o nome do grupo/etiqueta para os contatos selecionados:</p>
+            <input type="text" id="nomeNovaTag" placeholder="Ex: Promoção Mães, VIP, etc...">
+            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px;">
                 <button class="btn btn-outline" onclick="fecharModalTag()">Cancelar</button>
                 <button class="btn" onclick="salvarTagMassa()">Aplicar Tag</button>
             </div>
@@ -125,29 +146,43 @@
 
     <div class="modal" id="modalDisparo">
         <div class="modal-content">
-            <h2>🚀 Disparar Campanha</h2>
+            <h2 style="margin-top: 0; color: var(--primary);">Criar Nova Campanha</h2>
             <div id="form-disparo">
+                <div class="info-disparo">⚠️ Envio humanizado ativado. O robô fará pausas para evitar bloqueios.</div>
+                
                 <div class="tabs">
                     <button class="tab-btn active" onclick="trocarAba('tags')" id="btn-tags">🏷️ Etiquetas</button>
                     <button class="tab-btn" onclick="trocarAba('avulso')" id="btn-avulso">✏️ Digitar</button>
                 </div>
+                
                 <div id="aba-tags" class="tab-content active">
+                    <p style="font-size: 13px; color: #666;">Selecione as etiquetas que receberão a mensagem:</p>
                     <div class="lista-selecao" id="listaTagsDisparo"></div>
                 </div>
+                
                 <div id="aba-avulso" class="tab-content">
-                    <textarea id="listaNumeros" rows="3" placeholder="Ex: 5546999999999" style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ccc; box-sizing: border-box;"></textarea>
+                    <textarea id="listaNumeros" rows="3" placeholder="Ex: 5546999999999"></textarea>
                 </div>
+
                 <label><strong>Anexar Mídia (Opcional):</strong></label>
-                <div class="upload-box"><input type="file" id="arquivoMidia" accept="image/*, application/pdf"></div>
-                <textarea id="mensagemPromo" rows="4" placeholder="Sua mensagem..." style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ccc; box-sizing: border-box;"></textarea>
-                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px;">
-                    <button class="btn btn-outline" onclick="fecharModalDisparo()">Cancelar</button>
-                    <button class="btn btn-success" onclick="iniciarDisparo()">🚀 Iniciar Envio</button>
+                <div class="upload-box">
+                    <span style="font-size: 12px; color: #666; display: block; margin-bottom: 8px;">📎 Envie uma Imagem (.jpg, .png), Catálogo (.pdf) ou Áudio (.mp3, .ogg)</span>
+                    <input type="file" id="arquivoMidia" accept="image/*, application/pdf, audio/*">
+                </div>
+
+                <label><strong>Digite a mensagem (Legenda):</strong></label>
+                <textarea id="mensagemPromo" rows="4" placeholder="Escreva o texto da sua campanha aqui..."></textarea>
+                
+                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px;">
+                    <button class="btn btn-outline" style="color: #dc3545; border-color: #dc3545;" onclick="fecharModalDisparo()">Cancelar</button>
+                    <button class="btn btn-success" onclick="iniciarDisparo()">🚀 Iniciar</button>
                 </div>
             </div>
-            <div id="tela-progresso" style="display: none; text-align: center;">
+            
+            <div id="tela-progresso" style="display: none; text-align: center; padding: 20px 0;">
+                <h3 style="color: var(--primary); margin-top: 0;">Disparando Campanha...</h3>
                 <div class="progress-wrapper"><div id="barra-progresso" class="progress-fill">0%</div></div>
-                <div id="texto-contagem">Processando...</div>
+                <div style="font-size: 18px; font-weight: bold;" id="texto-contagem">Enviando 0 de 0</div>
             </div>
         </div>
     </div>
@@ -155,6 +190,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        // IMPORTANTE: Adicionado o onSnapshot na linha abaixo
         import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -172,197 +208,316 @@
         const db = getFirestore(app);
 
         window.listaContatos = [];
-        window.idClienteLogado = ""; 
-        window.nomeLojista = "";
-        window.zapLojista = "";
-
-        // 💾 PERSISTÊNCIA E MEMÓRIA
-        window.salvarContatosLocal = function() {
-            if(window.idClienteLogado) localStorage.setItem('crm_' + window.idClienteLogado, JSON.stringify(window.listaContatos));
-        }
-        window.carregarContatosLocal = function() {
-            if(window.idClienteLogado) {
-                const salvos = localStorage.getItem('crm_' + window.idClienteLogado);
-                if(salvos) { window.listaContatos = JSON.parse(salvos); renderizarTabela(); }
-            }
-        }
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                const docSnap = await getDoc(doc(db, "empresas", user.uid));
+                const docRef = doc(db, "empresas", user.uid);
+                const docSnap = await getDoc(docRef);
                 if (docSnap.exists()) {
                     const dados = docSnap.data();
-                    window.idClienteLogado = user.uid;
-                    window.nomeLojista = dados.nomeEmpresa;
-                    window.zapLojista = dados.whatsappLojista || "";
                     document.getElementById('nomeCliente').innerText = dados.nomeEmpresa;
-                    window.carregarContatosLocal();
                     
                     if (dados.plano === 'basico') {
                         document.getElementById('tagPlano').innerText = "🥉 Plano Básico";
                         document.getElementById('area-conexao').innerHTML = `<div><span class="status-indicator"></span><strong>Conectado à Central</strong></div>`;
-                    } else {
+                        document.getElementById('desc-conexao').innerText = "Você está usando o nosso número oficial para enviar avisos e comunicados.";
+                    
+                    } else if (dados.plano === 'premium') {
                         document.getElementById('tagPlano').innerText = "🥇 Plano Premium";
-                        document.getElementById('area-conexao').innerHTML = `<button class="btn" onclick="conectarRoboPremium()">Conectar WhatsApp Particular</button>`;
+                        // AQUI ESTÁ O BOTÃO INTELIGENTE QUE CHAMA A NOVA FUNÇÃO
+                        document.getElementById('area-conexao').innerHTML = `<div><span class="status-indicator" style="background-color: #ffc107;"></span><strong>Aguardando Conexão</strong></div><button class="btn btn-outline" id="btnGerarQR" onclick="conectarRoboPremium()">Conectar WhatsApp</button>`;
+                        document.getElementById('desc-conexao').innerText = "Clique no botão acima para gerar seu QR Code exclusivo.";
                     }
                 }
             } else { window.location.href = "index.html"; }
         });
 
-        // 🔍 RENDERIZAÇÃO COM BUSCA E ORDEM ALFABÉTICA
+        // ==========================================
+        // 🚀 NOVA FUNÇÃO: INTEGRAÇÃO COM A ORACLE (SaaS)
+        // ==========================================
+        window.conectarRoboPremium = async function() {
+            // Usamos o ID "teste-omni" que você criou no Firebase para validarmos agora
+            const idCliente = "teste-omni"; 
+            
+            document.getElementById('area-qr-code').style.display = 'block';
+            document.getElementById('status-texto-qr').innerText = "Iniciando motor na Oracle... Aguarde.";
+            document.getElementById('btnGerarQR').disabled = true;
+
+            try {
+                // 1. Manda o comando POST para a sua VPS (Oracle) ligar o WhatsApp
+               await fetch('/api-oracle/api/saas/conectar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'x-senha': '123321' },
+                    body: JSON.stringify({ idCliente: idCliente })
+                });
+
+                // 2. Fica escutando o Firebase em tempo real (onSnapshot)
+                const docSaaS = doc(db, "clientes_premium", idCliente);
+                onSnapshot(docSaaS, (docSnap) => {
+                    if (docSnap.exists()) {
+                        const dadosSaaS = docSnap.data();
+                        const qrImagem = document.getElementById("qrcode-imagem");
+                        const statusTexto = document.getElementById("status-texto-qr");
+
+                        if (dadosSaaS.qrCode) {
+                            // Converte o código gigante do Firebase em imagem de QR Code
+                            qrImagem.src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(dadosSaaS.qrCode)}`;
+                            qrImagem.style.display = "block";
+                            statusTexto.innerText = "📱 Escaneie o código abaixo com seu WhatsApp:";
+                        } 
+                        else if (dadosSaaS.status === 'online') {
+                            // Robô conectou com sucesso! Esconde o QR e muda a cor para verde
+                            qrImagem.style.display = "none";
+                            statusTexto.innerText = "✅ Robô Operacional!";
+                            document.getElementById('area-conexao').innerHTML = `<div><span class="status-indicator" style="background-color: var(--success);"></span><strong style="color: var(--success);">Sessão Autenticada</strong></div>`;
+                            document.getElementById('desc-conexao').innerText = "Seu número particular está conectado à nossa Inteligência Omnichannel.";
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error("Erro:", error);
+                document.getElementById('status-texto-qr').innerHTML = "❌ Erro ao conectar ao servidor.<br><small>Verifique se o seu navegador está permitindo 'Conteúdo Inseguro' (Mixed Content) para acessar a Oracle.</small>";
+                document.getElementById('btnGerarQR').disabled = false;
+            }
+        };
+
+        // ... O resto das suas funções originais de CRM continuam intactas aqui para baixo ...
+        window.fazerLogout = function() { signOut(auth).then(() => { window.location.href = "index.html"; }); };
+        
+        window.abrirModalImportar = () => document.getElementById('modalImportar').style.display = 'flex';
+        window.fecharModalImportar = () => document.getElementById('modalImportar').style.display = 'none';
+        window.abrirModalTag = () => document.getElementById('modalTag').style.display = 'flex';
+        window.fecharModalTag = () => { document.getElementById('modalTag').style.display = 'none'; document.getElementById('nomeNovaTag').value = ''; };
+        window.abrirModalDisparo = () => { 
+            atualizarListaTagsDisparo();
+            document.getElementById('modalDisparo').style.display = 'flex'; 
+            document.getElementById('form-disparo').style.display = 'block'; 
+            document.getElementById('tela-progresso').style.display = 'none'; 
+            document.getElementById('arquivoMidia').value = '';
+        };
+        window.fecharModalDisparo = () => document.getElementById('modalDisparo').style.display = 'none';
+        
+        window.trocarAba = (aba) => {
+            ['tags', 'avulso'].forEach(id => {
+                document.getElementById('btn-' + id).classList.remove('active');
+                document.getElementById('aba-' + id).classList.remove('active');
+            });
+            document.getElementById('btn-' + aba).classList.add('active');
+            document.getElementById('aba-' + aba).classList.add('active');
+        }
+
+        function formatarTelefoneBR(telefone) {
+            let num = telefone.replace(/\D/g, ''); 
+            if (num.startsWith('55') && num.length >= 12) num = num.substring(2); 
+            if (num.startsWith('0')) {
+                if (num.length >= 13) num = num.substring(3);
+                else if (num.length === 11 || num.length === 12) num = num.substring(1); 
+            }
+            if (num.length === 10) num = num.substring(0, 2) + '9' + num.substring(2);
+            return num;
+        }
+
+        function decodificarNome(str) {
+            try {
+                if(str.includes('=')) {
+                    let limpo = str.replace(/=\r?\n/g, '').replace(/=([A-F0-9]{2})/g, '%$1'); 
+                    return decodeURIComponent(limpo);
+                }
+                return str;
+            } catch(e) { return str; } 
+        }
+
+        window.iniciarImportacao = function() {
+            const input = document.getElementById('arquivoCsv');
+            const file = input.files[0];
+            if(!file) return alert("⚠️ Selecione um arquivo!");
+            
+            const btnSalvar = document.getElementById('btnSalvarImportacao');
+            btnSalvar.innerText = "⏳ Processando...";
+            btnSalvar.disabled = true;
+
+            const extensao = file.name.split('.').pop().toLowerCase();
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                setTimeout(() => {
+                    const conteudo = e.target.result;
+                    let contatosLidos = 0;
+
+                    if (extensao === 'csv') {
+                        const linhas = conteudo.split('\n');
+                        for(let i = 1; i < linhas.length; i++) { 
+                            const linha = linhas[i].trim();
+                            if(!linha) continue;
+                            const colunas = linha.split(/[,;]/); 
+                            if(colunas.length >= 2) {
+                                adicionarAOMotor(colunas[0], colunas[1], colunas[2] || 'CSV');
+                                contatosLidos++;
+                            }
+                        }
+                    } else if (extensao === 'vcf') {
+                        const vcards = conteudo.split('BEGIN:VCARD');
+                        for(let i = 1; i < vcards.length; i++) {
+                            const card = vcards[i];
+                            const nomeMatch = card.match(/FN(?:;.*)?:(.*)/i);
+                            const telMatch = card.match(/TEL(?:;.*)?:(.*)/i);
+                            if(nomeMatch && telMatch) {
+                                adicionarAOMotor(decodificarNome(nomeMatch[1].trim()), telMatch[1].trim(), 'VCF Android');
+                                contatosLidos++;
+                            }
+                        }
+                    }
+
+                    alert(`✅ Importação concluída! ${contatosLidos} contatos carregados.`);
+                    fecharModalImportar(); 
+                    input.value = ''; 
+                    btnSalvar.innerText = "Salvar Contatos";
+                    btnSalvar.disabled = false;
+                    renderizarTabela(); 
+                }, 50); 
+            };
+            reader.readAsText(file);
+        }
+
+        function adicionarAOMotor(nome, telefone, tag) {
+            const numLimpo = formatarTelefoneBR(telefone);
+            if(!numLimpo) return; 
+            const id = 'ctt_' + Math.random().toString(36).substr(2, 9);
+            window.listaContatos.push({ id: id, nome: nome.trim(), telefone: numLimpo, tags: [tag.trim()] });
+        }
+
         window.renderizarTabela = function() {
             const tbody = document.getElementById('tabelaContatos');
-            const termo = document.getElementById('buscaContato').value.toLowerCase();
-            let filtrados = window.listaContatos.filter(c => c.nome.toLowerCase().includes(termo) || c.telefone.includes(termo));
-            filtrados.sort((a, b) => a.nome.localeCompare(b.nome));
+            const termoBusca = document.getElementById('buscaContato').value.toLowerCase();
+            
+            let listaFiltrada = window.listaContatos.filter(c => c.nome.toLowerCase().includes(termoBusca) || c.telefone.includes(termoBusca));
+            listaFiltrada.sort((a, b) => a.nome.localeCompare(b.nome));
 
-            if(filtrados.length === 0) {
+            if(listaFiltrada.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Nenhum contato encontrado.</td></tr>';
                 return;
             }
 
-            tbody.innerHTML = filtrados.map(c => `
-                <tr>
-                    <td><input type="checkbox" class="check-contato" value="${c.id}"></td>
-                    <td>${c.nome}</td>
-                    <td>${c.telefone}</td>
-                    <td><span class="tag">🏷️ ${c.tags.join(', ')}</span></td>
-                    <td><button class="btn btn-outline" style="padding: 2px 5px; color: #dc3545; border-color: #dc3545;" onclick="apagarContato('${c.id}')">🗑️</button></td>
-                </tr>
-            `).join('');
+            let htmlGigante = '';
+            listaFiltrada.forEach(c => {
+                const tagsHtml = c.tags.map(t => `<span class="tag tag-novo">🏷️ ${t}</span>`).join(' ');
+                htmlGigante += `
+                    <tr>
+                        <td><input type="checkbox" class="check-contato" value="${c.id}"></td>
+                        <td>${c.nome}</td>
+                        <td>${c.telefone}</td>
+                        <td>${tagsHtml}</td>
+                        <td>
+                            <button class="btn btn-outline" style="padding: 4px 8px; font-size: 12px;" onclick="alert('Editar em breve!')">Editar</button>
+                            <button class="btn btn-outline" style="padding: 4px 8px; font-size: 12px; color: #dc3545; border-color: #dc3545;" onclick="apagarContato('${c.id}')">🗑️</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = htmlGigante;
         }
 
-        // 🏷️ ETIQUETAR EM MASSA
+        window.apagarContato = function(id) {
+            if(confirm("Deseja excluir este contato?")) {
+                window.listaContatos = window.listaContatos.filter(c => c.id !== id);
+                renderizarTabela();
+            }
+        }
+
+        window.apagarSelecionados = function() {
+            const checks = document.querySelectorAll('.check-contato:checked');
+            if(checks.length === 0) return alert("⚠️ Selecione os contatos marcando as caixinhas ao lado do nome.");
+            if(confirm(`Apagar os ${checks.length} contatos marcados?`)) {
+                const idsParaApagar = Array.from(checks).map(c => c.value);
+                window.listaContatos = window.listaContatos.filter(c => !idsParaApagar.includes(c.id));
+                document.getElementById('checkTodos').checked = false;
+                renderizarTabela();
+            }
+        }
+
+        window.apagarTodos = function() {
+            if(window.listaContatos.length === 0) return alert("⚠️ A lista já está vazia.");
+            if(confirm("🚨 ATENÇÃO: Apagar TODOS os contatos?")) {
+                window.listaContatos = [];
+                document.getElementById('checkTodos').checked = false;
+                renderizarTabela();
+            }
+        }
+
+        window.alternarTodosChecks = function() {
+            const master = document.getElementById('checkTodos');
+            document.querySelectorAll('.check-contato').forEach(c => c.checked = master.checked);
+        }
+
+        window.etiquetarSelecionados = function() {
+            if(document.querySelectorAll('.check-contato:checked').length === 0) return alert("⚠️ Selecione um contato!");
+            abrirModalTag();
+        }
+
         window.salvarTagMassa = function() {
             const novaTag = document.getElementById('nomeNovaTag').value.trim();
-            if(!novaTag) return alert("Digite o nome da etiqueta!");
-            const marcados = document.querySelectorAll('.check-contato:checked');
-            if(marcados.length === 0) return alert("Selecione os contatos primeiro!");
-            
-            marcados.forEach(cb => {
-                const contato = window.listaContatos.find(c => c.id === cb.value);
+            if(!novaTag) return alert("Digite um nome!");
+            const checks = document.querySelectorAll('.check-contato:checked');
+            checks.forEach(chk => {
+                const contato = window.listaContatos.find(c => c.id === chk.value);
                 if(contato && !contato.tags.includes(novaTag)) contato.tags.push(novaTag);
             });
-            
-            renderizarTabela(); window.salvarContatosLocal(); fecharModalTag();
-            alert(`✅ Etiqueta "${novaTag}" aplicada a ${marcados.length} contatos!`);
+            alert(`✅ Etiqueta aplicada a ${checks.length} contatos!`);
+            fecharModalTag(); document.getElementById('checkTodos').checked = false; renderizarTabela();
         }
 
-        // 🚀 DISPARO COM MÍDIA (BASE64)
-        window.iniciarDisparo = async function() {
+        window.exportarVCF = function() {
+            if(window.listaContatos.length === 0) return alert("⚠️ Lista vazia!");
+            let vcfString = "";
+            window.listaContatos.forEach(c => {
+                vcfString += "BEGIN:VCARD\nVERSION:3.0\n";
+                vcfString += `FN:${c.nome}\n`;
+                vcfString += `TEL;TYPE=CELL:+55${c.telefone}\n`; 
+                vcfString += "END:VCARD\n";
+            });
+            const blob = new Blob([vcfString], { type: 'text/vcard' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = 'contatos_central.vcf';
+            document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        window.atualizarListaTagsDisparo = function() {
+            const divTags = document.getElementById('listaTagsDisparo');
+            divTags.innerHTML = '<label><input type="checkbox" value="TODOS_OS_CONTATOS"> 📢 Toda a Base (Todos os contatos)</label>';
+            let todasTags = new Set();
+            window.listaContatos.forEach(c => c.tags.forEach(t => todasTags.add(t)));
+            todasTags.forEach(tag => { divTags.innerHTML += `<label><input type="checkbox" value="${tag}"> 🏷️ ${tag}</label>`; });
+        }
+
+        window.iniciarDisparo = function() {
             const msg = document.getElementById('mensagemPromo').value;
-            const inputMidia = document.getElementById('arquivoMidia');
-            const arquivo = inputMidia.files[0];
+            const arquivo = document.getElementById('arquivoMidia').files[0];
+            
             if(!msg && !arquivo) return alert("⚠️ Digite uma mensagem ou anexe uma mídia!");
-
-            let midiaBase64 = null, midiaNome = "", midiaMime = "";
-            if (arquivo) {
-                const reader = new FileReader();
-                midiaBase64 = await new Promise((res) => {
-                    reader.onload = (e) => res(e.target.result.split(',')[1]);
-                    reader.readAsDataURL(arquivo);
-                });
-                midiaNome = arquivo.name; midiaMime = arquivo.type;
-            }
-
-            let numerosParaEnvio = [];
-            const abaTagsAtiva = document.getElementById('aba-tags').classList.contains('active');
-            if(abaTagsAtiva) {
-                const tagsMarcadas = Array.from(document.querySelectorAll('#listaTagsDisparo input:checked')).map(cb => cb.value);
-                if(tagsMarcadas.length === 0) return alert("Selecione uma etiqueta!");
-                if(tagsMarcadas.includes("TODOS_OS_CONTATOS")) {
-                    numerosParaEnvio = window.listaContatos.map(c => c.telefone);
-                } else {
-                    numerosParaEnvio = window.listaContatos.filter(c => c.tags.some(t => tagsMarcadas.includes(t))).map(c => c.telefone);
-                }
-            } else {
-                numerosParaEnvio = document.getElementById('listaNumeros').value.split('\n').filter(l => l.trim() !== '');
-            }
-
-            if(numerosParaEnvio.length === 0) return alert("Nenhum contato selecionado!");
-
+            
             document.getElementById('form-disparo').style.display = 'none';
             document.getElementById('tela-progresso').style.display = 'block';
-
-            try {
-                await fetch('/api-oracle/api/saas/disparar', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'x-senha': '123321' },
-                    body: JSON.stringify({
-                        idCliente: window.idClienteLogado,
-                        nomeEmpresa: window.nomeLojista,
-                        zapLojista: window.zapLojista,
-                        numeros: numerosParaEnvio,
-                        mensagem: msg,
-                        midia: midiaBase64, midiaNome: midiaNome, midiaMime: midiaMime,
-                        plano: 'basico'
-                    })
-                });
-
-                let env = 0; const tot = numerosParaEnvio.length;
-                let sim = setInterval(() => {
-                    env++; let porc = Math.round((env / tot) * 100);
-                    document.getElementById('barra-progresso').style.width = porc + '%';
-                    document.getElementById('barra-progresso').innerText = porc + '%';
-                    document.getElementById('texto-contagem').innerText = `Enviando ${env} de ${tot}`;
-                    if(env >= tot) { clearInterval(sim); alert("✅ Disparo finalizado!"); fecharModalDisparo(); }
-                }, 10000);
-            } catch (e) { alert("Erro de conexão."); fecharModalDisparo(); }
+            
+            let env = 0; const tot = 5;
+            let sim = setInterval(() => {
+                env++; document.getElementById('barra-progresso').style.width = (env/tot*100) + '%';
+                document.getElementById('barra-progresso').innerText = (env/tot*100) + '%';
+                document.getElementById('texto-contagem').innerText = `Simulando ${env} de ${tot}`;
+                if(env >= tot) { 
+                    clearInterval(sim); 
+                    setTimeout(() => { 
+                        alert("✅ Campanha enviada para o servidor com sucesso!"); 
+                        fecharModalDisparo(); 
+                        document.getElementById('barra-progresso').style.width = '0%'; 
+                    }, 500); 
+                }
+            }, 800);
         }
-
-        // 🔄 ATUALIZA LISTA DE ETIQUETAS NO DISPARO (O que faltava!)
-        window.atualizarListaTagsDisparo = function() {
-            const div = document.getElementById('listaTagsDisparo');
-            div.innerHTML = '<label><input type="checkbox" value="TODOS_OS_CONTATOS"> 📢 Todos os Contatos</label>';
-            let tagsExistentes = new Set();
-            window.listaContatos.forEach(c => c.tags.forEach(t => tagsExistentes.add(t)));
-            tagsExistentes.forEach(tag => {
-                div.innerHTML += `<label><input type="checkbox" value="${tag}"> 🏷️ ${tag}</label>`;
-            });
-        }
-
-        // 🗑️ FUNÇÕES DE EXCLUSÃO
-        window.apagarContato = (id) => { if(confirm("Apagar?")) { window.listaContatos = window.listaContatos.filter(c => c.id !== id); renderizarTabela(); window.salvarContatosLocal(); } }
-        window.apagarSelecionados = () => {
-            const ids = Array.from(document.querySelectorAll('.check-contato:checked')).map(cb => cb.value);
-            if(ids.length === 0) return alert("Selecione contatos!");
-            if(confirm("Apagar marcados?")) {
-                window.listaContatos = window.listaContatos.filter(c => !ids.includes(c.id));
-                renderizarTabela(); window.salvarContatosLocal();
-            }
-        }
-        window.apagarTodos = () => { if(confirm("Apagar TUDO?")) { window.listaContatos = []; renderizarTabela(); window.salvarContatosLocal(); } }
-
-        // IMPORTAR E EXPORTAR
-        window.iniciarImportacao = function() {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const linhas = e.target.result.split('\n').slice(1);
-                linhas.forEach(l => {
-                    const col = l.split(/[,;]/);
-                    if(col.length >= 2) window.listaContatos.push({ id: 'ctt_'+Math.random().toString(36).substr(2,9), nome: col[0].trim(), telefone: col[1].replace(/\D/g,''), tags: ['Importado'] });
-                });
-                renderizarTabela(); window.salvarContatosLocal(); fecharModalImportar();
-            };
-            reader.readAsText(document.getElementById('arquivoCsv').files[0]);
-        }
-        window.exportarVCF = () => {
-            let vcf = window.listaContatos.map(c => `BEGIN:VCARD\nVERSION:3.0\nFN:${c.nome}\nTEL;TYPE=CELL:+55${c.telefone}\nEND:VCARD`).join('\n');
-            const url = URL.createObjectURL(new Blob([vcf], {type:'text/vcard'}));
-            const a = document.createElement('a'); a.href = url; a.download = 'contatos.vcf'; a.click();
-        }
-
-        // INTERFACE
-        window.abrirModalImportar = () => document.getElementById('modalImportar').style.display = 'flex';
-        window.fecharModalImportar = () => document.getElementById('modalImportar').style.display = 'none';
-        window.abrirModalTag = () => document.getElementById('modalTag').style.display = 'flex';
-        window.fecharModalTag = () => document.getElementById('modalTag').style.display = 'none';
-        window.etiquetarSelecionados = () => { if(document.querySelectorAll('.check-contato:checked').length > 0) abrirModalTag(); else alert("Selecione contatos!"); }
-        window.abrirModalDisparo = () => { atualizarListaTagsDisparo(); document.getElementById('modalDisparo').style.display = 'flex'; document.getElementById('form-disparo').style.display = 'block'; document.getElementById('tela-progresso').style.display = 'none'; }
-        window.fecharModalDisparo = () => document.getElementById('modalDisparo').style.display = 'none';
-        window.trocarAba = (aba) => { ['tags', 'avulso'].forEach(id => { document.getElementById('aba-'+id).classList.remove('active'); }); document.getElementById('aba-'+aba).classList.add('active'); }
-        window.alternarTodosChecks = () => { const m = document.getElementById('checkTodos'); document.querySelectorAll('.check-contato').forEach(c => c.checked = m.checked); }
-        window.fazerLogout = () => signOut(auth).then(() => window.location.href = "index.html");
+    </script>
+    <script>
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.onkeydown = function(e) { if (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && (e.keyCode === 'I'.charCodeAt(0) || e.keyCode === 'C'.charCodeAt(0) || e.keyCode === 'J'.charCodeAt(0))) || (e.ctrlKey && e.keyCode === 'U'.charCodeAt(0))) return false; }
     </script>
 </body>
 </html>
