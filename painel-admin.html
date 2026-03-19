@@ -8,10 +8,7 @@
         :root { --primary: #003399; --bg-color: #f4f7f6; --card-bg: #ffffff; --text-dark: #333; --terminal-bg: #1e1e1e; --danger: #dc3545; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); margin: 0; padding: 20px; color: var(--text-dark); }
         
-        /* Cabeçalho */
         .header { display: flex; justify-content: space-between; align-items: center; background-color: var(--primary); color: white; padding: 15px 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 30px; }
-        
-        /* Botões */
         .btn { background-color: #28a745; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: background 0.3s; font-size: 13px; display: inline-flex; align-items: center; gap: 5px; }
         .btn:hover { background-color: #218838; }
         .btn-danger { background-color: var(--danger); }
@@ -19,16 +16,13 @@
         .btn-outline { background-color: transparent; color: var(--primary); border: 1px solid var(--primary); }
         .btn-edit { background-color: #ffc107; color: black; }
 
-        /* Títulos de Seção */
         .section-title { font-size: 20px; color: var(--primary); border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 20px; margin-top: 40px; display: flex; align-items: center; gap: 10px;}
         
-        /* Lista de Pendentes */
         .lista-pendentes { display: flex; flex-direction: column; gap: 15px; margin-bottom: 40px; }
         .card-pendente { background: #fff3cd; border-left: 5px solid #ffc107; padding: 15px 20px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .info-pendente h4 { margin: 0 0 5px 0; color: #856404; font-size: 18px; }
         .info-pendente p { margin: 0; font-size: 14px; color: #666; }
 
-        /* Grid de Ativos */
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
         .card { background: var(--card-bg); border-radius: 8px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-top: 4px solid var(--primary); display: flex; flex-direction: column; position: relative; }
         .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
@@ -39,17 +33,15 @@
         .status-tag.online { background-color: #28a745; }
         .status-tag.offline { background-color: #6c757d; }
 
-        /* Log Estilo Terminal */
         .log-window { background-color: var(--terminal-bg); color: #00ff00; font-family: 'Courier New', monospace; font-size: 11px; height: 100px; overflow-y: auto; padding: 10px; border-radius: 5px; margin-bottom: 15px; border: 1px solid #333; }
         
         .card-actions { display: flex; gap: 8px; margin-top: auto; }
         .card-actions button { flex: 1; }
 
-        /* Modal */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { background: white; padding: 30px; border-radius: 8px; width: 550px; max-width: 95%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
         .modal label { font-weight: bold; font-size: 13px; display: block; margin-bottom: 5px; color: #555; }
-        .modal input, .modal textarea { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: inherit; }
+        .modal input, .modal textarea, .modal select { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: inherit; }
     </style>
 </head>
 <body>
@@ -65,13 +57,18 @@
     </div>
 
     <h3 class="section-title">🤖 Clientes Ativos</h3>
-    <div class="grid" id="painelAtivos">
-        </div>
+    <div class="grid" id="painelAtivos"></div>
 
     <div class="modal" id="modalEmpresa">
         <div class="modal-content">
             <h2 style="margin-top: 0; color: var(--primary);">⚙️ Editar Cliente: <span id="nomeRoboEdit"></span></h2>
             <input type="hidden" id="editEmpresaId">
+            
+            <label>Plano da Conta:</label>
+            <select id="editPlanoConta">
+                <option value="basico">🥉 Plano Básico</option>
+                <option value="premium">🥇 Plano Premium (WhatsApp Próprio)</option>
+            </select>
             
             <label>WhatsApp de Atendimento (Link wa.me):</label>
             <input type="text" id="editZapLoja" placeholder="Ex: 46999999999">
@@ -101,7 +98,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, onSnapshot, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // SUAS CHAVES REAIS
         const firebaseConfig = {
             apiKey: "AIzaSyC4-2LavZt7iWPt2u71u-yRUYbIJu-Vzf0",
             authDomain: "central-omnichannel-saas.firebaseapp.com",
@@ -115,8 +111,8 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         let listaEmpresas = [];
+        window.empresaEmEdicao = null; // Guarda a empresa que está sendo editada
 
-        // Escuta o banco de dados em tempo real
         onSnapshot(collection(db, "empresas"), (snapshot) => {
             listaEmpresas = [];
             snapshot.forEach((doc) => { listaEmpresas.push({ id: doc.id, ...doc.data() }); });
@@ -165,11 +161,10 @@
                             </div>
                             <div class="log-window">
                                 > [${new Date().toLocaleTimeString()}] Sistema pronto.<br>
-                                > [Status] ${premium ? 'Aguardando QR Code...' : 'Conectado à Central.'}
+                                > [Status] ${premium ? (status === 'online' ? 'Conectado à IA.' : 'Aguardando QR Code...') : 'Conectado à Central.'}
                             </div>
                             <div class="card-actions">
-                                ${premium ? `<button class="btn btn-outline" onclick="alert('Gerando QR...')">🔗 Link QR</button>` : ''}
-                                <button class="btn btn-edit" onclick="abrirModal('${emp.id}')">⚙️ Editar</button>
+                                <button class="btn btn-edit" onclick="abrirModal('${emp.id}')">⚙️ Editar Conta</button>
                                 <button class="btn btn-danger" onclick="excluirEmpresa('${emp.id}', '${emp.nomeEmpresa}')" style="flex:0; padding: 10px 12px;">🗑️</button>
                             </div>
                         </div>
@@ -195,13 +190,21 @@
 
         window.abrirModal = (id) => {
             const emp = listaEmpresas.find(e => e.id === id);
+            window.empresaEmEdicao = emp; // Salva para usarmos no momento de salvar
+            
             document.getElementById('editEmpresaId').value = emp.id;
             document.getElementById('nomeRoboEdit').innerText = emp.nomeEmpresa;
+            document.getElementById('editPlanoConta').value = emp.plano || 'basico'; // Carrega o plano atual
             document.getElementById('editZapLoja').value = emp.whatsappLojista || '';
+            
             if(emp.menu) {
                 document.getElementById('menuSaudacao').value = emp.menu.saudacao || '';
                 document.getElementById('opt1Nome').value = emp.menu.opt1Nome || '';
                 document.getElementById('opt1Resp').value = emp.menu.opt1Resp || '';
+            } else {
+                document.getElementById('menuSaudacao').value = '';
+                document.getElementById('opt1Nome').value = '';
+                document.getElementById('opt1Resp').value = '';
             }
             document.getElementById('modalEmpresa').style.display = 'flex';
         };
@@ -211,26 +214,32 @@
         window.salvarConfiguracao = async () => {
             const id = document.getElementById('editEmpresaId').value;
             const zap = document.getElementById('editZapLoja').value.replace(/\D/g, '');
+            const novoPlano = document.getElementById('editPlanoConta').value;
+            const emp = window.empresaEmEdicao;
+
+            // Inteligência de troca de plano:
+            let novoStatus = emp.statusRobo;
+            if (emp.plano !== novoPlano) {
+                // Se mudou para básico, já fica online pela central. Se mudou para premium, fica offline até ler o QR Code.
+                novoStatus = (novoPlano === 'basico') ? 'ativo_central' : 'offline';
+            }
+
             const menu = {
                 saudacao: document.getElementById('menuSaudacao').value,
                 opt1Nome: document.getElementById('opt1Nome').value,
                 opt1Resp: document.getElementById('opt1Resp').value
             };
-            await updateDoc(doc(db, "empresas", id), { whatsappLojista: zap, menu: menu });
+            
+            await updateDoc(doc(db, "empresas", id), { 
+                whatsappLojista: zap, 
+                menu: menu,
+                plano: novoPlano,
+                statusRobo: novoStatus
+            });
+            
             fecharModal();
-            alert("✅ Atualizado!");
+            alert("✅ Atualizado! Plano e configurações salvas com sucesso.");
         };
-    </script>
-
-    <script>
-        document.addEventListener('contextmenu', e => e.preventDefault());
-        document.onkeydown = function(e) {
-            if (e.keyCode === 123 || 
-               (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 67 || e.keyCode === 74)) || 
-               (e.ctrlKey && e.keyCode === 85)) {
-                return false;
-            }
-        }
     </script>
 </body>
 </html>
