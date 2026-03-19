@@ -546,11 +546,11 @@
             
             if(!msg && !arquivo) return alert("⚠️ Digite uma mensagem ou anexe uma mídia!");
 
+            // 👉 1. CONVERSÃO DA MÍDIA PARA BASE64
             let midiaBase64 = null;
             let midiaNome = "";
             let midiaMime = "";
 
-            // 👉 CONVERSOR DE MÍDIA PARA BASE64
             if (arquivo) {
                 const reader = new FileReader();
                 midiaBase64 = await new Promise((resolve) => {
@@ -561,7 +561,7 @@
                 midiaMime = arquivo.type;
             }
 
-            // 1. EXTRAIR OS NÚMEROS DAS ETIQUETAS OU DA CAIXA DE TEXTO
+            // 2. EXTRAÇÃO DOS NÚMEROS DAS ETIQUETAS OU DA CAIXA DE TEXTO
             let numerosParaEnvio = [];
             const abaTagsEstaAtiva = document.getElementById('aba-tags').classList.contains('active');
             
@@ -582,14 +582,13 @@
 
             if (numerosParaEnvio.length === 0) return alert("⚠️ Nenhum contato válido foi encontrado para envio.");
 
-            // 2. COMUNICAÇÃO REAL COM A ORACLE
+            // 3. ENVIO PARA A ORACLE COM SUPORTE A MÍDIA
             document.getElementById('form-disparo').style.display = 'none';
             document.getElementById('tela-progresso').style.display = 'block';
             document.getElementById('texto-contagem').innerText = "Conectando ao servidor...";
             
             try {
-                // Envia o pacote (Payload) para a API da Oracle
-          const resposta = await fetch('/api-oracle/api/saas/disparar', {
+                const resposta = await fetch('/api-oracle/api/saas/disparar', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'x-senha': '123321' },
                     body: JSON.stringify({
@@ -598,26 +597,26 @@
                         nomeEmpresa: window.nomeLojista,
                         zapLojista: window.zapLojista,
                         numeros: numerosParaEnvio,
-                        mensagem: msg
+                        mensagem: msg,
+                        midia: midiaBase64,
+                        midiaNome: midiaNome,
+                        midiaMime: midiaMime
                     })
                 });
-                const dados = await resposta.json();
                 
+                const dados = await resposta.json();
                 if (dados.erro) {
                     alert("❌ O servidor recusou: " + dados.erro);
                     fecharModalDisparo();
                     return;
                 }
 
-                // 3. ANIMAÇÃO SINCRONIZADA COM O SERVIDOR REAL
+                // ANIMAÇÃO DA BARRA DE PROGRESSO (10s por contato)
                 let env = 0; 
                 const tot = numerosParaEnvio.length; 
-                
-                // A barra anda a cada 10 segundos, acompanhando o tempo do "Envio Humanizado" da Oracle
                 let sim = setInterval(() => {
                     env++; 
-                    if(env > tot) env = tot; // Trava de segurança visual
-                    
+                    if(env > tot) env = tot;
                     let porcentagem = Math.round((env / tot) * 100);
                     document.getElementById('barra-progresso').style.width = porcentagem + '%';
                     document.getElementById('barra-progresso').innerText = porcentagem + '%';
@@ -626,12 +625,11 @@
                     if(env >= tot) { 
                         clearInterval(sim); 
                         setTimeout(() => { 
-                            alert(`✅ Disparo finalizado!\nO servidor terminou de enviar a campanha para ${tot} cliente(s).`); 
+                            alert(`✅ Disparo finalizado com sucesso!`); 
                             fecharModalDisparo(); 
-                            document.getElementById('barra-progresso').style.width = '0%'; 
                         }, 500); 
                     }
-                }, 10000); // 10s por contato
+                }, 10000);
 
             } catch (error) {
                 alert("❌ Erro de conexão com o servidor da Oracle.");
