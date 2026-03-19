@@ -279,8 +279,18 @@
                await fetch('/api-oracle/api/saas/conectar', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'x-senha': '123321' },
-                    body: JSON.stringify({ idCliente: idCliente })
-                });
+                   body: JSON.stringify({
+                        idCliente: window.idClienteLogado,
+                        plano: window.planoClienteLogado,
+                        nomeEmpresa: window.nomeLojista,
+                        zapLojista: window.zapLojista,
+                        numeros: numerosParaEnvio,
+                        mensagem: msg,
+                        // 👉 NOVOS CAMPOS:
+                        midia: midiaBase64,
+                        midiaNome: midiaNome,
+                        midiaMime: midiaMime
+                    })
 
                 // 2. Fica escutando o Firebase em tempo real (onSnapshot)
                 const docSaaS = doc(db, "clientes_premium", idCliente);
