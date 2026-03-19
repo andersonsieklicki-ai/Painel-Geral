@@ -28,6 +28,12 @@
         .tag { font-size: 11px; padding: 4px 8px; border-radius: 12px; color: white; font-weight: bold; display: inline-block; margin: 2px; background-color: #6c757d; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { background: white; padding: 30px; border-radius: 8px; width: 500px; max-width: 90%; max-height: 90vh; overflow-y: auto; }
+        .tabs { display: flex; border-bottom: 2px solid #ccc; margin-bottom: 15px; }
+        .tab-btn { flex: 1; background: none; border: none; padding: 10px; font-size: 14px; font-weight: bold; cursor: pointer; color: #666; }
+        .tab-btn.active { color: var(--primary); border-bottom: 3px solid var(--primary); margin-bottom: -2px; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .lista-selecao { border: 1px solid #ccc; border-radius: 4px; padding: 10px; max-height: 120px; overflow-y: auto; margin-bottom: 15px; background: #f9f9f9; display: flex; flex-direction: column; gap: 8px;}
         .progress-wrapper { background: #e9ecef; border-radius: 10px; height: 25px; width: 100%; overflow: hidden; margin: 20px 0; }
         .progress-fill { background: var(--success); width: 0%; height: 100%; transition: width 0.4s ease; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: bold; }
         .upload-box { border: 2px dashed #ccc; padding: 15px; border-radius: 6px; text-align: center; margin-bottom: 15px; background: #fafafa; }
@@ -59,18 +65,19 @@
         </div>
 
         <div class="card full-width">
-            <h3>Meus Contatos (CRM)
-                <div style="float: right; display: flex; gap: 10px;">
-                    <button class="btn btn-outline" onclick="exportarVCF()">⬇️ Exportar</button>
+            <h3 style="flex-wrap: wrap; gap: 10px;">
+                👥 Meus Contatos (CRM)
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-outline" onclick="exportarVCF()">⬇️ Exportar (VCF)</button>
                     <button class="btn" onclick="abrirModalImportar()">⬆️ Importar</button>
                 </div>
             </h3>
             
             <div class="crm-controls">
                 <input type="text" id="buscaContato" class="search-box" placeholder="🔍 Buscar por nome ou número..." onkeyup="renderizarTabela()">
-                <div style="display: flex; gap: 8px;">
-                    <button class="btn btn-outline" onclick="etiquetarSelecionados()">🏷️ Etiquetar</button>
-                    <button class="btn btn-outline" onclick="apagarSelecionados()" style="color: #dc3545; border-color: #dc3545;">🗑️ Apagar Seleção</button>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <button class="btn btn-outline" onclick="etiquetarSelecionados()" style="background: white;">🏷️ Etiquetar Seleção</button>
+                    <button class="btn btn-outline" onclick="apagarSelecionados()" style="background: white; color: #dc3545; border-color: #dc3545;">🗑️ Apagar Seleção</button>
                     <button class="btn btn-danger" onclick="apagarTodos()">🗑️ Apagar Todos</button>
                 </div>
             </div>
@@ -86,7 +93,9 @@
                             <th>Ações</th>
                         </tr>
                     </thead>
-                    <tbody id="tabelaContatos"></tbody>
+                    <tbody id="tabelaContatos">
+                        <tr><td colspan="5" style="text-align: center; color: #999;">Nenhum contato importado ainda.</td></tr>
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -94,36 +103,46 @@
 
     <div class="modal" id="modalImportar">
         <div class="modal-content">
-            <h3>Importar Contatos</h3>
-            <input type="file" id="arquivoCsv" accept=".csv, .vcf" style="margin-bottom: 15px;">
+            <h2>Importar Contatos</h2>
+            <input type="file" accept=".csv, .vcf" id="arquivoCsv" style="width: 100%; margin-bottom: 15px;">
             <div style="display: flex; gap: 10px; justify-content: flex-end;">
                 <button class="btn btn-outline" onclick="fecharModalImportar()">Cancelar</button>
-                <button class="btn" onclick="iniciarImportacao()">Salvar</button>
+                <button class="btn" onclick="iniciarImportacao()">Salvar Contatos</button>
             </div>
         </div>
     </div>
 
     <div class="modal" id="modalTag">
-        <div class="modal-content">
-            <h3>🏷️ Adicionar Etiqueta</h3>
-            <input type="text" id="nomeNovaTag" placeholder="Ex: VIP, Promoção...">
-            <button class="btn" onclick="salvarTagMassa()">Aplicar</button>
-            <button class="btn btn-outline" onclick="fecharModalTag()">Cancelar</button>
+        <div class="modal-content" style="width: 400px;">
+            <h2>🏷️ Adicionar Etiqueta</h2>
+            <input type="text" id="nomeNovaTag" placeholder="Ex: Vip, Promoção Mães...">
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button class="btn btn-outline" onclick="fecharModalTag()">Cancelar</button>
+                <button class="btn" onclick="salvarTagMassa()">Aplicar Tag</button>
+            </div>
         </div>
     </div>
 
     <div class="modal" id="modalDisparo">
         <div class="modal-content">
-            <h3>🚀 Nova Campanha</h3>
+            <h2>🚀 Disparar Campanha</h2>
             <div id="form-disparo">
-                <div class="lista-selecao" id="listaTagsDisparo"></div>
-                <div class="upload-box">
-                    <input type="file" id="arquivoMidia" accept="image/*, application/pdf">
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="trocarAba('tags')" id="btn-tags">🏷️ Etiquetas</button>
+                    <button class="tab-btn" onclick="trocarAba('avulso')" id="btn-avulso">✏️ Digitar</button>
                 </div>
-                <textarea id="mensagemPromo" rows="4" placeholder="Sua mensagem..." style="width:100%"></textarea>
-                <div style="margin-top: 15px;">
-                    <button class="btn btn-success" onclick="iniciarDisparo()">Enviar</button>
+                <div id="aba-tags" class="tab-content active">
+                    <div class="lista-selecao" id="listaTagsDisparo"></div>
+                </div>
+                <div id="aba-avulso" class="tab-content">
+                    <textarea id="listaNumeros" rows="3" placeholder="Ex: 5546999999999" style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ccc; box-sizing: border-box;"></textarea>
+                </div>
+                <label><strong>Anexar Mídia (Opcional):</strong></label>
+                <div class="upload-box"><input type="file" id="arquivoMidia" accept="image/*, application/pdf"></div>
+                <textarea id="mensagemPromo" rows="4" placeholder="Sua mensagem..." style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ccc; box-sizing: border-box;"></textarea>
+                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px;">
                     <button class="btn btn-outline" onclick="fecharModalDisparo()">Cancelar</button>
+                    <button class="btn btn-success" onclick="iniciarDisparo()">🚀 Iniciar Envio</button>
                 </div>
             </div>
             <div id="tela-progresso" style="display: none; text-align: center;">
@@ -154,16 +173,17 @@
 
         window.listaContatos = [];
         window.idClienteLogado = ""; 
+        window.nomeLojista = "";
+        window.zapLojista = "";
 
-        // 💾 PERSISTÊNCIA E BUSCA
+        // 💾 PERSISTÊNCIA E MEMÓRIA
         window.salvarContatosLocal = function() {
             if(window.idClienteLogado) localStorage.setItem('crm_' + window.idClienteLogado, JSON.stringify(window.listaContatos));
         }
-
         window.carregarContatosLocal = function() {
             if(window.idClienteLogado) {
-                const dados = localStorage.getItem('crm_' + window.idClienteLogado);
-                if(dados) { window.listaContatos = JSON.parse(dados); renderizarTabela(); }
+                const salvos = localStorage.getItem('crm_' + window.idClienteLogado);
+                if(salvos) { window.listaContatos = JSON.parse(salvos); renderizarTabela(); }
             }
         }
 
@@ -179,19 +199,27 @@
                     window.carregarContatosLocal();
                     
                     if (dados.plano === 'basico') {
+                        document.getElementById('tagPlano').innerText = "🥉 Plano Básico";
                         document.getElementById('area-conexao').innerHTML = `<div><span class="status-indicator"></span><strong>Conectado à Central</strong></div>`;
                     } else {
-                        document.getElementById('area-conexao').innerHTML = `<button class="btn" onclick="conectarRoboPremium()">Conectar WhatsApp</button>`;
+                        document.getElementById('tagPlano').innerText = "🥇 Plano Premium";
+                        document.getElementById('area-conexao').innerHTML = `<button class="btn" onclick="conectarRoboPremium()">Conectar WhatsApp Particular</button>`;
                     }
                 }
             } else { window.location.href = "index.html"; }
         });
 
+        // 🔍 RENDERIZAÇÃO COM BUSCA E ORDEM ALFABÉTICA
         window.renderizarTabela = function() {
             const tbody = document.getElementById('tabelaContatos');
             const termo = document.getElementById('buscaContato').value.toLowerCase();
             let filtrados = window.listaContatos.filter(c => c.nome.toLowerCase().includes(termo) || c.telefone.includes(termo));
             filtrados.sort((a, b) => a.nome.localeCompare(b.nome));
+
+            if(filtrados.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Nenhum contato encontrado.</td></tr>';
+                return;
+            }
 
             tbody.innerHTML = filtrados.map(c => `
                 <tr>
@@ -199,18 +227,33 @@
                     <td>${c.nome}</td>
                     <td>${c.telefone}</td>
                     <td><span class="tag">🏷️ ${c.tags.join(', ')}</span></td>
-                    <td><button class="btn btn-outline" style="padding: 2px 5px;" onclick="apagarContato('${c.id}')">🗑️</button></td>
+                    <td><button class="btn btn-outline" style="padding: 2px 5px; color: #dc3545; border-color: #dc3545;" onclick="apagarContato('${c.id}')">🗑️</button></td>
                 </tr>
-            `).join('') || '<tr><td colspan="5" style="text-align: center;">Vazio</td></tr>';
+            `).join('');
         }
 
-        // 🚀 DISPARO CORRIGIDO
+        // 🏷️ ETIQUETAR EM MASSA
+        window.salvarTagMassa = function() {
+            const novaTag = document.getElementById('nomeNovaTag').value.trim();
+            if(!novaTag) return alert("Digite o nome da etiqueta!");
+            const marcados = document.querySelectorAll('.check-contato:checked');
+            if(marcados.length === 0) return alert("Selecione os contatos primeiro!");
+            
+            marcados.forEach(cb => {
+                const contato = window.listaContatos.find(c => c.id === cb.value);
+                if(contato && !contato.tags.includes(novaTag)) contato.tags.push(novaTag);
+            });
+            
+            renderizarTabela(); window.salvarContatosLocal(); fecharModalTag();
+            alert(`✅ Etiqueta "${novaTag}" aplicada a ${marcados.length} contatos!`);
+        }
+
+        // 🚀 DISPARO COM MÍDIA (BASE64)
         window.iniciarDisparo = async function() {
             const msg = document.getElementById('mensagemPromo').value;
             const inputMidia = document.getElementById('arquivoMidia');
             const arquivo = inputMidia.files[0];
-            
-            if(!msg && !arquivo) return alert("Preencha a mensagem ou arquivo!");
+            if(!msg && !arquivo) return alert("⚠️ Digite uma mensagem ou anexe uma mídia!");
 
             let midiaBase64 = null, midiaNome = "", midiaMime = "";
             if (arquivo) {
@@ -222,7 +265,22 @@
                 midiaNome = arquivo.name; midiaMime = arquivo.type;
             }
 
-            const numeros = window.listaContatos.map(c => c.telefone);
+            let numerosParaEnvio = [];
+            const abaTagsAtiva = document.getElementById('aba-tags').classList.contains('active');
+            if(abaTagsAtiva) {
+                const tagsMarcadas = Array.from(document.querySelectorAll('#listaTagsDisparo input:checked')).map(cb => cb.value);
+                if(tagsMarcadas.length === 0) return alert("Selecione uma etiqueta!");
+                if(tagsMarcadas.includes("TODOS_OS_CONTATOS")) {
+                    numerosParaEnvio = window.listaContatos.map(c => c.telefone);
+                } else {
+                    numerosParaEnvio = window.listaContatos.filter(c => c.tags.some(t => tagsMarcadas.includes(t))).map(c => c.telefone);
+                }
+            } else {
+                numerosParaEnvio = document.getElementById('listaNumeros').value.split('\n').filter(l => l.trim() !== '');
+            }
+
+            if(numerosParaEnvio.length === 0) return alert("Nenhum contato selecionado!");
+
             document.getElementById('form-disparo').style.display = 'none';
             document.getElementById('tela-progresso').style.display = 'block';
 
@@ -234,53 +292,55 @@
                         idCliente: window.idClienteLogado,
                         nomeEmpresa: window.nomeLojista,
                         zapLojista: window.zapLojista,
-                        numeros: numeros,
+                        numeros: numerosParaEnvio,
                         mensagem: msg,
-                        midia: midiaBase64,
-                        midiaNome: midiaNome,
-                        midiaMime: midiaMime,
+                        midia: midiaBase64, midiaNome: midiaNome, midiaMime: midiaMime,
                         plano: 'basico'
                     })
                 });
 
-                let env = 0;
-                const total = numeros.length;
+                let env = 0; const tot = numerosParaEnvio.length;
                 let sim = setInterval(() => {
-                    env++;
-                    let porc = Math.round((env / total) * 100);
+                    env++; let porc = Math.round((env / tot) * 100);
                     document.getElementById('barra-progresso').style.width = porc + '%';
                     document.getElementById('barra-progresso').innerText = porc + '%';
-                    document.getElementById('texto-contagem').innerText = `Enviando ${env} de ${total}`;
-                    if(env >= total) { clearInterval(sim); alert("✅ Sucesso!"); fecharModalDisparo(); }
+                    document.getElementById('texto-contagem').innerText = `Enviando ${env} de ${tot}`;
+                    if(env >= tot) { clearInterval(sim); alert("✅ Disparo finalizado!"); fecharModalDisparo(); }
                 }, 10000);
-            } catch (e) { alert("Erro na Oracle"); fecharModalDisparo(); }
+            } catch (e) { alert("Erro de conexão."); fecharModalDisparo(); }
         }
 
-        // FUNÇÕES CRM (APAGAR, ETIQUETAR, IMPORTAR)
-        window.apagarContato = (id) => { window.listaContatos = window.listaContatos.filter(c => c.id !== id); renderizarTabela(); window.salvarContatosLocal(); }
-        window.apagarTodos = () => { if(confirm("Apagar tudo?")) { window.listaContatos = []; renderizarTabela(); window.salvarContatosLocal(); } }
-        window.apagarSelecionados = () => {
-            const checks = document.querySelectorAll('.check-contato:checked');
-            const ids = Array.from(checks).map(c => c.value);
-            window.listaContatos = window.listaContatos.filter(c => !ids.includes(c.id));
-            renderizarTabela(); window.salvarContatosLocal();
-        }
-        window.etiquetarSelecionados = () => { if(document.querySelectorAll('.check-contato:checked').length > 0) document.getElementById('modalTag').style.display='flex'; }
-        window.salvarTagMassa = () => {
-            const tag = document.getElementById('nomeNovaTag').value;
-            document.querySelectorAll('.check-contato:checked').forEach(cb => {
-                const c = window.listaContatos.find(cont => cont.id === cb.value);
-                if(c && !c.tags.includes(tag)) c.tags.push(tag);
+        // 🔄 ATUALIZA LISTA DE ETIQUETAS NO DISPARO (O que faltava!)
+        window.atualizarListaTagsDisparo = function() {
+            const div = document.getElementById('listaTagsDisparo');
+            div.innerHTML = '<label><input type="checkbox" value="TODOS_OS_CONTATOS"> 📢 Todos os Contatos</label>';
+            let tagsExistentes = new Set();
+            window.listaContatos.forEach(c => c.tags.forEach(t => tagsExistentes.add(t)));
+            tagsExistentes.forEach(tag => {
+                div.innerHTML += `<label><input type="checkbox" value="${tag}"> 🏷️ ${tag}</label>`;
             });
-            renderizarTabela(); window.salvarContatosLocal(); document.getElementById('modalTag').style.display='none';
         }
+
+        // 🗑️ FUNÇÕES DE EXCLUSÃO
+        window.apagarContato = (id) => { if(confirm("Apagar?")) { window.listaContatos = window.listaContatos.filter(c => c.id !== id); renderizarTabela(); window.salvarContatosLocal(); } }
+        window.apagarSelecionados = () => {
+            const ids = Array.from(document.querySelectorAll('.check-contato:checked')).map(cb => cb.value);
+            if(ids.length === 0) return alert("Selecione contatos!");
+            if(confirm("Apagar marcados?")) {
+                window.listaContatos = window.listaContatos.filter(c => !ids.includes(c.id));
+                renderizarTabela(); window.salvarContatosLocal();
+            }
+        }
+        window.apagarTodos = () => { if(confirm("Apagar TUDO?")) { window.listaContatos = []; renderizarTabela(); window.salvarContatosLocal(); } }
+
+        // IMPORTAR E EXPORTAR
         window.iniciarImportacao = function() {
             const reader = new FileReader();
             reader.onload = (e) => {
                 const linhas = e.target.result.split('\n').slice(1);
                 linhas.forEach(l => {
                     const col = l.split(/[,;]/);
-                    if(col.length >= 2) window.listaContatos.push({ id: Date.now()+Math.random(), nome: col[0].trim(), telefone: col[1].replace(/\D/g,''), tags: ['Importado'] });
+                    if(col.length >= 2) window.listaContatos.push({ id: 'ctt_'+Math.random().toString(36).substr(2,9), nome: col[0].trim(), telefone: col[1].replace(/\D/g,''), tags: ['Importado'] });
                 });
                 renderizarTabela(); window.salvarContatosLocal(); fecharModalImportar();
             };
@@ -292,19 +352,17 @@
             const a = document.createElement('a'); a.href = url; a.download = 'contatos.vcf'; a.click();
         }
 
-        window.abrirModalImportar = () => document.getElementById('modalImportar').style.display='flex';
-        window.fecharModalImportar = () => document.getElementById('modalImportar').style.display='none';
-        window.abrirModalDisparo = () => { 
-            const div = document.getElementById('listaTagsDisparo');
-            div.innerHTML = '<label><input type="checkbox" value="TODOS_OS_CONTATOS"> 📢 Todos</label>';
-            document.getElementById('modalDisparo').style.display='flex'; 
-            document.getElementById('form-disparo').style.display='block'; 
-            document.getElementById('tela-progresso').style.display='none'; 
-        }
-        window.fecharModalDisparo = () => document.getElementById('modalDisparo').style.display='none';
-        window.fecharModalTag = () => document.getElementById('modalTag').style.display='none';
-        window.fazerLogout = () => signOut(auth).then(() => window.location.href="index.html");
+        // INTERFACE
+        window.abrirModalImportar = () => document.getElementById('modalImportar').style.display = 'flex';
+        window.fecharModalImportar = () => document.getElementById('modalImportar').style.display = 'none';
+        window.abrirModalTag = () => document.getElementById('modalTag').style.display = 'flex';
+        window.fecharModalTag = () => document.getElementById('modalTag').style.display = 'none';
+        window.etiquetarSelecionados = () => { if(document.querySelectorAll('.check-contato:checked').length > 0) abrirModalTag(); else alert("Selecione contatos!"); }
+        window.abrirModalDisparo = () => { atualizarListaTagsDisparo(); document.getElementById('modalDisparo').style.display = 'flex'; document.getElementById('form-disparo').style.display = 'block'; document.getElementById('tela-progresso').style.display = 'none'; }
+        window.fecharModalDisparo = () => document.getElementById('modalDisparo').style.display = 'none';
+        window.trocarAba = (aba) => { ['tags', 'avulso'].forEach(id => { document.getElementById('aba-'+id).classList.remove('active'); }); document.getElementById('aba-'+aba).classList.add('active'); }
         window.alternarTodosChecks = () => { const m = document.getElementById('checkTodos'); document.querySelectorAll('.check-contato').forEach(c => c.checked = m.checked); }
+        window.fazerLogout = () => signOut(auth).then(() => window.location.href = "index.html");
     </script>
 </body>
 </html>
