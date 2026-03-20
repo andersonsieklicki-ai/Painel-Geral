@@ -222,26 +222,15 @@
     </div>
 
     <div class="modal" id="modalCobranca"><div class="modal-content"><h2 style="margin-top: 0; color: #dc3545;"><i class="fa-solid fa-file-invoice-dollar"></i> Cobranças</h2><label style="font-size: 0.9rem; font-weight: 600;">Selecione o Grupo Alvo:</label><div class="lista-selecao" id="listaTagsCobranca" style="max-height: 100px;"></div><label style="font-size: 0.9rem; font-weight: 600;">Sua Chave PIX (Opcional):</label><input type="text" id="pixCobranca" placeholder="Ex: 12.345.678/0001-90"><label style="font-size: 0.9rem; font-weight: 600;">Mensagem:</label><textarea id="textoCobranca" rows="5">Olá {nome}! Passando para lembrar que sua fatura vence nos próximos dias. Segue a chave PIX:</textarea><div style="display: flex; gap: 10px; justify-content: flex-end;"><button class="btn btn-outline" onclick="fecharModal('modalCobranca')">Cancelar</button><button class="btn btn-danger" onclick="iniciarDisparoCobranca()"><i class="fa-solid fa-paper-plane"></i> Enviar p/ Fila</button></div></div></div>
-    
     <div class="modal" id="modalImportar"><div class="modal-content"><h2 style="margin-top: 0; color: var(--primary);"><i class="fa-solid fa-upload"></i> Importar Contatos</h2><input type="file" accept=".csv, .vcf" id="arquivoCsv" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px;"><div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px;"><button class="btn btn-outline" onclick="fecharModal('modalImportar')">Cancelar</button><button class="btn btn-primary" onclick="iniciarImportacao()">Salvar</button></div></div></div>
-    
     <div class="modal" id="modalTag"><div class="modal-content" style="width: 400px;"><h2 style="margin-top: 0; color: var(--primary);"><i class="fa-solid fa-tags"></i> Etiquetar</h2><div id="areaTagsExistentes" style="margin-bottom: 15px; display: none;"><label style="font-size: 0.85rem; font-weight: bold; color: #666;">Salvas:</label><div id="botoesTagsSalvas" style="display: flex; flex-wrap: wrap; gap: 5px;"></div></div><label style="font-size: 0.85rem; font-weight: bold;">Nova Tag:</label><input type="text" id="nomeNovaTag" placeholder="Ex: VIP"><div style="display: flex; gap: 10px; justify-content: flex-end;"><button class="btn btn-outline" onclick="fecharModal('modalTag')">Cancelar</button><button class="btn btn-primary" onclick="salvarTagMassa()">Aplicar</button></div></div></div>
-    
     <div class="modal" id="modalAniversario"><div class="modal-content"><h2 style="margin-top: 0; color: var(--warning);"><i class="fa-solid fa-cake-candles"></i> Aniversário</h2><div class="upload-box"><input type="file" id="arquivoMidiaAniversario" accept="image/*" style="width: 100%;"></div><label style="font-size: 0.9rem; font-weight: 600;">Texto (Use {nome}):</label><textarea id="textoAniversario" rows="4"></textarea><div style="display: flex; gap: 10px; justify-content: flex-end;"><button class="btn btn-outline" onclick="fecharModal('modalAniversario')">Cancelar</button><button class="btn btn-warning" id="btnSalvarAniversario" onclick="salvarConfigAniversario()">Salvar</button></div></div></div>
-    
     <div class="modal" id="modalDisparo"><div class="modal-content"><h2 style="margin-top: 0; color: var(--primary);"><i class="fa-solid fa-rocket"></i> Disparo em Massa</h2><div class="tabs"><button class="tab-btn active" onclick="trocarAbaMenu('tags')" id="btn-menu-tags">🏷️ Por Tag</button><button class="tab-btn" onclick="trocarAbaMenu('avulso')" id="btn-menu-avulso">✏️ Números</button></div><div id="aba-menu-tags" class="tab-content active"><div class="lista-selecao" id="listaTagsDisparo"></div></div><div id="aba-menu-avulso" class="tab-content"><textarea id="listaNumeros" rows="3" placeholder="Cole números (um por linha)"></textarea></div><label style="font-size: 0.9rem; font-weight: 600;">Foto (Máx 5MB):</label><div class="upload-box"><input type="file" id="arquivoMidia" accept="image/*, application/pdf" style="width: 100%;"></div><label style="font-size: 0.9rem; font-weight: 600;">Texto:</label><textarea id="mensagemPromo" rows="4" placeholder="Texto da campanha..."></textarea><div style="display: flex; gap: 10px; justify-content: flex-end;"><button class="btn btn-outline" onclick="fecharModal('modalDisparo')">Cancelar</button><button class="btn btn-primary" onclick="iniciarDisparo()"><i class="fa-solid fa-paper-plane"></i> Enviar p/ Fila</button></div></div></div>
 
     <script>
-        // Variáveis Globais
-        window.listaContatos = [];
-        window.idClienteLogado = "";
-        window.planoClienteLogado = "basico";
-        window.nomeLojista = "";
-        window.zapLojista = "";
-        window.ordemAtual = { coluna: '', direcao: 'asc' };
-        window.menuData = { tamanhos: [], bordas: [], sabores: [] };
+        window.listaContatos = []; window.idClienteLogado = ""; window.planoClienteLogado = "basico"; window.nomeLojista = ""; window.zapLojista = "";
+        window.ordemAtual = { coluna: '', direcao: 'asc' }; window.menuData = { tamanhos: [], bordas: [], sabores: [] };
 
-        // Navegação
         window.trocarPagina = function(idAba, elementoMenu) {
             document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
@@ -262,12 +251,10 @@
             document.getElementById('aba-menu-' + aba).classList.add('active');
         };
 
-        // Controle de Modais Base
         window.abrirModal = function(id) { document.getElementById(id).style.display = 'flex'; };
         window.fecharModal = function(id) { document.getElementById(id).style.display = 'none'; };
         window.fecharCardLateral = function() { document.getElementById('cardEnviado').classList.remove('show'); };
 
-        // UI do Cardápio
         window.addObjUI = function(tipo) {
             if(tipo === 'tamanhos') {
                 const n = document.getElementById('tamNome').value; const q = document.getElementById('tamQtd').value;
@@ -295,14 +282,12 @@
             render(window.menuData.sabores, 'listaSabores', ['nome', 'cat', 'preco']);
         };
 
-        // UI do Ramo
         window.verificarRamoAtivo = function(ramo) {
             const cardFid = document.getElementById('cardFidelidade');
             if (['pizzaria', 'hamburgueria', 'restaurante'].includes(ramo)) cardFid.style.display = 'block';
             else cardFid.style.display = 'none';
         };
 
-        // UI da Tabela CRM
         window.renderizarTabelaUI = function() {
             const corpo = document.getElementById('tabelaContatos');
             const busca = document.getElementById('buscaContato').value.toLowerCase();
@@ -352,7 +337,6 @@
         const firebaseConfig = { apiKey: "AIzaSyC4-2LavZt7iWPt2u71u-yRUYbIJu-Vzf0", authDomain: "central-omnichannel-saas.firebaseapp.com", projectId: "central-omnichannel-saas", storageBucket: "central-omnichannel-saas.firebasestorage.app", messagingSenderId: "869327159480", appId: "1:869327159480:web:605be5ec37ab688d44b44d", measurementId: "G-984WSSJBHP" };
         const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
 
-        // 1. AUTENTICAÇÃO E CARREGAMENTO DE DADOS INICIAIS
         onAuthStateChanged(auth, async function(user) {
             if (user) {
                 window.idClienteLogado = user.uid;
@@ -370,7 +354,8 @@
                         document.getElementById('bolinha-status').className = 'status-indicator online'; document.getElementById('texto-status').innerText = "Motor Global Online"; areaBtn.innerHTML = '';
                     } else { 
                         document.getElementById('tagPlano').innerHTML = "<i class='fa-solid fa-crown'></i> Premium"; 
-                        areaBtn.innerHTML = `<button id="btnConectarZapBase" class="btn btn-primary" onclick="conectarRoboPremium()"><i class="fa-solid fa-mobile-screen"></i> Ligar Meu WhatsApp</button>`;
+                        // BOTAO VERDE COM WHATSAPP
+                        areaBtn.innerHTML = `<button id="btnConectarZapBase" class="btn" style="background-color: #25D366; color: white; width: 100%; padding: 14px; font-size: 1.05rem;" onclick="conectarRoboPremium()"><i class="fa-brands fa-whatsapp" style="font-size: 1.3rem;"></i> Ligar Meu WhatsApp</button>`;
                         
                         onSnapshot(doc(db, "clientes_premium", window.idClienteLogado), (docSnap) => {
                             if(docSnap.exists()) {
@@ -383,20 +368,18 @@
                                     document.getElementById('bolinha-status').className = 'status-indicator'; document.getElementById('texto-status').innerText = "Aguardando leitura...";
                                 } else if(dataRobo.status === 'online') {
                                     document.getElementById('area-qr-code').style.display = 'none'; document.getElementById('bolinha-status').className = 'status-indicator online'; document.getElementById('texto-status').innerText = "Conectado!";
-                                    if(areaBtn) areaBtn.innerHTML = `<button class="btn btn-outline" disabled><i class="fa-solid fa-check"></i> Máquina Operante</button>`;
+                                    if(areaBtn) areaBtn.innerHTML = `<button class="btn btn-outline" style="width:100%; border-color: #25D366; color: #25D366;" disabled><i class="fa-solid fa-check"></i> WhatsApp Operante</button>`;
                                 }
                             }
                         });
                     }
                 }
-                // Traz o Ramo
                 try { const snapConfig = await getDoc(doc(db, "configuracoes_loja", window.idClienteLogado)); if(snapConfig.exists() && snapConfig.data().ramo) { document.getElementById('selectRamo').value = snapConfig.data().ramo; window.verificarRamoAtivo(snapConfig.data().ramo); } } catch(e) {}
             } else {
                 window.location.href = "index.html";
             }
         });
 
-        // 2. FUNÇÕES FIREBASE EXPORTADAS PARA O WINDOW (Para a UI poder chamar)
         window.conectarRoboPremium = async function() {
             const btn = document.getElementById('btnConectarZapBase');
             if(btn) { btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Acionando Oracle...'; btn.disabled = true; }
@@ -405,19 +388,17 @@
                 if (!res.ok) throw new Error("Falha no servidor.");
             } catch(e) {
                 alert("❌ Erro ao ligar o motor na Oracle. Tente novamente.");
-                if(btn) { btn.innerHTML = '<i class="fa-solid fa-mobile-screen"></i> Ligar Meu WhatsApp'; btn.disabled = false; }
+                if(btn) { btn.innerHTML = '<i class="fa-brands fa-whatsapp" style="font-size: 1.3rem;"></i> Ligar Meu WhatsApp'; btn.disabled = false; }
             }
         };
 
         window.fazerLogout = () => signOut(auth).then(()=>window.location.href="index.html");
 
-        // Salvamento do Ramo
         window.salvarConfigRamoDB = async function() {
             const r = document.getElementById('selectRamo').value; if(!r) return alert("⚠️ Selecione um Ramo!"); 
             try { await setDoc(doc(db, "configuracoes_loja", window.idClienteLogado), { ramo: r }, { merge: true }); alert("✅ Perfil Salvo!"); window.verificarRamoAtivo(r); } catch(e) { alert("❌ Erro no DB."); } 
         };
 
-        // Lógica de Contatos (CRM)
         async function salvarContatosDB() {
             if (window.idClienteLogado) {
                 localStorage.setItem('crm_'+window.idClienteLogado, JSON.stringify(window.listaContatos));
@@ -480,7 +461,7 @@
         };
 
         window.prepararModalEtiqueta = function() {
-            const l = document.querySelectorAll('.check-contato:checked'); if(l.length===0) return alert("⚠️ Selecione os clientes na tabela antes de etiquetar!");
+            const l = document.querySelectorAll('.check-contato:checked'); if(l.length===0) return alert("⚠️ Selecione os clientes na tabela!");
             window.abrirModal('modalTag');
             let t = new Set(); window.listaContatos.forEach(c => c.tags && c.tags.forEach(x => t.add(x)));
             let a = Array.from(t); const c = document.getElementById('botoesTagsSalvas'); const ar = document.getElementById('areaTagsExistentes'); c.innerHTML = '';
@@ -496,7 +477,6 @@
             salvarContatosDB(); window.fecharModal('modalTag'); document.getElementById('checkTodos').checked = false; window.alternarTodosChecks(); alert(`✅ Tag "${t}" aplicada com sucesso.`);
         };
 
-        // Lógica de Modais de Disparo e Cobrança
         function preencherTags(selectId) {
             const d = document.getElementById(selectId);
             let h = '<label style="display:block; padding:10px; background:white; border-radius:8px; margin-bottom:5px; border: 1px solid #cbd5e1; font-weight:bold; cursor:pointer;"><input type="checkbox" value="TODOS_OS_CONTATOS"> 📢 TODOS OS CONTATOS</label>';
@@ -560,7 +540,6 @@
             } catch (e) {}
         };
 
-        // Lógica de Cardápio / Aniversário
         window.prepararModalCardapio = async function() {
             if (window.planoClienteLogado === 'basico') return alert("⚠️ Recurso Exclusivo Premium!\nFaça o upgrade para o robô automatizar seus pedidos.");
             window.abrirModal('modalCardapio');
@@ -599,7 +578,6 @@
             try { let p={msgAniversario:t}; if(mi){p.imgAniversario=mi;p.mimeAniversario=mim;p.nomeAniversario=n;} await setDoc(doc(db,"configuracoes_loja",window.idClienteLogado),p,{merge:true}); alert("✅ Motor de aniversário ativado."); window.fecharModal('modalAniversario'); } catch(e){}
             btn.innerText="Salvar"; btn.disabled=false;
         };
-
     </script>
 </body>
 </html>
