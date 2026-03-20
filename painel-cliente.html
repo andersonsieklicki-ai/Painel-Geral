@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel do Cliente - Omnichannel PRO</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
     <style>
-        :root { --primary: #003399; --secondary: #f4f7f6; --success: #28a745; --danger: #dc3545; --text-dark: #2c3e50; --card-bg: #ffffff; }
+        :root { --primary: #003399; --secondary: #f4f7f6; --success: #28a745; --danger: #dc3545; --warning: #f59e0b; --text-dark: #2c3e50; --card-bg: #ffffff; }
         body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background-color: var(--secondary); margin: 0; padding: 0; color: var(--text-dark); }
         
         .navbar { background-color: var(--primary); color: white; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); flex-wrap: wrap; gap: 10px; }
@@ -17,11 +19,11 @@
         .card.full-width { grid-column: 1 / -1; }
         .card h3 { margin-top: 0; color: var(--primary); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
         
-        .btn { background-color: var(--primary); color: white; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 5px; justify-content: center; }
+        .btn { background-color: var(--primary); color: white; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 8px; justify-content: center; }
         .btn:hover { opacity: 0.9; transform: translateY(-1px); }
         .btn-success { background-color: var(--success); }
         .btn-danger { background-color: var(--danger); }
-        .btn-warning { background-color: #ffc107; color: #000; }
+        .btn-warning { background-color: #f59e0b; color: white; }
         .btn-outline { background-color: transparent; color: var(--primary); border: 1px solid var(--primary); }
         .btn-outline:hover { background-color: var(--primary); color: white; }
         
@@ -48,7 +50,12 @@
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); justify-content: center; align-items: center; z-index: 1000; padding: 20px; box-sizing: border-box; }
         .modal-content { background: white; padding: 30px; border-radius: 15px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
         .modal textarea, .modal input[type="text"] { width: 100%; padding: 12px; margin: 8px 0 15px 0; border: 1px solid #ced4da; border-radius: 8px; box-sizing: border-box; font-family: inherit; resize: vertical; }
+        .modal input[type="number"] { width: 100%; padding: 12px; margin: 8px 0 15px 0; border: 1px solid #ced4da; border-radius: 8px; box-sizing: border-box; }
         
+        select.select-ramo { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ced4da; font-size: 1rem; margin-top: 5px; margin-bottom: 20px; outline: none; }
+        select.select-ramo optgroup { font-weight: bold; color: var(--primary); background: #f8f9fa; }
+        select.select-ramo option { color: #333; background: white; font-weight: normal; }
+
         .tabs { display: flex; border-bottom: 2px solid #eee; margin-bottom: 20px; }
         .tab-btn { flex: 1; background: none; border: none; padding: 12px; font-size: 0.95rem; font-weight: 600; cursor: pointer; color: #6c757d; transition: all 0.3s; }
         .tab-btn.active { color: var(--primary); border-bottom: 3px solid var(--primary); margin-bottom: -2px; }
@@ -61,19 +68,24 @@
         .card-enviado-lateral.show { display: block; animation: slideIn 0.3s ease-out; }
         @keyframes slideIn { from { transform: translateX(-100%); } to { transform: translateX(0); } }
 
+        /* Estilo da Tabela do Cardápio */
+        .tabela-cardapio { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .tabela-cardapio th, .tabela-cardapio td { padding: 8px; text-align: left; border-bottom: 1px solid #eee; font-size: 0.85rem; }
+        .tabela-cardapio th { background: #f8f9fa; }
+
         @media (max-width: 768px) { .crm-controls { flex-direction: column; align-items: stretch; } .btn { width: 100%; justify-content: center; } .card-enviado-lateral { width: 90%; left: 5%; bottom: 10px; } }
     </style>
 </head>
 <body>
 
     <div class="navbar">
-        <h2>Painel Omnichannel <span style="margin: 0 10px;">|</span> <span id="nomeCliente">...</span> <span id="tagPlano" class="tag-plano"></span></h2>
-        <a href="#" onclick="fazerLogout()" style="color: white; text-decoration: none; font-weight: bold; font-size: 0.9rem;">Sair 🚪</a>
+        <h2><i class="fa-solid fa-rocket"></i> Painel Omnichannel <span style="margin: 0 10px;">|</span> <span id="nomeCliente">...</span> <span id="tagPlano" class="tag-plano"></span></h2>
+        <a href="#" onclick="fazerLogout()" style="color: white; text-decoration: none; font-weight: bold; font-size: 0.9rem;"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sair</a>
     </div>
 
     <div class="container">
         <div class="card">
-            <h3>🤖 Conexão WhatsApp</h3>
+            <h3><i class="fa-solid fa-robot"></i> Conexão WhatsApp</h3>
             <div class="status-box" id="area-conexao">
                 <span class="status-indicator" style="background-color: #ccc;"></span>
                 <span>Verificando...</span>
@@ -86,29 +98,38 @@
         </div>
 
         <div class="card">
-            <h3>📢 Marketing & Cobranças</h3>
-            <p style="color: #6c757d; font-size: 0.9rem;">Gerencie suas promoções, aniversários e setor financeiro.</p>
-            <div style="display: flex; gap: 10px; flex-direction: column; margin-top: 15px;">
-                <button class="btn btn-success" style="width: 100%; padding: 12px;" onclick="abrirModalDisparo()">🚀 Criar Nova Campanha</button>
-                <button class="btn btn-warning" style="width: 100%; padding: 12px;" onclick="abrirModalAniversario()">🎁 Motor de Aniversário</button>
-                <button class="btn btn-danger" style="width: 100%; padding: 12px; background-color: #dc3545;" onclick="abrirModalCobranca()">💳 Cobranças e Vencimentos</button>
+            <h3><i class="fa-solid fa-bullhorn"></i> Marketing & Operação</h3>
+            <p style="color: #6c757d; font-size: 0.9rem;">Gerencie suas campanhas, cobranças e dados da loja.</p>
+            
+            <div style="display: flex; gap: 8px; flex-direction: column; margin-top: 15px;">
+                <button class="btn btn-success" style="width: 100%; padding: 12px;" onclick="abrirModalDisparo()"><i class="fa-solid fa-paper-plane"></i> Criar Nova Campanha</button>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn btn-warning" style="flex: 1;" onclick="abrirModalAniversario()"><i class="fa-solid fa-cake-candles"></i> Aniversários</button>
+                    <button class="btn btn-danger" style="flex: 1; background-color: #dc3545;" onclick="abrirModalCobranca()"><i class="fa-solid fa-file-invoice-dollar"></i> Cobranças</button>
+                </div>
+                
+                <hr style="border: 0; border-top: 1px dashed #ccc; margin: 5px 0;">
+                
+                <button class="btn btn-outline" style="width: 100%; padding: 12px;" onclick="abrirModalConfig()"><i class="fa-solid fa-gear"></i> Configurações do Ramo</button>
+                
+                <button id="btnCatFidelidade" class="btn" style="width: 100%; padding: 12px; background-color: #ea580c; color: white;" onclick="abrirModalCardapio()"><i class="fa-solid fa-book-open"></i> Cardápio & Automação de Pedidos</button>
             </div>
         </div>
 
         <div class="card full-width">
             <h3>
-                👥 Gestão de Contatos (CRM)
+                <i class="fa-solid fa-address-book"></i> Gestão de Contatos (CRM)
                 <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;">
-                    <button class="btn btn-outline" onclick="exportarVCF()">⬇️ Exportar</button>
-                    <button class="btn" onclick="abrirModalImportar()">⬆️ Importar</button>
+                    <button class="btn btn-outline" onclick="exportarVCF()"><i class="fa-solid fa-download"></i> Exportar</button>
+                    <button class="btn" onclick="abrirModalImportar()"><i class="fa-solid fa-upload"></i> Importar</button>
                 </div>
             </h3>
             
             <div class="crm-controls">
                 <input type="text" id="buscaContato" class="search-box" placeholder="🔍 Buscar nome ou número..." onkeyup="renderizarTabela()">
                 <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                    <button class="btn btn-outline" onclick="etiquetarSelecionados()">🏷️ Etiquetar Seleção</button>
-                    <button class="btn btn-outline" style="color: #dc3545; border-color: #dc3545;" onclick="apagarSelecionados()">🗑️ Apagar Seleção</button>
+                    <button class="btn btn-outline" onclick="etiquetarSelecionados()"><i class="fa-solid fa-tags"></i> Etiquetar Seleção</button>
+                    <button class="btn btn-outline" style="color: #dc3545; border-color: #dc3545;" onclick="apagarSelecionados()"><i class="fa-solid fa-trash"></i> Apagar Seleção</button>
                 </div>
             </div>
 
@@ -117,10 +138,10 @@
                     <thead>
                         <tr>
                             <th style="width: 40px;"><input type="checkbox" id="checkTodos" onclick="alternarTodosChecks()"></th>
-                            <th class="th-sortable" onclick="ordenarTabela('nome')" title="Clique para ordenar por nome">Nome do Cliente</th>
+                            <th class="th-sortable" onclick="ordenarTabela('nome')" title="Clique para ordenar">Nome do Cliente</th>
                             <th>WhatsApp</th>
-                            <th class="th-sortable" onclick="ordenarTabela('nascimento')" title="Clique para ordenar por data">Nascimento</th>
-                            <th class="th-sortable" onclick="ordenarTabela('tags')" title="Clique para agrupar por etiqueta">Etiquetas (Tags)</th>
+                            <th class="th-sortable" onclick="ordenarTabela('nascimento')" title="Clique para ordenar">Nascimento</th>
+                            <th class="th-sortable" onclick="ordenarTabela('tags')" title="Clique para agrupar">Etiquetas (Tags)</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
@@ -133,38 +154,102 @@
     </div>
 
     <div class="card-enviado-lateral" id="cardEnviado">
-        <h4 style="margin-top: 0; color: var(--success); display: flex; align-items: center; gap: 8px;">🚀 Adicionado à Fila</h4>
+        <h4 style="margin-top: 0; color: var(--success); display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-circle-check"></i> Adicionado à Fila</h4>
         <p style="font-size: 0.85rem; color: #666; margin-bottom: 10px;">A Central está processando as suas mensagens em segurança.</p>
         <p style="font-size: 0.8rem; font-weight: bold;">Início: <span id="horaCriacao" style="color: var(--primary);">--:--</span></p>
         <div style="background: #e9ecef; border-radius: 20px; height: 20px; overflow: hidden; margin-top: 10px;"><div id="barra-progresso-lateral" style="background: var(--success); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.75rem; font-weight: bold;">Processando...</div></div>
         <button class="btn-outline" style="width: 100%; padding: 5px; font-size: 0.75rem; margin-top: 10px;" onclick="fecharCardLateral()">Fechar Aviso</button>
     </div>
 
-    <div class="modal" id="modalCobranca">
+    <div class="modal" id="modalConfig">
         <div class="modal-content">
-            <h2 style="margin-top: 0; color: #dc3545;">💳 Central de Cobranças</h2>
-            <p style="font-size: 0.85rem; color: #666;">Envie avisos de vencimento ou faturas em atraso.</p>
-            <label style="font-size: 0.9rem; font-weight: 600;">Selecione o Grupo Alvo:</label>
-            <div class="lista-selecao" id="listaTagsCobranca" style="max-height: 100px;"></div>
-            <label style="font-size: 0.9rem; font-weight: 600;">Sua Chave PIX (Opcional):</label>
-            <input type="text" id="pixCobranca" placeholder="Ex: 12.345.678/0001-90">
-            <label style="font-size: 0.9rem; font-weight: 600;">Mensagem de Cobrança:</label>
-            <p style="font-size: 0.75rem; color: #dc3545; margin-top: 0;">Use <b>{nome}</b> para chamar o cliente pelo nome.</p>
-            <textarea id="textoCobranca" rows="5">Olá {nome}! Tudo bem? Passando para lembrar que sua fatura vence nos próximos dias. Para sua comodidade, segue a nossa chave PIX para pagamento:</textarea>
-            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px;"><button class="btn btn-outline" onclick="fecharModalCobranca()">Cancelar</button><button class="btn btn-danger" onclick="iniciarDisparoCobranca()">💸 Adicionar à Fila</button></div>
+            <h2 style="margin-top: 0; color: var(--primary);"><i class="fa-solid fa-store"></i> Perfil do Negócio</h2>
+            <p style="font-size: 0.85rem; color: #666; margin-bottom: 20px;">Defina o seu ramo de atividade para personalizar o atendimento do robô.</p>
+
+            <label style="font-size: 0.9rem; font-weight: 600; text-align: left; display: block;">Qual é o Ramo da sua Empresa?</label>
+            <select id="selectRamo" class="select-ramo">
+                <option value="">Selecione uma opção...</option>
+                <optgroup label="🍔 Setor de Alimentação">
+                    <option value="pizzaria">Pizzaria</option>
+                    <option value="hamburgueria">Hamburgueria / Lanchonete</option>
+                    <option value="restaurante">Restaurante / Delivery</option>
+                </optgroup>
+                <optgroup label="👗 Setor de Vestuário">
+                    <option value="roupas">Loja de Roupas</option>
+                    <option value="calcados">Loja de Calçados</option>
+                </optgroup>
+                <optgroup label="🛍️ Setor de Vendas / Comércio">
+                    <option value="moveis">Loja de Móveis</option>
+                    <option value="construcao">Materiais de Construção</option>
+                    <option value="cosmeticos">Cosméticos e Perfumaria</option>
+                    <option value="varejo">Comércio Varejista Geral</option>
+                </optgroup>
+                <optgroup label="✂️ Setor de Serviços">
+                    <option value="ar_condicionado">Instalação de Ar Condicionados</option>
+                    <option value="jardinagem">Serviços de Jardinagem</option>
+                    <option value="cabeleireiro">Cabeleireiro / Salão de Beleza</option>
+                    <option value="imobiliaria">Corretor / Imobiliária</option>
+                </optgroup>
+            </select>
+
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button class="btn btn-outline" onclick="fecharModalConfig()">Cancelar</button>
+                <button class="btn btn-success" onclick="salvarConfigRamo()"><i class="fa-solid fa-save"></i> Salvar Perfil</button>
+            </div>
         </div>
     </div>
 
-    <div class="modal" id="modalImportar"><div class="modal-content"><h2 style="margin-top: 0; color: var(--primary);">Importar Contatos</h2><p style="font-size: 0.9rem; color: #666;">Selecione <strong>.csv</strong> ou <strong>.vcf</strong>.</p><input type="file" accept=".csv, .vcf" id="arquivoCsv" style="width: 100%; padding: 10px; margin: 15px 0; border: 1px solid #ccc; border-radius: 8px;"><div style="display: flex; gap: 10px; justify-content: flex-end;"><button class="btn btn-danger" onclick="fecharModalImportar()">Cancelar</button><button class="btn" onclick="iniciarImportacao()">Salvar</button></div></div></div>
-    <div class="modal" id="modalTag"><div class="modal-content" style="width: 400px;"><h2 style="margin-top: 0; color: var(--primary);">🏷️ Etiquetar Contatos</h2><div id="areaTagsExistentes" style="margin-bottom: 15px; display: none;"><label style="font-size: 0.85rem; font-weight: bold; color: #666;">Salvas:</label><div id="botoesTagsSalvas" style="display: flex; flex-wrap: wrap; gap: 5px;"></div></div><label style="font-size: 0.85rem; font-weight: bold; color: #666;">Ou crie nova:</label><input type="text" id="nomeNovaTag" placeholder="VIP, Atacado, Leads..."><div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px;"><button class="btn btn-danger" onclick="fecharModalTag()">Cancelar</button><button class="btn" onclick="salvarTagMassa()">Aplicar Etiqueta</button></div></div></div>
-    <div class="modal" id="modalAniversario"><div class="modal-content"><h2 style="margin-top: 0; color: var(--primary);">🎁 Motor de Aniversário</h2><p style="font-size: 0.85rem; color: #666;">Envio automático diário.</p><label style="font-size: 0.9rem; font-weight: 600;">Imagem/Logo:</label><div class="upload-box"><input type="file" id="arquivoMidiaAniversario" accept="image/*" style="width: 100%;"></div><label style="font-size: 0.9rem; font-weight: 600;">Texto:</label><p style="font-size: 0.75rem; color: #dc3545; margin-top: 0;">Use <b>{nome}</b> no texto.</p><textarea id="textoAniversario" rows="4"></textarea><div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px;"><button class="btn btn-danger" onclick="fecharModalAniversario()">Cancelar</button><button class="btn btn-success" id="btnSalvarAniversario" onclick="salvarConfigAniversario()">Salvar</button></div></div></div>
-    
-    <div class="modal" id="modalDisparo"><div class="modal-content"><h2 style="margin-top: 0; color: var(--primary);">🚀 Criar Campanha</h2><div id="form-disparo"><div class="tabs"><button class="tab-btn active" onclick="trocarAba('tags')" id="btn-tags">🏷️ Por Tag</button><button class="tab-btn" onclick="trocarAba('avulso')" id="btn-avulso">✏️ Números Avulsos</button></div><div id="aba-tags" class="tab-content active"><div class="lista-selecao" id="listaTagsDisparo"></div></div><div id="aba-avulso" class="tab-content"><textarea id="listaNumeros" rows="3" placeholder="Cole números aqui"></textarea></div><label style="font-size: 0.9rem; font-weight: 600;">Mídia (Máx 5MB):</label><div class="upload-box"><input type="file" id="arquivoMidia" accept="image/*, application/pdf" style="width: 100%;"></div><label style="font-size: 0.9rem; font-weight: 600;">Legenda:</label><textarea id="mensagemPromo" rows="4" placeholder="Texto da promoção..."></textarea><div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px;"><button class="btn btn-danger" onclick="fecharModalDisparo()">Cancelar</button><button class="btn btn-success" onclick="iniciarDisparo()">🚀 Enviar para a Fila</button></div></div></div></div>
+    <div class="modal" id="modalCardapio">
+        <div class="modal-content" style="max-width: 600px;">
+            <h2 style="margin-top: 0; color: #ea580c;"><i class="fa-solid fa-book-open"></i> Gestão de Cardápio / Catálogo</h2>
+            <p style="font-size: 0.85rem; color: #666;">Configure a imagem com os números dos produtos e cadastre-os aqui para o robô anotar pedidos automaticamente.</p>
+            
+            <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+                <div style="flex: 1;">
+                    <label style="font-size: 0.9rem; font-weight: 600;">1. Foto do Cardápio/Catálogo (Máx 5MB):</label>
+                    <div class="upload-box" style="padding: 10px;">
+                        <input type="file" id="imgCardapio" accept="image/*" style="width: 100%;">
+                    </div>
+                </div>
+                <div style="flex: 1;">
+                    <label style="font-size: 0.9rem; font-weight: 600;">Regra de Fidelidade (Ex: 10):</label>
+                    <input type="number" id="metaFidelidade" placeholder="Quantos pedidos ganha cortesia?" style="margin-top: 5px;">
+                </div>
+            </div>
+
+            <label style="font-size: 0.9rem; font-weight: 600; border-top: 1px solid #eee; padding-top: 15px; display: block;">2. Cadastrar Itens do Robô:</label>
+            <div style="display: flex; gap: 10px; align-items: center; background: #f8f9fa; padding: 10px; border-radius: 8px; margin-bottom: 10px;">
+                <input type="number" id="itemNum" placeholder="Nº" style="width: 70px; margin: 0;">
+                <input type="text" id="itemNome" placeholder="Nome do Produto/Sabor" style="flex: 2; margin: 0;">
+                <input type="text" id="itemPreco" placeholder="R$ 0,00" style="flex: 1; margin: 0;">
+                <button class="btn btn-success" onclick="adicionarItemCardapio()" style="padding: 10px;"><i class="fa-solid fa-plus"></i></button>
+            </div>
+
+            <div style="max-height: 200px; overflow-y: auto; border: 1px solid #eee; border-radius: 8px;">
+                <table class="tabela-cardapio">
+                    <thead><tr><th>Nº</th><th>Produto/Sabor</th><th>Preço</th><th>Ação</th></tr></thead>
+                    <tbody id="listaItensCardapio">
+                        </tbody>
+                </table>
+            </div>
+
+            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                <button class="btn btn-outline" onclick="fecharModalCardapio()">Cancelar</button>
+                <button class="btn" style="background-color: #ea580c;" onclick="salvarCardapioNuvem()" id="btnSalvarCardapio"><i class="fa-solid fa-cloud-arrow-up"></i> Salvar no Robô</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="modalCobranca"><div class="modal-content"><h2 style="margin-top: 0; color: #dc3545;"><i class="fa-solid fa-file-invoice-dollar"></i> Cobranças</h2><p style="font-size: 0.85rem; color: #666;">Envie avisos de vencimento ou faturas.</p><label style="font-size: 0.9rem; font-weight: 600;">Selecione o Grupo Alvo:</label><div class="lista-selecao" id="listaTagsCobranca" style="max-height: 100px;"></div><label style="font-size: 0.9rem; font-weight: 600;">Sua Chave PIX (Opcional):</label><input type="text" id="pixCobranca" placeholder="Ex: 12.345.678/0001-90"><label style="font-size: 0.9rem; font-weight: 600;">Mensagem de Cobrança:</label><p style="font-size: 0.75rem; color: #dc3545; margin-top: 0;">Use <b>{nome}</b> para chamar o cliente pelo nome.</p><textarea id="textoCobranca" rows="5">Olá {nome}! Tudo bem? Passando para lembrar que sua fatura vence nos próximos dias. Para sua comodidade, segue a nossa chave PIX para pagamento:</textarea><div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px;"><button class="btn btn-outline" onclick="fecharModalCobranca()">Cancelar</button><button class="btn btn-danger" onclick="iniciarDisparoCobranca()"><i class="fa-solid fa-paper-plane"></i> Adicionar à Fila</button></div></div></div>
+    <div class="modal" id="modalImportar"><div class="modal-content"><h2 style="margin-top: 0; color: var(--primary);"><i class="fa-solid fa-upload"></i> Importar</h2><p style="font-size: 0.9rem; color: #666;">Selecione <strong>.csv</strong> ou <strong>.vcf</strong>.</p><input type="file" accept=".csv, .vcf" id="arquivoCsv" style="width: 100%; padding: 10px; margin: 15px 0; border: 1px solid #ccc; border-radius: 8px;"><div style="display: flex; gap: 10px; justify-content: flex-end;"><button class="btn btn-danger" onclick="fecharModalImportar()">Cancelar</button><button class="btn" onclick="iniciarImportacao()">Salvar</button></div></div></div>
+    <div class="modal" id="modalTag"><div class="modal-content" style="width: 400px;"><h2 style="margin-top: 0; color: var(--primary);"><i class="fa-solid fa-tags"></i> Etiquetar</h2><div id="areaTagsExistentes" style="margin-bottom: 15px; display: none;"><label style="font-size: 0.85rem; font-weight: bold; color: #666;">Salvas:</label><div id="botoesTagsSalvas" style="display: flex; flex-wrap: wrap; gap: 5px;"></div></div><label style="font-size: 0.85rem; font-weight: bold; color: #666;">Ou crie nova:</label><input type="text" id="nomeNovaTag" placeholder="VIP, Atacado..."><div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px;"><button class="btn btn-danger" onclick="fecharModalTag()">Cancelar</button><button class="btn" onclick="salvarTagMassa()">Aplicar Etiqueta</button></div></div></div>
+    <div class="modal" id="modalAniversario"><div class="modal-content"><h2 style="margin-top: 0; color: var(--primary);"><i class="fa-solid fa-cake-candles"></i> Aniversário</h2><p style="font-size: 0.85rem; color: #666;">Envio diário matinal.</p><label style="font-size: 0.9rem; font-weight: 600;">Imagem/Logo:</label><div class="upload-box"><input type="file" id="arquivoMidiaAniversario" accept="image/*" style="width: 100%;"></div><label style="font-size: 0.9rem; font-weight: 600;">Texto:</label><p style="font-size: 0.75rem; color: #dc3545; margin-top: 0;">Use <b>{nome}</b>.</p><textarea id="textoAniversario" rows="4"></textarea><div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px;"><button class="btn btn-danger" onclick="fecharModalAniversario()">Cancelar</button><button class="btn btn-success" id="btnSalvarAniversario" onclick="salvarConfigAniversario()">Salvar</button></div></div></div>
+    <div class="modal" id="modalDisparo"><div class="modal-content"><h2 style="margin-top: 0; color: var(--primary);"><i class="fa-solid fa-bullhorn"></i> Disparo em Massa</h2><div id="form-disparo"><div class="tabs"><button class="tab-btn active" onclick="trocarAba('tags')" id="btn-tags">🏷️ Por Tag</button><button class="tab-btn" onclick="trocarAba('avulso')" id="btn-avulso">✏️ Números</button></div><div id="aba-tags" class="tab-content active"><div class="lista-selecao" id="listaTagsDisparo"></div></div><div id="aba-avulso" class="tab-content"><textarea id="listaNumeros" rows="3" placeholder="Cole números aqui"></textarea></div><label style="font-size: 0.9rem; font-weight: 600;">Mídia (Máx 5MB):</label><div class="upload-box"><input type="file" id="arquivoMidia" accept="image/*, application/pdf" style="width: 100%;"></div><label style="font-size: 0.9rem; font-weight: 600;">Legenda:</label><textarea id="mensagemPromo" rows="4" placeholder="Texto da promoção..."></textarea><div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px;"><button class="btn btn-danger" onclick="fecharModalDisparo()">Cancelar</button><button class="btn btn-success" onclick="iniciarDisparo()"><i class="fa-solid fa-paper-plane"></i> Enviar p/ Fila</button></div></div></div></div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyC4-2LavZt7iWPt2u71u-yRUYbIJu-Vzf0",
@@ -180,7 +265,137 @@
 
         window.listaContatos = []; window.idClienteLogado = ""; window.planoClienteLogado = "basico"; window.nomeLojista = ""; window.zapLojista = "";
         window.ordemAtual = { coluna: '', direcao: 'asc' };
+        
+        // Memória do Cardápio local
+        window.itensCardapio = []; 
 
+        // ==========================================
+        // 🍕 MÓDULO CARDÁPIO E FIDELIDADE
+        // ==========================================
+        window.abrirModalCardapio = async function() {
+            // TRAVA DE SEGURANÇA PREMIUM
+            if (window.planoClienteLogado === 'basico') {
+                return alert("⚠️ Recurso Exclusivo do Plano Premium!\n\nPara ter o robô atendendo clientes automaticamente com Cardápio e Fidelidade, faça o upgrade e conecte o seu próprio número de WhatsApp!");
+            }
+            
+            document.getElementById('modalCardapio').style.display = 'flex';
+            
+            try {
+                const snap = await getDoc(doc(db, "cardapios_loja", window.idClienteLogado));
+                if(snap.exists()) {
+                    let d = snap.data();
+                    window.itensCardapio = d.itens || [];
+                    if(d.metaFidelidade) document.getElementById('metaFidelidade').value = d.metaFidelidade;
+                    renderizarTabelaCardapio();
+                }
+            } catch(e) {}
+        }
+
+        window.fecharModalCardapio = () => document.getElementById('modalCardapio').style.display = 'none';
+
+        window.adicionarItemCardapio = function() {
+            const num = document.getElementById('itemNum').value;
+            const nome = document.getElementById('itemNome').value;
+            const preco = document.getElementById('itemPreco').value;
+
+            if(!num || !nome || !preco) return alert("Preencha Nº, Nome e Preço!");
+            
+            window.itensCardapio.push({ num: num, nome: nome, preco: preco });
+            renderizarTabelaCardapio();
+            
+            document.getElementById('itemNum').value = '';
+            document.getElementById('itemNome').value = '';
+            document.getElementById('itemPreco').value = '';
+            document.getElementById('itemNum').focus();
+        }
+
+        window.removerItemCardapio = function(index) {
+            window.itensCardapio.splice(index, 1);
+            renderizarTabelaCardapio();
+        }
+
+        window.renderizarTabelaCardapio = function() {
+            const tbody = document.getElementById('listaItensCardapio');
+            let h = '';
+            if(window.itensCardapio.length === 0) {
+                h = '<tr><td colspan="4" style="text-align:center; color:#999;">Nenhum item cadastrado.</td></tr>';
+            } else {
+                window.itensCardapio.forEach((item, index) => {
+                    h += `<tr><td><b>${item.num}</b></td><td>${item.nome}</td><td>${item.preco}</td><td><button class="btn-outline" style="padding:2px 8px; font-size:0.7rem; color:#dc3545; border-color:#dc3545;" onclick="removerItemCardapio(${index})">X</button></td></tr>`;
+                });
+            }
+            tbody.innerHTML = h;
+        }
+
+        window.salvarCardapioNuvem = async function() {
+            const btn = document.getElementById('btnSalvarCardapio');
+            const imgFile = document.getElementById('imgCardapio').files[0];
+            const meta = document.getElementById('metaFidelidade').value;
+
+            if (window.itensCardapio.length === 0) return alert("Cadastre pelo menos 1 item no cardápio.");
+
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Salvando...';
+            btn.disabled = true;
+
+            let imgBase64 = null;
+            let mime = null;
+
+            if (imgFile) {
+                if ((imgFile.size / 1024 / 1024) > 5) {
+                    btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Salvar no Robô'; btn.disabled = false;
+                    return alert("A imagem do cardápio deve ter no máximo 5MB.");
+                }
+                const leitor = new FileReader();
+                imgBase64 = await new Promise((r) => { leitor.onload = (e) => r(e.target.result.split(',')[1]); leitor.readAsDataURL(imgFile); });
+                mime = imgFile.type;
+            }
+
+            try {
+                let payload = {
+                    itens: window.itensCardapio,
+                    metaFidelidade: meta || 10
+                };
+                
+                if (imgBase64) {
+                    payload.imgMenuBase64 = imgBase64;
+                    payload.mimeMenu = mime;
+                }
+
+                await setDoc(doc(db, "cardapios_loja", window.idClienteLogado), payload, { merge: true });
+                alert("✅ Cardápio e Inteligência atualizados na Oracle com sucesso!");
+                fecharModalCardapio();
+            } catch(e) {
+                alert("❌ Erro ao enviar os dados para o robô.");
+            }
+            btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Salvar no Robô'; btn.disabled = false;
+        }
+
+
+        // ==========================================
+        // ⚙️ FUNÇÕES DO RAMO 
+        // ==========================================
+        window.abrirModalConfig = async function() {
+            document.getElementById('modalConfig').style.display = 'flex';
+            try {
+                const snap = await getDoc(doc(db, "configuracoes_loja", window.idClienteLogado));
+                if(snap.exists() && snap.data().ramo) document.getElementById('selectRamo').value = snap.data().ramo;
+            } catch(e) {}
+        }
+        
+        window.fecharModalConfig = () => document.getElementById('modalConfig').style.display = 'none';
+
+        window.salvarConfigRamo = async function() {
+            const ramo = document.getElementById('selectRamo').value;
+            if(!ramo) return alert("⚠️ Selecione um ramo de atividade da lista!");
+            try {
+                await setDoc(doc(db, "configuracoes_loja", window.idClienteLogado), { ramo: ramo }, { merge: true });
+                alert("✅ Perfil atualizado!"); fecharModalConfig();
+            } catch(e) { alert("❌ Erro ao salvar."); }
+        }
+
+        // ==========================================
+        // CRM, TABELAS E IMPORTAÇÕES PADRÕES
+        // ==========================================
         window.ordenarTabela = function(colunaClicada) {
             if (window.ordemAtual.coluna === colunaClicada) window.ordemAtual.direcao = window.ordemAtual.direcao === 'asc' ? 'desc' : 'asc';
             else { window.ordemAtual.coluna = colunaClicada; window.ordemAtual.direcao = 'asc'; }
@@ -214,14 +429,12 @@
             const corpo = document.getElementById('tabelaContatos');
             const busca = document.getElementById('buscaContato').value.toLowerCase();
             let listaFiltrada = window.listaContatos.filter(c => c.nome.toLowerCase().includes(busca) || c.telefone.includes(busca));
-            
             if (listaFiltrada.length === 0) { corpo.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px; color: #666;">Nenhum contato na base.</td></tr>'; return; }
-
             let htmlFinal = '';
             for (let i = 0; i < listaFiltrada.length; i++) {
                 let c = listaFiltrada[i]; let htmlDasTags = '';
                 if (c.tags && c.tags.length > 0) { for (let t = 0; t < c.tags.length; t++) htmlDasTags += `<span class="tag-wrapper"><span class="tag">🏷️ ${c.tags[t]}</span><button class="tag-remove" onclick="removerTagDoContato('${c.id}', '${c.tags[t]}')" title="Remover etiqueta">×</button></span>`; }
-                htmlFinal += `<tr><td><input type="checkbox" class="check-contato" value="${c.id}"></td><td><strong>${c.nome}</strong></td><td>${c.telefone}</td><td><input type="text" class="input-nasc" placeholder="DD/MM" value="${c.aniversario || ''}" onchange="atualizarNascimento('${c.id}', this.value)"></td><td>${htmlDasTags}</td><td><button class="btn btn-outline" style="padding: 5px 10px; font-size: 0.8rem; color: #dc3545; border-color: #dc3545;" onclick="apagarContato('${c.id}')">Excluir</button></td></tr>`;
+                htmlFinal += `<tr><td><input type="checkbox" class="check-contato" value="${c.id}"></td><td><strong>${c.nome}</strong></td><td>${c.telefone}</td><td><input type="text" class="input-nasc" placeholder="DD/MM" value="${c.aniversario || ''}" onchange="atualizarNascimento('${c.id}', this.value)"></td><td>${htmlDasTags}</td><td><button class="btn btn-outline" style="padding: 5px 10px; font-size: 0.8rem; color: #dc3545; border-color: #dc3545;" onclick="apagarContato('${c.id}')"><i class="fa-solid fa-trash"></i></button></td></tr>`;
             }
             corpo.innerHTML = htmlFinal;
         }
@@ -232,6 +445,8 @@
             renderizarTabela(); window.salvarContatosLocal();
         }
 
+        // --- MANUTENÇÃO DOS MODAIS ANTIGOS AQUI (Cobranca, Disparo, Import, Auth) ---
+        // (Omitindo repetições de import, upload CSV, etc, que já estavam perfeitas, para focar nas novas)
         window.abrirModalCobranca = function() {
             const div = document.getElementById('listaTagsCobranca'); let h = ''; let tags = new Set();
             window.listaContatos.forEach(c => c.tags && c.tags.forEach(t => tags.add(t)));
@@ -242,7 +457,6 @@
         }
         window.fecharModalCobranca = () => document.getElementById('modalCobranca').style.display = 'none';
 
-        // 🚀 ENVIO PARA A FILA GLOBAL (MÁX 200 PRO BÁSICO)
         window.iniciarDisparoCobranca = async function() {
             const msg = document.getElementById('textoCobranca').value; const pix = document.getElementById('pixCobranca').value;
             const checks = document.querySelectorAll('#listaTagsCobranca input:checked');
@@ -252,31 +466,19 @@
             let tagsSel = Array.from(checks).map(i => i.value);
             let nums = window.listaContatos.filter(c => c.tags && c.tags.some(t => tagsSel.includes(t))).map(c => c.telefone);
 
-            if (nums.length === 0) return alert("⚠️ Ninguém encontrado nesse grupo.");
-            
-            // 🛡️ TRAVA DE SEGURANÇA BÁSICO
-            if (window.planoClienteLogado === 'basico' && nums.length > 200) {
-                return alert(`⚠️ Segurança Antiban: O seu plano Básico permite enviar para no máximo 200 contatos por vez (Este grupo tem ${nums.length}). Para envios em massa ilimitados, faça upgrade para o Premium!`);
-            }
+            if (nums.length === 0) return alert("⚠️ Ninguém encontrado.");
+            if (window.planoClienteLogado === 'basico' && nums.length > 200) return alert(`⚠️ Segurança Antiban: Básico permite máx 200 contatos por vez.`);
 
             let finalMsg = pix !== "" ? `${msg}\n\n🏦 *CHAVE PIX:*\n${pix}` : msg;
-
-            fecharModalCobranca();
-            document.getElementById('cardEnviado').classList.add('show');
+            fecharModalCobranca(); document.getElementById('cardEnviado').classList.add('show');
             document.getElementById('horaCriacao').innerText = new Date().getHours() + ':' + String(new Date().getMinutes()).padStart(2, '0');
             document.getElementById('barra-progresso-lateral').innerText = "Adicionando à Fila Segura...";
             document.getElementById('barra-progresso-lateral').style.backgroundColor = '#dc3545'; 
 
             try {
-                const res = await fetch('/api-oracle/api/saas/disparar', {
-                    method: 'POST', headers: { 'Content-Type': 'application/json', 'x-senha': '123321' },
-                    body: JSON.stringify({ idCliente: window.idClienteLogado, nomeEmpresa: window.nomeLojista, zapLojista: window.zapLojista, numeros: nums, mensagem: finalMsg, plano: window.planoClienteLogado })
-                });
-                document.getElementById('barra-progresso-lateral').innerText = `Na Fila da Oracle!`;
-                document.getElementById('barra-progresso-lateral').style.backgroundColor = '#28a745';
-            } catch (e) { 
-                document.getElementById('barra-progresso-lateral').style.backgroundColor = '#dc3545'; document.getElementById('barra-progresso-lateral').innerText = "Erro de conexão.";
-            }
+                await fetch('/api-oracle/api/saas/disparar', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-senha': '123321' }, body: JSON.stringify({ idCliente: window.idClienteLogado, nomeEmpresa: window.nomeLojista, zapLojista: window.zapLojista, numeros: nums, mensagem: finalMsg, plano: window.planoClienteLogado }) });
+                document.getElementById('barra-progresso-lateral').innerText = `Na Fila da Oracle!`; document.getElementById('barra-progresso-lateral').style.backgroundColor = '#28a745';
+            } catch (e) { document.getElementById('barra-progresso-lateral').style.backgroundColor = '#dc3545'; document.getElementById('barra-progresso-lateral').innerText = "Erro de conexão."; }
         }
 
         window.iniciarDisparo = async function() {
@@ -285,8 +487,7 @@
 
             let b64 = null; let nome = ""; let mime = "";
             if (arq) {
-                // 🛑 NOVO LIMITE DE 5MB PARA PROTEGER A RAM DA ORACLE
-                if ((arq.size / 1024 / 1024) > 5) return alert("⚠️ Para envios rápidos em massa, o limite do arquivo é de 5MB.");
+                if ((arq.size / 1024 / 1024) > 5) return alert("⚠️ Limite de 5MB.");
                 const l = new FileReader(); b64 = await new Promise((r) => { l.onload = (e) => r(e.target.result.split(',')[1]); l.readAsDataURL(arq); });
                 nome = arq.name; mime = arq.type;
             }
@@ -301,26 +502,16 @@
             } else nums = document.getElementById('listaNumeros').value.split('\n').map(n => n.trim()).filter(n => n !== "");
 
             if (nums.length === 0) return alert("⚠️ Nenhum número válido.");
-
-            // 🛡️ TRAVA DE SEGURANÇA BÁSICO
-            if (window.planoClienteLogado === 'basico' && nums.length > 200) {
-                return alert(`⚠️ Segurança Antiban: O seu plano Básico permite enviar para no máximo 200 contatos por vez (Sua lista tem ${nums.length}). Para envios ilimitados, faça upgrade para o Premium!`);
-            }
+            if (window.planoClienteLogado === 'basico' && nums.length > 200) return alert(`⚠️ Segurança Antiban: Básico permite máx 200 contatos por vez.`);
 
             fecharModalDisparo(); document.getElementById('cardEnviado').classList.add('show');
             document.getElementById('horaCriacao').innerText = new Date().getHours() + ':' + String(new Date().getMinutes()).padStart(2, '0');
-            document.getElementById('barra-progresso-lateral').innerText = "Enviando para a Fila Global...";
-            document.getElementById('barra-progresso-lateral').style.backgroundColor = '#28a745';
+            document.getElementById('barra-progresso-lateral').innerText = "Enviando para a Fila Global..."; document.getElementById('barra-progresso-lateral').style.backgroundColor = '#28a745';
 
             try {
-                const res = await fetch('/api-oracle/api/saas/disparar', {
-                    method: 'POST', headers: { 'Content-Type': 'application/json', 'x-senha': '123321' },
-                    body: JSON.stringify({ idCliente: window.idClienteLogado, nomeEmpresa: window.nomeLojista, zapLojista: window.zapLojista, numeros: nums, mensagem: msg, midia: b64, midiaNome: nome, midiaMime: mime, plano: window.planoClienteLogado })
-                });
+                await fetch('/api-oracle/api/saas/disparar', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-senha': '123321' }, body: JSON.stringify({ idCliente: window.idClienteLogado, nomeEmpresa: window.nomeLojista, zapLojista: window.zapLojista, numeros: nums, mensagem: msg, midia: b64, midiaNome: nome, midiaMime: mime, plano: window.planoClienteLogado }) });
                 document.getElementById('barra-progresso-lateral').innerText = "Na Fila! O Robô já assumiu.";
-            } catch (e) { 
-                document.getElementById('barra-progresso-lateral').style.backgroundColor = '#dc3545'; document.getElementById('barra-progresso-lateral').innerText = "Erro de conexão.";
-            }
+            } catch (e) { document.getElementById('barra-progresso-lateral').style.backgroundColor = '#dc3545'; document.getElementById('barra-progresso-lateral').innerText = "Erro de conexão."; }
         }
 
         onAuthStateChanged(auth, async function(user) {
@@ -330,8 +521,9 @@
                     const d = snap.data(); window.idClienteLogado = user.uid; window.planoClienteLogado = d.plano || 'basico';
                     window.nomeLojista = d.nomeEmpresa; window.zapLojista = d.whatsappLojista || "";
                     document.getElementById('nomeCliente').innerText = d.nomeEmpresa; window.carregarContatosLocal(); 
+                    
                     if (d.plano === 'basico') { document.getElementById('tagPlano').innerText = "🥇 Omnichannel PRO"; document.getElementById('area-conexao').innerHTML = `<div><span class="status-indicator"></span><strong>Motor Central ON</strong></div>`; document.getElementById('desc-conexao').innerText = "Motor de envio global ativado."; } 
-                    else { document.getElementById('tagPlano').innerText = "🏆 Premium"; document.getElementById('area-conexao').innerHTML = `<button class="btn" onclick="conectarRoboPremium()">📱 Conectar Meu Zap</button>`; document.getElementById('desc-conexao').innerText = "Acesse com o seu número."; }
+                    else { document.getElementById('tagPlano').innerText = "🏆 Premium"; document.getElementById('area-conexao').innerHTML = `<button class="btn" onclick="conectarRoboPremium()"><i class="fa-solid fa-mobile-screen"></i> Conectar Meu Zap</button>`; document.getElementById('desc-conexao').innerText = "Acesse com o seu número."; }
                 }
             } else window.location.href = "index.html";
         });
