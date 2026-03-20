@@ -50,6 +50,7 @@
         .btn-danger { background-color: var(--danger); color: white; } 
         .btn-warning { background-color: var(--warning); color: white; }
         .btn-whatsapp { background-color: var(--whatsapp); color: white; }
+        .btn-whatsapp:hover { opacity: 0.9; transform: translateY(-1px); }
         .btn-outline { background-color: transparent; border: 1px solid #cbd5e1; color: var(--text-main); }
         .btn-block { width: 100%; margin-bottom: 10px; padding: 12px; }
         input[type="text"], input[type="number"], textarea, select { width: 100%; padding: 12px; margin: 8px 0 15px 0; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; font-family: inherit; outline: none; }
@@ -79,7 +80,7 @@
         .tab-btn.active { color: var(--primary); border-color: var(--primary); }
         .tab-content { display: none; } .tab-content.active { display: block; }
         
-        /* 📱 DESIGN KIOSK (NOVO CARDÁPIO) */
+        /* 📱 NOVO DESIGN KIOSK (CARTÕES OTIMIZADOS) */
         .kiosk-modal { max-width: 900px !important; display: flex; flex-direction: column; padding: 0; overflow: hidden;}
         .kiosk-header { background: #ea580c; color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
         .kiosk-header h2 { margin: 0; font-size: 1.4rem; }
@@ -94,13 +95,20 @@
         .kiosk-form input, .kiosk-form select { margin: 0; flex: 1; min-width: 120px; }
         .kiosk-form button { margin: 0; white-space: nowrap; }
 
-        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; }
-        .product-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 15px; text-align: center; position: relative; box-shadow: 0 4px 6px rgba(0,0,0,0.02); transition: 0.2s; }
-        .product-card:hover { transform: translateY(-3px); box-shadow: 0 10px 15px rgba(0,0,0,0.05); }
-        .product-card .icon { font-size: 2.5rem; margin-bottom: 10px; }
-        .product-card h4 { margin: 0 0 5px 0; color: #0f172a; font-size: 1rem; }
-        .product-card p { margin: 0; color: var(--success); font-weight: 700; font-size: 1.1rem; }
-        .product-card .del-btn { position: absolute; top: -8px; right: -8px; background: var(--danger); color: white; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        /* GRID INTELIGENTE DE PRODUTOS */
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; padding: 5px;}
+        .product-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; text-align: left; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.03); transition: 0.2s; display: flex; flex-direction: column; justify-content: space-between;}
+        .product-card:hover { transform: translateY(-2px); box-shadow: 0 8px 12px rgba(0,0,0,0.05); border-color: #cbd5e1; }
+        
+        .product-card .badge-cat { display: inline-flex; align-items: center; gap: 4px; background: #f1f5f9; color: #475569; font-size: 0.7rem; padding: 4px 8px; border-radius: 20px; font-weight: 600; width: fit-content; margin-bottom: 8px;}
+        .product-card h4 { margin: 0 0 5px 0; color: #0f172a; font-size: 0.95rem; line-height: 1.3;}
+        .product-card p.price { margin: 0; color: var(--success); font-weight: 700; font-size: 0.9rem; }
+        .product-card p.meta { margin: 0; color: #64748b; font-size: 0.75rem; }
+        
+        .product-card .actions { position: absolute; top: 8px; right: 8px; display: flex; gap: 4px; }
+        .product-card .btn-action { background: #f1f5f9; color: #64748b; border: none; border-radius: 6px; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; font-size: 0.75rem;}
+        .product-card .btn-action.edit:hover { background: #dbeafe; color: var(--primary); }
+        .product-card .btn-action.del:hover { background: #fee2e2; color: var(--danger); }
 
         .card-enviado-lateral { position: fixed; bottom: 20px; right: 20px; width: 320px; background: white; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); border-left: 5px solid var(--success); padding: 20px; z-index: 1500; display: none; }
         .card-enviado-lateral.show { display: block; animation: slideInRight 0.3s ease-out; } @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
@@ -118,14 +126,14 @@
             .main-content { overflow-y: auto; height: calc(100vh - 70px); }
             .page-section { padding: 15px; padding-bottom: 90px; } 
             
-            /* Kiosk Mobile Adjustments */
+            /* Mobile Kiosk */
             .kiosk-modal { height: 95vh; max-height: 95vh; border-radius: 15px 15px 0 0; top: auto; bottom: 0; padding: 0;}
             .kiosk-body { flex-direction: column; }
             .kiosk-sidebar { width: 100%; flex-direction: row; border-right: none; border-bottom: 1px solid #e2e8f0; overflow-x: auto; flex-shrink: 0; }
             .kiosk-nav-btn { white-space: nowrap; padding: 12px; font-size: 0.85rem; border-bottom: none; border-left: none; }
             .kiosk-nav-btn.active { border-bottom: 3px solid #ea580c; border-left: none; }
             .kiosk-form { flex-direction: column; align-items: stretch; }
-            .product-grid { grid-template-columns: repeat(2, 1fr); }
+            .product-grid { grid-template-columns: repeat(2, 1fr); gap: 10px;}
         }
     </style>
 </head>
@@ -238,7 +246,7 @@
                     <button class="kiosk-nav-btn" id="k-btn-tamanhos" onclick="trocarKiosk('tamanhos')"><i class="fa-solid fa-ruler-combined"></i> Tamanhos</button>
                     <button class="kiosk-nav-btn" id="k-btn-sabores" onclick="trocarKiosk('sabores')"><i class="fa-solid fa-pizza-slice"></i> Sabores</button>
                     <button class="kiosk-nav-btn" id="k-btn-bordas" onclick="trocarKiosk('bordas')"><i class="fa-solid fa-cheese"></i> Bordas/Extras</button>
-                    <button class="kiosk-nav-btn" id="k-btn-porcoes" onclick="trocarKiosk('porcoes')"><i class="fa-solid fa-fries"></i> Porções/Bebidas</button>
+                    <button class="kiosk-nav-btn" id="k-btn-porcoes" onclick="trocarKiosk('porcoes')"><i class="fa-solid fa-fries"></i> Porções</button>
                 </div>
 
                 <div class="kiosk-content">
@@ -246,7 +254,7 @@
                     <div id="k-aba-setup" style="display: block;">
                         <h3 style="margin-top: 0; color: #0f172a;">Ajustes de Delivery</h3>
                         <div class="kiosk-form" style="flex-direction: column; align-items: flex-start;">
-                            <label style="font-weight: 600; font-size: 0.9rem;">Imagem do Cardápio (Enviada no WhatsApp):</label>
+                            <label style="font-weight: 600; font-size: 0.9rem;">Foto do Cardápio (Enviada no WhatsApp):</label>
                             <input type="file" id="imgCardapio" accept="image/*" style="width: 100%;">
                         </div>
                         <div class="kiosk-form">
@@ -259,8 +267,7 @@
                     <div id="k-aba-tamanhos" style="display: none;">
                         <div class="kiosk-form">
                             <input type="text" id="tamNome" placeholder="Tamanho (Ex: Família)">
-                            <input type="number" id="tamQtd" placeholder="Máx Sabores">
-                            <input type="number" id="tamPreco" placeholder="Valor (Opcional)">
+                            <div style="display: flex; gap: 8px;"><input type="number" id="tamQtd" placeholder="Máx Sabores" style="flex: 1;"><input type="number" id="tamPreco" placeholder="Valor Padrão R$" style="flex: 1;"></div>
                             <button class="btn btn-success" onclick="addObj('tamanhos')"><i class="fa-solid fa-plus"></i></button>
                         </div>
                         <div class="product-grid" id="listaTamanhos"></div>
@@ -268,18 +275,20 @@
 
                     <div id="k-aba-sabores" style="display: none;">
                         <div class="kiosk-form">
-                            <input type="text" id="saborNome" placeholder="Nome do Sabor (Ex: Calabresa)">
-                            <select id="saborCategoria"><option value="🍕">Salgada</option><option value="🍫">Doce</option></select>
-                            <input type="number" id="saborPreco" placeholder="R$ (Maior valor prevalece)">
-                            <button class="btn btn-success" onclick="addObj('sabores')"><i class="fa-solid fa-plus"></i></button>
+                            <input type="text" id="saborNome" placeholder="Sabor (Ex: Calabresa)">
+                            <div style="display: flex; gap: 8px;">
+                                <select id="saborCategoria" style="flex: 1;"><option value="Salgada">Salgada</option><option value="Doce">Doce</option><option value="Bebida">Bebida</option></select>
+                                <input type="number" id="saborPreco" placeholder="Preço (Opcional)" style="flex: 1;">
+                            </div>
+                            <button class="btn btn-success" onclick="addObj('sabores')"><i class="fa-solid fa-plus"></i> Cadastrar</button>
                         </div>
                         <div class="product-grid" id="listaSabores"></div>
                     </div>
 
                     <div id="k-aba-bordas" style="display: none;">
                         <div class="kiosk-form">
-                            <input type="text" id="bordaNome" placeholder="Nome (Ex: Borda Catupiry)">
-                            <input type="number" id="bordaPreco" placeholder="Preço Adicional">
+                            <input type="text" id="bordaNome" placeholder="Borda (Ex: Catupiry)">
+                            <input type="number" id="bordaPreco" placeholder="Preço R$">
                             <button class="btn btn-success" onclick="addObj('bordas')"><i class="fa-solid fa-plus"></i></button>
                         </div>
                         <div class="product-grid" id="listaBordas"></div>
@@ -287,8 +296,8 @@
 
                     <div id="k-aba-porcoes" style="display: none;">
                         <div class="kiosk-form">
-                            <input type="text" id="porcaoNome" placeholder="Item (Ex: Batata Média / Coca 2L)">
-                            <input type="number" id="porcaoPreco" placeholder="Preço Integral">
+                            <input type="text" id="porcaoNome" placeholder="Porção/Bebida (Ex: Coca 2L)">
+                            <input type="number" id="porcaoPreco" placeholder="Preço Integral R$">
                             <button class="btn btn-success" onclick="addObj('porcoes')"><i class="fa-solid fa-plus"></i></button>
                         </div>
                         <div class="product-grid" id="listaPorcoes"></div>
@@ -297,13 +306,13 @@
                 </div>
             </div>
             <div style="padding: 15px; background: white; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end;">
-                <button class="btn" style="background-color: #ea580c; color: white; width: 100%; font-size: 1rem; padding: 12px;" onclick="salvarCardapioNuvem()" id="btnSalvarCardapio"><i class="fa-solid fa-cloud-arrow-up"></i> Salvar na Oracle</button>
+                <button class="btn" style="background-color: #ea580c; color: white; width: 100%; font-size: 1rem; padding: 12px;" onclick="salvarCardapioNuvem()" id="btnSalvarCardapio"><i class="fa-solid fa-cloud-arrow-up"></i> Sincronizar Máquina</button>
             </div>
         </div>
     </div>
 
     <div class="modal" id="modalCobranca"><div class="modal-content"><h2 style="margin-top: 0; color: #dc3545;"><i class="fa-solid fa-file-invoice-dollar"></i> Cobranças</h2><label style="font-size: 0.9rem; font-weight: 600;">Selecione o Grupo Alvo:</label><div class="lista-selecao" id="listaTagsCobranca" style="max-height: 100px; overflow-y: auto;"></div><label style="font-size: 0.9rem; font-weight: 600;">Sua Chave PIX (Opcional):</label><input type="text" id="pixCobranca" placeholder="Ex: 12.345.678/0001-90"><label style="font-size: 0.9rem; font-weight: 600;">Mensagem:</label><textarea id="textoCobranca" rows="4">Olá {nome}! Tudo bem? Passando para lembrar que sua fatura vence nos próximos dias. Segue a chave PIX:</textarea><div style="display: flex; gap: 10px; justify-content: flex-end;"><button class="btn btn-outline" onclick="fecharModalCobranca()">Cancelar</button><button class="btn btn-danger" onclick="iniciarDisparoCobranca()"><i class="fa-solid fa-paper-plane"></i> Enviar</button></div></div></div>
-    <div class="modal" id="modalImportar"><div class="modal-content"><h2 style="margin-top: 0; color: var(--primary);"><i class="fa-solid fa-upload"></i> Importar Contatos</h2><input type="file" accept=".csv, .vcf" id="arquivoCsv"><div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px;"><button class="btn btn-outline" onclick="fecharModalImportar()">Cancelar</button><button class="btn btn-primary" onclick="iniciarImportacao()">Salvar</button></div></div></div>
+    <div class="modal" id="modalImportar"><div class="modal-content"><h2 style="margin-top: 0; color: var(--primary);"><i class="fa-solid fa-upload"></i> Importar Contatos</h2><input type="file" accept=".csv, .vcf" id="arquivoCsv"><div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px;"><button class="btn btn-outline" onclick="fecharModalImportar()">Cancelar</button><button class="btn btn-primary" onclick="iniciarImportacao()">Salvar Base</button></div></div></div>
     <div class="modal" id="modalTag"><div class="modal-content" style="width: 400px;"><h2 style="margin-top: 0; color: var(--primary);"><i class="fa-solid fa-tags"></i> Etiquetar Clientes</h2><div id="areaTagsExistentes" style="margin-bottom: 15px; display: none;"><label style="font-size: 0.85rem; font-weight: bold; color: #666;">Salvas:</label><div id="botoesTagsSalvas" style="display: flex; flex-wrap: wrap; gap: 5px;"></div></div><label style="font-size: 0.85rem; font-weight: bold;">Nova Tag:</label><input type="text" id="nomeNovaTag" placeholder="Ex: VIP"><div style="display: flex; gap: 10px; justify-content: flex-end;"><button class="btn btn-outline" onclick="fecharModalTag()">Cancelar</button><button class="btn btn-primary" onclick="salvarTagMassa()">Aplicar</button></div></div></div>
     <div class="modal" id="modalAniversario"><div class="modal-content"><h2 style="margin-top: 0; color: var(--warning);"><i class="fa-solid fa-cake-candles"></i> Aniversário</h2><div class="upload-box"><input type="file" id="arquivoMidiaAniversario" accept="image/*"></div><label style="font-size: 0.9rem; font-weight: 600;">Texto (Use {nome}):</label><textarea id="textoAniversario" rows="4"></textarea><div style="display: flex; gap: 10px; justify-content: flex-end;"><button class="btn btn-outline" onclick="fecharModalAniversario()">Cancelar</button><button class="btn btn-warning" id="btnSalvarAniversario" onclick="salvarConfigAniversario()">Salvar</button></div></div></div>
     <div class="modal" id="modalDisparo"><div class="modal-content"><h2 style="margin-top: 0; color: var(--primary);"><i class="fa-solid fa-rocket"></i> Disparo em Massa</h2><div class="tabs"><button class="tab-btn active" onclick="trocarAba('tags')" id="btn-tags">🏷️ Por Tag</button><button class="tab-btn" onclick="trocarAba('avulso')" id="btn-avulso">✏️ Números</button></div><div id="aba-tags" class="tab-content active"><div class="lista-selecao" id="listaTagsDisparo" style="max-height: 100px; overflow-y: auto;"></div></div><div id="aba-avulso" class="tab-content"><textarea id="listaNumeros" rows="3" placeholder="Cole números (um por linha)"></textarea></div><label style="font-size: 0.9rem; font-weight: 600;">Foto (Máx 5MB):</label><div class="upload-box" style="padding: 10px;"><input type="file" id="arquivoMidia" accept="image/*, application/pdf"></div><label style="font-size: 0.9rem; font-weight: 600;">Texto da Campanha:</label><textarea id="mensagemPromo" rows="4"></textarea><div style="display: flex; gap: 10px; justify-content: flex-end;"><button class="btn btn-outline" onclick="fecharModalDisparo()">Cancelar</button><button class="btn btn-primary" onclick="iniciarDisparo()"><i class="fa-solid fa-paper-plane"></i> Disparar Fila</button></div></div></div>
@@ -322,31 +331,22 @@
         window.trocarPagina = function(idAba, el) { document.querySelectorAll('.page-section').forEach(e => e.classList.remove('active')); document.querySelectorAll('.nav-item').forEach(e => e.classList.remove('active')); document.getElementById('page-' + idAba).classList.add('active'); el.classList.add('active'); }
         window.trocarAba = (a) => { document.querySelectorAll('#modalDisparo .tab-btn, #modalDisparo .tab-content').forEach(e=>e.classList.remove('active')); document.getElementById('aba-'+a).classList.add('active'); document.getElementById('btn-'+a).classList.add('active'); };
         
-        // NAVEGAÇÃO DO KIOSK
         window.trocarKiosk = function(aba) {
-            document.querySelectorAll('.kiosk-nav-btn').forEach(e=>e.classList.remove('active'));
-            document.getElementById('k-btn-'+aba).classList.add('active');
-            document.getElementById('k-aba-setup').style.display = 'none';
-            document.getElementById('k-aba-tamanhos').style.display = 'none';
-            document.getElementById('k-aba-sabores').style.display = 'none';
-            document.getElementById('k-aba-bordas').style.display = 'none';
-            document.getElementById('k-aba-porcoes').style.display = 'none';
-            document.getElementById('k-aba-'+aba).style.display = 'block';
+            document.querySelectorAll('.kiosk-nav-btn').forEach(e=>e.classList.remove('active')); document.getElementById('k-btn-'+aba).classList.add('active');
+            document.getElementById('k-aba-setup').style.display = 'none'; document.getElementById('k-aba-tamanhos').style.display = 'none';
+            document.getElementById('k-aba-sabores').style.display = 'none'; document.getElementById('k-aba-bordas').style.display = 'none';
+            document.getElementById('k-aba-porcoes').style.display = 'none'; document.getElementById('k-aba-'+aba).style.display = 'block';
         }
 
-        // ==========================================
-        // WHATSAPP (BOTÃO VERDE)
-        // ==========================================
+        // WHATSAPP 
         window.conectarRoboPremium = async function() {
-            const btn = document.getElementById('btnConectarZapBase');
-            if(btn) { btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Acionando Oracle...'; btn.disabled = true; }
+            const btn = document.getElementById('btnConectarZapBase'); if(btn) { btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Acionando Oracle...'; btn.disabled = true; }
             try {
                 const res = await fetch('/api-oracle/api/saas/conectar', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-senha': '123321' }, body: JSON.stringify({ idCliente: window.idClienteLogado }) });
                 if (!res.ok) throw new Error("Erro");
                 document.getElementById('area-qr-code').style.display = 'block'; document.getElementById('status-texto-qr').innerText = "Gerando QR Code..."; document.getElementById('qrcode-imagem').style.display = 'none';
-            } catch(e) { alert("❌ Verifique o vercel.json e o IP do servidor."); if(btn) { btn.innerHTML = '<i class="fa-brands fa-whatsapp"></i> Ligar Meu WhatsApp'; btn.disabled = false; } }
+            } catch(e) { alert("❌ Verifique a conexão com a Oracle."); if(btn) { btn.innerHTML = '<i class="fa-brands fa-whatsapp"></i> Ligar Meu WhatsApp'; btn.disabled = false; } }
         }
-
         window.desconectarRoboPremium = async function() {
             if(!confirm("⚠️ Desligar o robô de vendas do seu WhatsApp?")) return;
             try { await fetch('/api-oracle/api/saas/desconectar', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-senha': '123321' }, body: JSON.stringify({ idCliente: window.idClienteLogado }) }); document.getElementById('area-qr-code').style.display = 'none'; } catch(e) {}
@@ -354,14 +354,12 @@
 
         onAuthStateChanged(auth, async function(user) {
             if (user) {
-                window.idClienteLogado = user.uid;
-                const snap = await getDoc(doc(db, "empresas", user.uid));
+                window.idClienteLogado = user.uid; const snap = await getDoc(doc(db, "empresas", user.uid));
                 if (snap.exists()) {
-                    const d = snap.data(); window.planoClienteLogado = d.plano || 'basico';
-                    window.nomeLojista = d.nomeEmpresa; window.zapLojista = d.whatsappLojista || "";
+                    const d = snap.data(); window.planoClienteLogado = d.plano || 'basico'; window.nomeLojista = d.nomeEmpresa; window.zapLojista = d.whatsappLojista || "";
                     document.getElementById('nomeCliente').innerText = d.nomeEmpresa; window.carregarContatosLocal(); 
-                    
                     const areaBtn = document.getElementById('area-botao-conectar');
+                    
                     if (d.plano === 'basico') { 
                         document.getElementById('bolinha-status').className = 'status-indicator online'; document.getElementById('texto-status').innerText = "Motor Global Online"; areaBtn.innerHTML = '';
                     } else { 
@@ -376,7 +374,7 @@
                                     document.getElementById('bolinha-status').className = 'status-indicator'; document.getElementById('texto-status').innerText = "Aguardando leitura...";
                                 } else if(dataRobo.status === 'online') {
                                     document.getElementById('area-qr-code').style.display = 'none'; document.getElementById('bolinha-status').className = 'status-indicator online'; document.getElementById('texto-status').innerText = "Conectado e Vendendo!";
-                                    if(areaBtn) areaBtn.innerHTML = `<button class="btn btn-outline" disabled style="border-color: var(--success); color: var(--success);"><i class="fa-solid fa-check-double"></i> WhatsApp Operante</button><button class="btn btn-danger" onclick="desconectarRoboPremium()"><i class="fa-solid fa-plug-circle-xmark"></i> Desconectar</button>`;
+                                    if(areaBtn) areaBtn.innerHTML = `<button class="btn btn-outline" disabled style="border-color: var(--success); color: var(--success);"><i class="fa-solid fa-check-double"></i> WhatsApp Operante</button><button class="btn btn-danger" onclick="desconectarRoboPremium()"><i class="fa-solid fa-plug-circle-xmark"></i> Desconectar Robô</button>`;
                                 } else {
                                     document.getElementById('area-qr-code').style.display = 'none'; document.getElementById('bolinha-status').className = 'status-indicator'; document.getElementById('texto-status').innerText = "Motor Desligado";
                                     if(areaBtn) areaBtn.innerHTML = `<button id="btnConectarZapBase" class="btn btn-whatsapp" onclick="conectarRoboPremium()"><i class="fa-brands fa-whatsapp"></i> Ligar Meu WhatsApp</button>`;
@@ -390,7 +388,7 @@
         });
 
         // ==========================================
-        // 🍕 KIOSK: IMPORTADOR E GESTÃO
+        // 🍕 KIOSK: GESTÃO INTELIGENTE DE PREÇOS
         // ==========================================
         window.salvarConfigRamo = async function() { const r = document.getElementById('selectRamo').value; if(!r) return; await setDoc(doc(db, "configuracoes_loja", window.idClienteLogado), { ramo: r }, { merge: true }); window.verificarRamoAtivo(r); alert('Salvo!'); }
         window.verificarRamoAtivo = function(r) { const c = document.getElementById('cardFidelidade'); if (['pizzaria', 'hamburgueria', 'restaurante'].includes(r)) c.style.display = 'block'; else c.style.display = 'none'; }
@@ -404,23 +402,21 @@
                     let d = s.data(); window.menuData.tamanhos = d.tamanhos || []; window.menuData.bordas = d.bordas || []; 
                     window.menuData.sabores = d.sabores || []; window.menuData.porcoes = d.porcoes || [];
                     document.getElementById('tempoEntrega').value = d.tempoEntrega || ''; document.getElementById('taxaEntrega').value = d.taxaEntrega || '';
-                    document.getElementById('metaFidelidade').value = d.metaFidelidade || '';
-                    renderCards();
+                    document.getElementById('metaFidelidade').value = d.metaFidelidade || ''; renderCards();
                 }
             } catch(e) {}
         }
         window.fecharModalCardapio = () => document.getElementById('modalCardapio').style.display = 'none';
 
         window.importarCardapioJson = function(event) {
-            const file = event.target.files[0]; if(!file) return;
-            const reader = new FileReader();
+            const file = event.target.files[0]; if(!file) return; const reader = new FileReader();
             reader.onload = function(e) {
                 try {
                     const j = JSON.parse(e.target.result);
                     if(j.tamanhos) window.menuData.tamanhos = j.tamanhos; if(j.bordas) window.menuData.bordas = j.bordas;
                     if(j.sabores) window.menuData.sabores = j.sabores; if(j.porcoes) window.menuData.porcoes = j.porcoes;
-                    renderCards(); alert("✅ JSON Importado! Salve na Oracle.");
-                } catch(err) { alert("❌ Arquivo inválido."); }
+                    renderCards(); alert("✅ JSON Importado! Clique em Salvar na Oracle para finalizar.");
+                } catch(err) { alert("❌ O arquivo não é um JSON válido."); }
             }; reader.readAsText(file); event.target.value = ''; 
         }
 
@@ -443,17 +439,41 @@
                 document.getElementById('porcaoNome').value=''; document.getElementById('porcaoPreco').value='';
             } renderCards();
         }
+        
         window.removeObj = (tipo, idx) => { window.menuData[tipo].splice(idx, 1); renderCards(); }
+        
+        // Função de Edição Simples (Puxa os dados para o input e remove do array)
+        window.editObj = function(tipo, idx) {
+            const item = window.menuData[tipo][idx];
+            if(tipo === 'tamanhos') { document.getElementById('tamNome').value = item.nome; document.getElementById('tamQtd').value = item.qtd || ''; document.getElementById('tamPreco').value = item.preco > 0 ? item.preco : ''; } 
+            else if(tipo === 'bordas') { document.getElementById('bordaNome').value = item.nome; document.getElementById('bordaPreco').value = item.preco > 0 ? item.preco : ''; } 
+            else if(tipo === 'sabores') { document.getElementById('saborNome').value = item.nome; document.getElementById('saborCategoria').value = item.cat || 'Salgada'; document.getElementById('saborPreco').value = item.preco > 0 ? item.preco : ''; } 
+            else if(tipo === 'porcoes') { document.getElementById('porcaoNome').value = item.nome; document.getElementById('porcaoPreco').value = item.preco > 0 ? item.preco : ''; }
+            window.removeObj(tipo, idx);
+        }
 
         window.renderCards = function() {
             const r = (arr, elId, t) => {
-                let h=''; if(!arr || arr.length===0) h='<p style="color:#999; font-size:0.8rem; text-align:center;">Vazio.</p>';
+                let h=''; if(!arr || arr.length===0) h='<p style="color:#999; font-size:0.8rem; width:100%; text-align:center;">Vazio.</p>';
                 else arr.forEach((o, i) => { 
+                    let catHtml = '';
+                    if (o.cat) { let ic = o.cat==='Salgada'?'🍕':(o.cat==='Doce'?'🍫':'🥤'); catHtml = `<div class="badge-cat">${ic} ${o.cat}</div>`; } 
+                    else if (t==='porcoes') catHtml = `<div class="badge-cat">🍟 Porção</div>`;
+                    else if (t==='tamanhos') catHtml = `<div class="badge-cat">📐 Tamanho</div>`;
+                    else if (t==='bordas') catHtml = `<div class="badge-cat">🧀 Adicional</div>`;
+
+                    let pDisp = '';
+                    if(o.preco && parseFloat(o.preco) > 0) pDisp = `R$ ${parseFloat(o.preco).toFixed(2)}`;
+                    else if (t==='tamanhos' && o.qtd) pDisp = `<span style="color:#64748b; font-size:0.8rem;">(Sabores: ${o.qtd})</span>`;
+                    
                     h+=`<div class="product-card">
-                        <button class="del-btn" onclick="removeObj('${t}', ${i})"><i class="fa-solid fa-xmark"></i></button>
-                        ${o.cat ? `<div class="icon">${o.cat}</div>` : (t === 'porcoes' ? '<div class="icon">🍟</div>' : '')}
+                        <div class="actions">
+                            <button class="btn-action edit" onclick="editObj('${t}', ${i})"><i class="fa-solid fa-pen"></i></button>
+                            <button class="btn-action del" onclick="removeObj('${t}', ${i})"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                        ${catHtml}
                         <h4>${o.nome}</h4>
-                        <p>${o.preco > 0 ? 'R$ '+o.preco : (o.qtd ? 'Máx '+o.qtd+' Sabores' : 'Sem Custo')}</p>
+                        <p class="price">${pDisp}</p>
                     </div>` 
                 }); document.getElementById(elId).innerHTML = h;
             };
@@ -469,7 +489,7 @@
                 let payload = { tamanhos: window.menuData.tamanhos, bordas: window.menuData.bordas, sabores: window.menuData.sabores, porcoes: window.menuData.porcoes, tempoEntrega: document.getElementById('tempoEntrega').value, taxaEntrega: document.getElementById('taxaEntrega').value, metaFidelidade: document.getElementById('metaFidelidade').value };
                 if(b64){ payload.imgMenuBase64=b64; payload.mimeMenu=mi; }
                 await setDoc(doc(db,"cardapios_loja",window.idClienteLogado), payload, {merge:true}); alert("✅ Robô Atualizado!"); fecharModalCardapio();
-            } catch(e) {} btn.innerHTML='<i class="fa-solid fa-cloud-arrow-up"></i> Salvar na Oracle'; btn.disabled=false;
+            } catch(e) {} btn.innerHTML='<i class="fa-solid fa-cloud-arrow-up"></i> Sincronizar Máquina'; btn.disabled=false;
         }
 
         // ==========================================
