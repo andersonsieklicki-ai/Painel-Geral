@@ -1,410 +1,519 @@
-const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
-const qrcode = require('qrcode-terminal');
-const admin = require('firebase-admin');
-const express = require('express');
-const cors = require('cors');
-const os = require('os'); 
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Painel Administrativo - Omnichannel PRO</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 
-// ==========================================
-// 1. CONFIGURAÇÕES GERAIS E TELEGRAM
-// ==========================================
-const TELEGRAM_TOKEN = '8273223604:AAF92Sjiwg7YqjOy6prbB4PlhhCvSpwP06Y';
-const TELEGRAM_CHAT_ID = '780991117';
+    <style>
+        :root { 
+            --primary: #2563eb; --primary-dark: #1e40af; 
+            --sidebar-bg: #0f172a; --bg-color: #f8fafc; --card-bg: #ffffff; 
+            --text-main: #334155; --text-muted: #64748b; 
+            --success: #10b981; --danger: #ef4444; --warning: #f59e0b; --whatsapp: #25D366;
+        }
 
-async function avisarTelegram(mensagem) {
-    const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage?chat_id=${TELEGRAM_CHAT_ID}&text=${encodeURIComponent(mensagem)}`;
-    try { await fetch(url); } catch (erro) { console.log('Erro Telegram', erro); }
-}
-
-const terminalLogs = [];
-function logConsole(modulo, mensagem) {
-    const dataHora = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
-    const linha = `[${dataHora}] [${modulo}] ${mensagem}`;
-    console.log(linha);
-    terminalLogs.push(linha);
-    if (terminalLogs.length > 100) terminalLogs.shift();
-}
-
-// ==========================================
-// 2. CONEXÃO FIREBASE (SaaS Exclusivo)
-// ==========================================
-const serviceAccountSaas = require('./firebase-key-saas.json');
-const appSaas = admin.initializeApp({ credential: admin.credential.cert(serviceAccountSaas) }); 
-const dbSaas = appSaas.firestore();
-
-logConsole('SISTEMA', '⚡ Conexão estabelecida: Servidor Omnichannel SaaS (Limpo)');
-
-// ==========================================
-// 3. API DO PAINEL DE CONTROLE WEB
-// ==========================================
-const app = express();
-app.use(cors());
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ limit: '50mb', extended: true }));
-
-const PALAVRA_PASSE = "123321"; 
-app.use('/api', function(req, res, next) {
-    const passRecebida = req.headers['x-senha'];
-    if (passRecebida === PALAVRA_PASSE) next(); 
-    else res.status(401).json({ erro: "Acesso Negado!" }); 
-});
-
-app.get('/api/logs', (req, res) => res.json(terminalLogs));
-
-app.get('/api/hardware', function(req, res) {
-    const memTotal = os.totalmem(); const memLivre = os.freemem();
-    const ramUsada = (((memTotal - memLivre) / memTotal) * 100).toFixed(1);
-    const cpus = os.cpus().length; const cargaCores = os.loadavg()[0]; 
-    let cpuUso = ((cargaCores / cpus) * 100).toFixed(1);
-    if (cpuUso > 100) cpuUso = 100;
-    res.json({ ram: ramUsada, cpu: cpuUso });
-});
-
-// ROTAS DO WHATSAPP PREMIUM (CONECTAR E DESCONECTAR)
-app.post('/api/saas/conectar', async function(req, res) {
-    const { idCliente } = req.body;
-    if (!idCliente) return res.status(400).json({ erro: "ID necessário" });
-    try {
-        const docEmpresa = await dbSaas.collection('empresas').doc(idCliente).get();
-        if (!docEmpresa.exists) return res.status(404).json({ erro: "Cliente não cadastrado" });
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); margin: 0; display: flex; height: 100vh; overflow: hidden; color: var(--text-main); }
         
-        await dbSaas.collection('clientes_premium').doc(idCliente).set({ qrCode: null, status: 'iniciando', timestamp: admin.firestore.FieldValue.serverTimestamp() }, { merge: true });
-        if (sessoesSaaS[idCliente]) { try { await sessoesSaaS[idCliente].destroy(); } catch(e){} delete sessoesSaaS[idCliente]; }
-        await iniciarRoboCliente(idCliente);
-        res.json({ success: true, mensagem: "Gerando QR Code..." });
-    } catch (e) { res.status(500).json({ erro: "Falha: " + e.message }); }
-});
+        /* SIDEBAR */
+        .sidebar { width: 260px; background-color: var(--sidebar-bg); color: white; display: flex; flex-direction: column; transition: 0.3s; z-index: 100; }
+        .sidebar-header { padding: 20px; display: flex; align-items: center; gap: 10px; font-size: 1.2rem; font-weight: 700; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-nav { flex: 1; padding: 20px 10px; overflow-y: auto; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 15px; color: #cbd5e1; text-decoration: none; border-radius: 8px; margin-bottom: 5px; cursor: pointer; transition: 0.2s; font-weight: 500; }
+        .nav-item:hover, .nav-item.active { background-color: var(--primary); color: white; }
+        .sidebar-footer { padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .logout-btn { color: #fca5a5; cursor: pointer; display: flex; align-items: center; gap: 10px; font-weight: 600; padding: 10px; border-radius: 8px;}
+        
+        /* MAIN CONTENT */
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+        .topbar { background: var(--card-bg); padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; }
+        .empresa-info { display: flex; align-items: center; gap: 15px; } .empresa-info h2 { margin: 0; font-size: 1.2rem; color: #0f172a; }
+        .tag-plano { background: #dbeafe; color: var(--primary-dark); padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; display: flex; align-items: center; gap: 5px; }
+        .mobile-logout { display: none; color: var(--danger); font-size: 1.2rem; cursor: pointer; }
+        
+        /* PAGES & CARDS */
+        .page-section { display: none; padding: 30px; overflow-y: auto; height: 100%; box-sizing: border-box; } 
+        .page-section.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .card { background: var(--card-bg); border-radius: 12px; padding: 25px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0; }
+        .card.full-width { grid-column: 1 / -1; }
+        .card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; color: #0f172a; font-size: 1.1rem; font-weight: 600; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px;}
+        
+        /* BOTÕES & INPUTS */
+        .btn { border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-primary { background-color: var(--primary); color: white; } 
+        .btn-success { background-color: var(--success); color: white; } 
+        .btn-danger { background-color: var(--danger); color: white; } 
+        .btn-warning { background-color: var(--warning); color: white; }
+        .btn-whatsapp { background-color: var(--whatsapp); color: white; }
+        .btn-outline { background-color: transparent; border: 1px solid #cbd5e1; color: var(--text-main); }
+        .btn-block { width: 100%; margin-bottom: 10px; padding: 12px; }
+        input[type="text"], input[type="number"], textarea, select { width: 100%; padding: 12px; margin: 8px 0 15px 0; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; font-family: inherit; outline: none; }
+        input:focus, textarea:focus { border-color: var(--primary); }
 
-app.post('/api/saas/desconectar', async function(req, res) {
-    const { idCliente } = req.body;
-    if (!idCliente) return res.status(400).json({ erro: "ID necessário" });
-    try {
-        if (sessoesSaaS[idCliente]) {
-            logConsole('SaaS', `🔌 Desconectando sessão do cliente ${idCliente}...`);
-            try { await sessoesSaaS[idCliente].logout(); } catch(e) {}
-            try { await sessoesSaaS[idCliente].destroy(); } catch(e) {}
-            delete sessoesSaaS[idCliente];
-        }
-        await dbSaas.collection('clientes_premium').doc(idCliente).update({ qrCode: null, status: 'desconectado' });
-        res.json({ success: true, mensagem: "Desconectado com sucesso." });
-    } catch (e) { res.status(500).json({ erro: "Falha ao desconectar: " + e.message }); }
-});
+        /* STATUS & QR */
+        .status-box { display: flex; align-items: center; background-color: #f1f5f9; padding: 15px; border-radius: 10px; font-weight: 600; font-size: 0.95rem; margin-bottom: 15px;}
+        .status-indicator { width: 12px; height: 12px; background-color: #94a3b8; border-radius: 50%; margin-right: 10px; display: inline-block; transition: 0.3s;}
+        .status-indicator.online { background-color: var(--success); box-shadow: 0 0 8px var(--success); }
+        .qr-container { text-align: center; margin-top: 15px; padding: 15px; border: 2px dashed #cbd5e1; border-radius: 10px; display: none; background: white;}
 
-// ==========================================
-// 4. MEMÓRIA SAAS E CACHE DE LOJAS
-// ==========================================
-const sessoesSaaS = {}; 
-const sessoesPremium = {}; 
-const memoriaSaaSBasico = {}; 
-const cacheSaaSEmpresas = {}; 
+        /* CRM TABLE */
+        .table-container { background: white; border-radius: 12px; border: 1px solid #e2e8f0; overflow-x: auto; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); padding: 20px;}
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        th { background-color: #f8fafc; padding: 15px; text-align: left; color: #475569; border-bottom: 1px solid #e2e8f0; font-weight: 600; cursor: pointer;}
+        td { padding: 15px; border-bottom: 1px solid #f1f5f9; }
+        tr:hover { background-color: #f8fafc; }
+        .tag-pill { background: #e2e8f0; color: #475569; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; margin: 2px; }
+        .tag-remove { border: none; background: none; color: #ef4444; cursor: pointer; padding: 0 2px; }
 
-async function atualizarCacheSaaS() {
-    try {
-        const snap = await dbSaas.collection('empresas').get();
-        snap.forEach(doc => {
-            let numRaw = doc.data().whatsappLojista;
-            if (numRaw) { 
-                let n = String(numRaw).replace(/\D/g, ''); 
-                cacheSaaSEmpresas[n.length > 8 ? n.slice(-8) : n] = { id: doc.id, nome: doc.data().nomeEmpresa, plano: doc.data().plano || 'basico', zapOficial: n }; 
-            }
-        });
-    } catch(e) {}
-}
-setInterval(atualizarCacheSaaS, 60000); atualizarCacheSaaS();
+        /* MODAIS PADRÕES */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 10000; padding: 20px; }
+        .modal-content { background: white; padding: 30px; border-radius: 15px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+        .upload-box { border: 2px dashed #cbd5e1; padding: 20px; border-radius: 10px; background: #f8fafc; margin-bottom: 15px; text-align: center; cursor: pointer; }
+        .tabs { display: flex; border-bottom: 2px solid #e2e8f0; margin-bottom: 20px; overflow-x: auto; }
+        .tab-btn { flex: 1; background: none; border: none; padding: 12px; font-weight: 600; color: #64748b; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; white-space: nowrap;}
+        .tab-btn.active { color: var(--primary); border-color: var(--primary); }
+        .tab-content { display: none; } .tab-content.active { display: block; }
+        
+        /* 📱 DESIGN KIOSK (NOVO CARDÁPIO) */
+        .kiosk-modal { max-width: 900px !important; display: flex; flex-direction: column; padding: 0; overflow: hidden;}
+        .kiosk-header { background: #ea580c; color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .kiosk-header h2 { margin: 0; font-size: 1.4rem; }
+        .kiosk-body { display: flex; flex: 1; overflow: hidden; height: 75vh; }
+        .kiosk-sidebar { width: 200px; background: #fff; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; overflow-y: auto; }
+        .kiosk-nav-btn { padding: 15px 20px; border: none; background: none; text-align: left; font-weight: 600; color: #475569; cursor: pointer; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; gap: 10px; transition: 0.2s;}
+        .kiosk-nav-btn:hover { background: #f8fafc; }
+        .kiosk-nav-btn.active { background: #fff7ed; color: #ea580c; border-left: 4px solid #ea580c; }
+        .kiosk-content { flex: 1; padding: 20px; overflow-y: auto; background: #f8fafc; }
+        
+        .kiosk-form { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid #e2e8f0; display: flex; flex-wrap: wrap; gap: 10px; align-items: center;}
+        .kiosk-form input, .kiosk-form select { margin: 0; flex: 1; min-width: 120px; }
+        .kiosk-form button { margin: 0; white-space: nowrap; }
 
-function obterSaudacao() {
-    const hora = parseInt(new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: 'numeric', hour12: false }), 10);
-    if (hora >= 5 && hora < 12) return 'Bom dia'; if (hora >= 12 && hora < 18) return 'Boa tarde'; return 'Boa noite';
-}
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; }
+        .product-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 15px; text-align: center; position: relative; box-shadow: 0 4px 6px rgba(0,0,0,0.02); transition: 0.2s; }
+        .product-card:hover { transform: translateY(-3px); box-shadow: 0 10px 15px rgba(0,0,0,0.05); }
+        .product-card .icon { font-size: 2.5rem; margin-bottom: 10px; }
+        .product-card h4 { margin: 0 0 5px 0; color: #0f172a; font-size: 1rem; }
+        .product-card p { margin: 0; color: var(--success); font-weight: 700; font-size: 1.1rem; }
+        .product-card .del-btn { position: absolute; top: -8px; right: -8px; background: var(--danger); color: white; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
 
-// ==========================================
-// 5. MOTOR DA CENTRAL (Plano Básico)
-// ==========================================
-const client = new Client({
-    authStrategy: new LocalAuth({ clientId: 'central-bot' }),
-    puppeteer: { headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu', '--disable-web-security'], protocolTimeout: 300000 }
-});
+        .card-enviado-lateral { position: fixed; bottom: 20px; right: 20px; width: 320px; background: white; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); border-left: 5px solid var(--success); padding: 20px; z-index: 1500; display: none; }
+        .card-enviado-lateral.show { display: block; animation: slideInRight 0.3s ease-out; } @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
 
-client.on('qr', (qr) => logConsole('SISTEMA', 'O plano básico necessita da leitura do QR na Oracle (Opcional se focar só no Premium).'));
-client.on('disconnected', async (motivo) => { logConsole('SISTEMA', "❌ Central Desconectou! " + motivo); await avisarTelegram(`🚨 A CENTRAL SaaS caiu! Motivo: ${motivo}`); });
-
-client.on('message', async function(msg) {
-    if (msg.from === 'status@broadcast' || msg.from.includes('@g.us') || msg.from.includes('@newsletter') || msg.from === client.info.wid._serialized) return;
-    if (['e2e_notification', 'protocol', 'call_log', 'revoked'].includes(msg.type)) return;
-    
-    const chatId = msg.from || ''; 
-    // Interceptador do SaaS Básico (Avisa o cliente para falar direto no zap da loja)
-    if (memoriaSaaSBasico[chatId]) {
-        const loja = memoriaSaaSBasico[chatId];
-        const linkWa = loja.zap ? `wa.me/${loja.zap}` : `o número de atendimento da loja`;
-        await msg.reply(`🤖 *Atendimento Automático*\n\nVocê respondeu a uma campanha de *${loja.nome}*.\n\nFale diretamente com a loja clicando no link abaixo:\n👉 ${linkWa}`);
-        delete memoriaSaaSBasico[chatId]; 
-        return; 
-    }
-});
-
-// ==========================================
-// 6. FILA GLOBAL DE ENVIOS (O Coração do Disparo)
-// ==========================================
-const filaDeEnviosSaaS = []; 
-let isProcessandoFilaSaaS = false;
-
-app.post('/api/saas/disparar', async (req, res) => {
-    const d = req.body; 
-    res.json({ success: true, total: d.numeros.length, mensagem: "Adicionado à Fila Global" });
-    for (let num of d.numeros) filaDeEnviosSaaS.push({ ...d, numOriginal: num });
-    logConsole('SaaS', `📥 ${d.numeros.length} envios recebidos de ${d.nomeEmpresa}.`);
-}); 
-
-setInterval(async function() {
-    if (isProcessandoFilaSaaS || filaDeEnviosSaaS.length === 0) return;
-    isProcessandoFilaSaaS = true;
-
-    while (filaDeEnviosSaaS.length > 0) {
-        const disparo = filaDeEnviosSaaS.shift(); 
-        let roboParaDisparo = disparo.plano === 'premium' ? sessoesSaaS[disparo.idCliente] : client;
-        if (!roboParaDisparo) roboParaDisparo = client; 
-
-        try {
-            let numLimpo = String(disparo.numOriginal).replace(/\D/g, ''); 
-            if (!numLimpo.startsWith('55')) numLimpo = '55' + numLimpo; 
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .sidebar { position: fixed; bottom: 0; left: 0; width: 100%; height: 70px; flex-direction: row; padding: 0; box-shadow: 0 -4px 15px rgba(0,0,0,0.1); justify-content: space-around; align-items: center; z-index: 9999; }
+            .sidebar-header, .sidebar-footer { display: none; }
+            .sidebar-nav { display: flex; flex-direction: row; width: 100%; justify-content: space-around; padding: 0; }
+            .nav-item { flex-direction: column; gap: 4px; padding: 10px; font-size: 0.65rem; border-radius: 0; margin: 0; flex: 1; text-align: center; color: #cbd5e1; }
+            .nav-item i { font-size: 1.4rem; margin-bottom: 2px; }
+            .nav-item.active { background: transparent; color: #38bdf8; border-top: 3px solid #38bdf8; }
+            .topbar { padding: 15px; position: sticky; top: 0; z-index: 1000;}
+            .empresa-info h2 { font-size: 1.1rem; } .tag-plano { font-size: 0.65rem; } .mobile-logout { display: block; }
+            .main-content { overflow-y: auto; height: calc(100vh - 70px); }
+            .page-section { padding: 15px; padding-bottom: 90px; } 
             
-            let idValido = await roboParaDisparo.getNumberId(numLimpo);
-            if (!idValido) continue;
+            /* Kiosk Mobile Adjustments */
+            .kiosk-modal { height: 95vh; max-height: 95vh; border-radius: 15px 15px 0 0; top: auto; bottom: 0; padding: 0;}
+            .kiosk-body { flex-direction: column; }
+            .kiosk-sidebar { width: 100%; flex-direction: row; border-right: none; border-bottom: 1px solid #e2e8f0; overflow-x: auto; flex-shrink: 0; }
+            .kiosk-nav-btn { white-space: nowrap; padding: 12px; font-size: 0.85rem; border-bottom: none; border-left: none; }
+            .kiosk-nav-btn.active { border-bottom: 3px solid #ea580c; border-left: none; }
+            .kiosk-form { flex-direction: column; align-items: stretch; }
+            .product-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
 
-            let jid = idValido._serialized; 
-            let msgFinal = disparo.mensagem || "";
+    <aside class="sidebar">
+        <div class="sidebar-header"><i class="fa-solid fa-rocket" style="color: #60a5fa;"></i> Omnichannel</div>
+        <nav class="sidebar-nav">
+            <div class="nav-item active" onclick="trocarPagina('inicio', this)"><i class="fa-solid fa-house"></i> Início</div>
+            <div class="nav-item" onclick="trocarPagina('marketing', this)"><i class="fa-solid fa-bullhorn"></i> Marketing</div>
+            <div class="nav-item" onclick="trocarPagina('crm', this)"><i class="fa-solid fa-users"></i> Contatos</div>
+            <div class="nav-item" onclick="trocarPagina('config', this)"><i class="fa-solid fa-gear"></i> Ajustes</div>
+        </nav>
+        <div class="sidebar-footer"><div class="logout-btn" onclick="fazerLogout()"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sair do Painel</div></div>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <div class="empresa-info"><h2 id="nomeCliente">Carregando...</h2><div class="tag-plano" id="tagPlano"><i class="fa-solid fa-medal"></i> PRO</div></div>
+            <div class="mobile-logout" onclick="fazerLogout()"><i class="fa-solid fa-arrow-right-from-bracket"></i></div>
+        </header>
+
+        <section id="page-inicio" class="page-section active">
+            <h2 style="margin-top: 0; color: #0f172a;">Visão Geral</h2>
+            <div class="grid-cards">
+                <div class="card">
+                    <div class="card-header"><i class="fa-solid fa-robot"></i> Status do Motor</div>
+                    <div class="status-box" id="area-conexao-status"><span class="status-indicator" id="bolinha-status"></span><span id="texto-status">Verificando Servidor...</span></div>
+                    <div id="area-botao-conectar" style="display: flex; flex-direction: column; gap: 8px;"></div>
+                    <div class="qr-container" id="area-qr-code"><h4 id="status-texto-qr" style="color: var(--primary); margin-top: 0;">Gerando QR...</h4><img id="qrcode-imagem" style="max-width: 100%; border-radius: 8px; display: none; margin: 0 auto;"></div>
+                </div>
+                <div class="card">
+                    <div class="card-header"><i class="fa-solid fa-chart-simple"></i> Base de Contatos</div>
+                    <div style="background: #f1f5f9; padding: 20px; border-radius: 10px; text-align: center;"><h1 style="margin: 0; color: var(--primary); font-size: 3rem;" id="totalContatosCard">0</h1><p style="margin: 5px 0 0 0; color: #64748b; font-weight: 500;">Registros no CRM</p></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="page-marketing" class="page-section">
+            <h2 style="margin-top: 0; color: #0f172a;">Central de Ferramentas</h2>
+            <p style="color: var(--text-muted); margin-bottom: 30px;">Agende disparos e gerencie o marketing da sua empresa.</p>
+            <div class="grid-cards">
+                <div class="card"><div class="card-header"><i class="fa-solid fa-paper-plane"></i> Campanhas</div><p style="font-size: 0.9rem; color: #64748b; margin-bottom: 20px;">Envie promoções em massa via WhatsApp com 100% de entrega.</p><button class="btn btn-primary btn-block" onclick="abrirModalDisparo()"><i class="fa-solid fa-rocket"></i> Criar Campanha</button></div>
+                <div class="card"><div class="card-header" style="color: var(--danger);"><i class="fa-solid fa-file-invoice-dollar"></i> Cobranças</div><p style="font-size: 0.9rem; color: #64748b; margin-bottom: 20px;">Lembre seus clientes de faturas vencidas com chave PIX.</p><button class="btn btn-danger btn-block" onclick="abrirModalCobranca()"><i class="fa-solid fa-comments-dollar"></i> Enviar Cobranças</button></div>
+                <div class="card"><div class="card-header" style="color: var(--warning);"><i class="fa-solid fa-cake-candles"></i> Aniversários</div><p style="font-size: 0.9rem; color: #64748b; margin-bottom: 20px;">Configure parabéns automáticos diários para fidelizar.</p><button class="btn btn-warning btn-block" onclick="abrirModalAniversario()"><i class="fa-solid fa-gift"></i> Configurar</button></div>
+            </div>
+        </section>
+
+        <section id="page-crm" class="page-section">
+            <div class="crm-header">
+                <div><h2 style="margin: 0; color: #0f172a;">Gestão de Clientes</h2><p style="color: var(--text-muted); margin: 5px 0 0 0; font-size: 0.9rem;">Organize sua carteira com etiquetas.</p></div>
+                <div style="display: flex; gap: 10px;"><button class="btn btn-outline" onclick="exportarVCF()"><i class="fa-solid fa-download"></i> Exportar VCF</button><button class="btn btn-primary" onclick="abrirModalImportar()"><i class="fa-solid fa-upload"></i> Importar CSV/VCF</button></div>
+            </div>
+            <div class="table-container">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+                    <div style="position: relative; width: 100%; max-width: 300px;"><i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 12px; top: 12px; color: #94a3b8;"></i><input type="text" id="buscaContato" class="search-box" style="padding-left: 35px; width: 100%; margin:0;" placeholder="Buscar cliente..." onkeyup="renderizarTabela()"></div>
+                    <div style="display: flex; gap: 8px;"><button class="btn btn-outline" onclick="etiquetarSelecionados()"><i class="fa-solid fa-tags"></i> Etiquetar (VIP)</button><button class="btn btn-outline" style="color: var(--danger); border-color: #fca5a5;" onclick="apagarSelecionados()"><i class="fa-solid fa-trash"></i> Apagar</button></div>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead><tr><th style="width: 40px;"><input type="checkbox" id="checkTodos" onclick="alternarTodosChecks()"></th><th class="sortable" onclick="ordenarTabela('nome')">Nome ↕</th><th>WhatsApp</th><th class="sortable" onclick="ordenarTabela('nascimento')">Nasc. ↕</th><th class="sortable" onclick="ordenarTabela('tags')">Etiquetas ↕</th><th>Ações</th></tr></thead>
+                        <tbody id="tabelaContatos"><tr><td colspan="6" style="text-align: center; color: #999; padding: 40px;">Carregando CRM...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+        
+        <section id="page-config" class="page-section">
+            <h2 style="margin-top: 0; color: #0f172a;">Ajustes do Negócio</h2>
+            <div class="grid-cards">
+                <div class="card">
+                    <div class="card-header"><i class="fa-solid fa-store"></i> Perfil do Ramo</div>
+                    <select id="selectRamo" class="select-ramo">
+                        <option value="">Selecione uma opção...</option>
+                        <optgroup label="🍔 Setor de Alimentação"><option value="pizzaria">Pizzaria</option><option value="hamburgueria">Hamburgueria / Lanchonete</option></optgroup>
+                        <optgroup label="🛍️ Setor de Vendas"><option value="varejo">Comércio Geral</option></optgroup>
+                    </select>
+                    <button class="btn btn-primary" onclick="salvarConfigRamo()"><i class="fa-solid fa-save"></i> Atualizar Perfil</button>
+                </div>
+                <div class="card" id="cardFidelidade" style="display: none; border-color: #fdba74;">
+                    <div class="card-header" style="color: #ea580c;"><i class="fa-solid fa-pizza-slice"></i> Kiosk do Cardápio</div>
+                    <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 20px;">Abra o gerenciador visual para adicionar produtos e treinar a Inteligência Artificial do robô.</p>
+                    <button class="btn btn-block" style="background-color: #ea580c; color: white;" onclick="abrirModalCardapio()"><i class="fa-solid fa-desktop"></i> Abrir Gerenciador Visual</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div class="card-enviado-lateral" id="cardEnviado">
+        <h4 style="margin-top: 0; color: var(--success);"><i class="fa-solid fa-circle-check"></i> Fila Ativada</h4>
+        <div style="background: #e2e8f0; border-radius: 20px; height: 15px; overflow: hidden; margin-top: 10px;"><div id="barra-progresso-lateral" style="background: var(--success); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.65rem; font-weight: bold;">Oracle Processando...</div></div>
+        <button class="btn-outline" style="width: 100%; padding: 5px; font-size: 0.75rem; margin-top: 10px;" onclick="fecharCardLateral()">Ocultar</button>
+    </div>
+
+    <div class="modal" id="modalCardapio" style="padding: 10px;">
+        <div class="modal-content kiosk-modal" style="width: 100%; height: 95vh;">
             
-            if (disparo.plano === 'basico') { 
-                msgFinal += msgFinal ? `\n\n*${disparo.nomeEmpresa}*\n_Mensagem automática._` : `*${disparo.nomeEmpresa}*\n_Mensagem automática._`; 
-                memoriaSaaSBasico[jid] = { nome: disparo.nomeEmpresa, zap: disparo.zapLojista }; 
-            }
+            <div class="kiosk-header">
+                <div><h2 style="font-size: 1.2rem;"><i class="fa-solid fa-store"></i> Menu Kiosk</h2><p style="margin: 0; font-size: 0.8rem; opacity: 0.8;">Gerencie produtos e sincronize com o Robô</p></div>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn" style="background: rgba(255,255,255,0.2); color: white; font-size: 0.8rem;" onclick="document.getElementById('importarJsonCardapio').click()"><i class="fa-solid fa-file-import"></i> Importar JSON</button>
+                    <input type="file" id="importarJsonCardapio" accept=".json" style="display:none;" onchange="importarCardapioJson(event)">
+                    <button class="btn" style="background: rgba(0,0,0,0.3); color: white; border-radius: 50%; width: 40px; height: 40px; padding: 0;" onclick="fecharModalCardapio()"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+            </div>
 
-            if (disparo.midiaBase64 && disparo.midiaMime) {
-                const arquivoEnvio = new MessageMedia(disparo.midiaMime, disparo.midiaBase64, disparo.midiaNome || "arquivo");
-                await roboParaDisparo.sendMessage(jid, arquivoEnvio, { caption: msgFinal });
-            } else {
-                await roboParaDisparo.sendMessage(jid, msgFinal);
-            }
+            <div class="kiosk-body">
+                <div class="kiosk-sidebar">
+                    <button class="kiosk-nav-btn active" id="k-btn-setup" onclick="trocarKiosk('setup')"><i class="fa-solid fa-gear"></i> Ajustes Gerais</button>
+                    <button class="kiosk-nav-btn" id="k-btn-tamanhos" onclick="trocarKiosk('tamanhos')"><i class="fa-solid fa-ruler-combined"></i> Tamanhos</button>
+                    <button class="kiosk-nav-btn" id="k-btn-sabores" onclick="trocarKiosk('sabores')"><i class="fa-solid fa-pizza-slice"></i> Sabores</button>
+                    <button class="kiosk-nav-btn" id="k-btn-bordas" onclick="trocarKiosk('bordas')"><i class="fa-solid fa-cheese"></i> Bordas/Extras</button>
+                    <button class="kiosk-nav-btn" id="k-btn-porcoes" onclick="trocarKiosk('porcoes')"><i class="fa-solid fa-fries"></i> Porções/Bebidas</button>
+                </div>
 
-            const pausa = (disparo.midiaBase64) ? 15000 : 8000;
-            await new Promise(r => setTimeout(r, pausa + Math.random() * 5000));
-        } catch (e) { }
-    }
-    isProcessandoFilaSaaS = false;
-}, 3000); 
+                <div class="kiosk-content">
+                    
+                    <div id="k-aba-setup" style="display: block;">
+                        <h3 style="margin-top: 0; color: #0f172a;">Ajustes de Delivery</h3>
+                        <div class="kiosk-form" style="flex-direction: column; align-items: flex-start;">
+                            <label style="font-weight: 600; font-size: 0.9rem;">Imagem do Cardápio (Enviada no WhatsApp):</label>
+                            <input type="file" id="imgCardapio" accept="image/*" style="width: 100%;">
+                        </div>
+                        <div class="kiosk-form">
+                            <div><label style="font-size: 0.8rem; font-weight: bold;">Tempo Entrega:</label><input type="text" id="tempoEntrega" placeholder="Ex: 30 min"></div>
+                            <div><label style="font-size: 0.8rem; font-weight: bold;">Taxa Padrão (R$):</label><input type="number" id="taxaEntrega" placeholder="Ex: 5.00"></div>
+                            <div><label style="font-size: 0.8rem; font-weight: bold;">Fidelidade (Qtd):</label><input type="number" id="metaFidelidade" placeholder="Ex: 10"></div>
+                        </div>
+                    </div>
 
-// ==========================================
-// 7. CÉREBRO NLP DA PIZZARIA (CLIENTES PREMIUM)
-// ==========================================
-async function processarMensagemPizzaria(chatId, textoCompleto, sessao, clienteBot, dadosCardapio, nomeCliente) {
-    textoCompleto = textoCompleto.toLowerCase();
-    
-    let tamanhoEscolhido = null; if (dadosCardapio.tamanhos) { for (let t of dadosCardapio.tamanhos) { if (textoCompleto.includes(t.nome.toLowerCase())) { tamanhoEscolhido = t; break; } } }
-    let bordaEscolhida = null; if (dadosCardapio.bordas) { for (let b of dadosCardapio.bordas) { if (textoCompleto.includes(b.nome.toLowerCase())) { bordaEscolhida = b; break; } } }
-    let saboresEscolhidos = []; if (dadosCardapio.sabores) { for (let s of dadosCardapio.sabores) { if (textoCompleto.includes(s.nome.toLowerCase())) { saboresEscolhidos.push(s); } } }
-    let porcoesEscolhidas = []; if (dadosCardapio.porcoes) { for (let p of dadosCardapio.porcoes) { if (textoCompleto.includes(p.nome.toLowerCase())) { porcoesEscolhidas.push(p); } } }
-    
-    let isRetirada = textoCompleto.includes('buscar') || textoCompleto.includes('retirar') || textoCompleto.includes('balcão') || textoCompleto.includes('balcao') || textoCompleto.includes('pegamos');
+                    <div id="k-aba-tamanhos" style="display: none;">
+                        <div class="kiosk-form">
+                            <input type="text" id="tamNome" placeholder="Tamanho (Ex: Família)">
+                            <input type="number" id="tamQtd" placeholder="Máx Sabores">
+                            <input type="number" id="tamPreco" placeholder="Valor (Opcional)">
+                            <button class="btn btn-success" onclick="addObj('tamanhos')"><i class="fa-solid fa-plus"></i></button>
+                        </div>
+                        <div class="product-grid" id="listaTamanhos"></div>
+                    </div>
 
-    if (saboresEscolhidos.length > 0) {
-        if (!tamanhoEscolhido && dadosCardapio.tamanhos && dadosCardapio.tamanhos.length > 0) return await clienteBot.sendMessage(chatId, `Desculpe, qual o tamanho da pizza? (${dadosCardapio.tamanhos.map(t=>t.nome).join(', ')})`);
-        if (tamanhoEscolhido && saboresEscolhidos.length > parseInt(tamanhoEscolhido.qtd)) return await clienteBot.sendMessage(chatId, `⚠️ A pizza ${tamanhoEscolhido.nome} permite no máximo ${tamanhoEscolhido.qtd} sabores. Você escolheu ${saboresEscolhidos.length}. Pode ajustar?`);
-    } else if (porcoesEscolhidas.length === 0) {
-        return await clienteBot.sendMessage(chatId, `❌ Não identifiquei os sabores ou porções no seu pedido. Pode me dizer de uma forma mais simples, por favor?`);
-    }
+                    <div id="k-aba-sabores" style="display: none;">
+                        <div class="kiosk-form">
+                            <input type="text" id="saborNome" placeholder="Nome do Sabor (Ex: Calabresa)">
+                            <select id="saborCategoria"><option value="🍕">Salgada</option><option value="🍫">Doce</option></select>
+                            <input type="number" id="saborPreco" placeholder="R$ (Maior valor prevalece)">
+                            <button class="btn btn-success" onclick="addObj('sabores')"><i class="fa-solid fa-plus"></i></button>
+                        </div>
+                        <div class="product-grid" id="listaSabores"></div>
+                    </div>
 
-    let precoMaiorSabor = 0; saboresEscolhidos.forEach(s => { let p = parseFloat(s.preco || 0); if (p > precoMaiorSabor) precoMaiorSabor = p; });
-    let precoBorda = bordaEscolhida ? parseFloat(bordaEscolhida.preco || 0) : 0;
-    let precoPorcoes = 0; porcoesEscolhidas.forEach(p => precoPorcoes += parseFloat(p.preco || 0));
-    let taxaEnt = isRetirada ? 0 : parseFloat(dadosCardapio.taxaEntrega || 0);
-    let total = precoMaiorSabor + precoBorda + precoPorcoes + taxaEnt;
+                    <div id="k-aba-bordas" style="display: none;">
+                        <div class="kiosk-form">
+                            <input type="text" id="bordaNome" placeholder="Nome (Ex: Borda Catupiry)">
+                            <input type="number" id="bordaPreco" placeholder="Preço Adicional">
+                            <button class="btn btn-success" onclick="addObj('bordas')"><i class="fa-solid fa-plus"></i></button>
+                        </div>
+                        <div class="product-grid" id="listaBordas"></div>
+                    </div>
 
-    let resumo = `✅ *Anotado, ${nomeCliente || 'amigo(a)'}!* Confira:\n\n`;
-    if (saboresEscolhidos.length > 0) {
-        if (tamanhoEscolhido) resumo += `🍕 *Tamanho:* ${tamanhoEscolhido.nome}\n`;
-        resumo += `🧂 *Sabores:* ${saboresEscolhidos.map(s=>s.nome).join(', ')}\n`;
-        if (bordaEscolhida) resumo += `🧀 *Borda:* ${bordaEscolhida.nome} (+R$ ${precoBorda.toFixed(2)})\n`;
-    }
-    if (porcoesEscolhidas.length > 0) { resumo += `🍟 *Porções/Extras:* ${porcoesEscolhidas.map(p=>p.nome).join(', ')} (+R$ ${precoPorcoes.toFixed(2)})\n`; }
-    resumo += `\n🚚 *Logística:* ${isRetirada ? 'Retirada no Balcão' : 'Entrega'} ${!isRetirada && taxaEnt > 0 ? '(Taxa: R$ '+taxaEnt.toFixed(2)+')' : ''}\n\n💰 *Total: R$ ${total.toFixed(2)}*\n\n`;
-    
-    if (isRetirada) { resumo += `Digite *Sim* para confirmar ou *Cancelar*.`; sessao.estado = 'CONFIRMANDO_RETIRADA'; } 
-    else { resumo += `Para finalizar, digite o *Endereço de Entrega*.`; sessao.estado = 'CONFIRMANDO_ENDERECO'; }
-    
-    sessao.resumoPedido = resumo; sessao.dadosUltimoPedido = { total: total, isRetirada: isRetirada, metaFidelidade: dadosCardapio.metaFidelidade };
-    await clienteBot.sendMessage(chatId, resumo);
-}
+                    <div id="k-aba-porcoes" style="display: none;">
+                        <div class="kiosk-form">
+                            <input type="text" id="porcaoNome" placeholder="Item (Ex: Batata Média / Coca 2L)">
+                            <input type="number" id="porcaoPreco" placeholder="Preço Integral">
+                            <button class="btn btn-success" onclick="addObj('porcoes')"><i class="fa-solid fa-plus"></i></button>
+                        </div>
+                        <div class="product-grid" id="listaPorcoes"></div>
+                    </div>
 
-// ==========================================
-// 8. O MOTOR PREMIUM (CADA LOJA TEM O SEU)
-// ==========================================
-async function iniciarRoboCliente(idCliente) {
-    if (sessoesSaaS[idCliente]) return; 
-    logConsole('SaaS', `🤖 Iniciando instância Premium para: ${idCliente}`);
-    
-    const clienteBot = new Client({
-        authStrategy: new LocalAuth({ clientId: `cliente-${idCliente}` }),
-        puppeteer: { headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu', '--disable-web-security'] }
-    });
-    
-    clienteBot.on('qr', function(qr) { dbSaas.collection('clientes_premium').doc(idCliente).update({ qrCode: qr, status: 'aguardando_leitura' }); });
-    clienteBot.on('ready', function() { dbSaas.collection('clientes_premium').doc(idCliente).update({ qrCode: null, status: 'online' }); });
-    
-    clienteBot.on('message', async function(msg) {
-        if (msg.from === 'status@broadcast' || msg.from.includes('@g.us') || msg.from.includes('@newsletter') || msg.from === clienteBot.info.wid._serialized) return;
-        if (['e2e_notification', 'protocol', 'call_log', 'revoked'].includes(msg.type)) return;
-        if (!msg.body && !msg.hasMedia) return;
+                </div>
+            </div>
+            <div style="padding: 15px; background: white; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end;">
+                <button class="btn" style="background-color: #ea580c; color: white; width: 100%; font-size: 1rem; padding: 12px;" onclick="salvarCardapioNuvem()" id="btnSalvarCardapio"><i class="fa-solid fa-cloud-arrow-up"></i> Salvar na Oracle</button>
+            </div>
+        </div>
+    </div>
 
-        const chatId = msg.from;
-        const textoUser = msg.body.trim().toLowerCase();
+    <div class="modal" id="modalCobranca"><div class="modal-content"><h2 style="margin-top: 0; color: #dc3545;"><i class="fa-solid fa-file-invoice-dollar"></i> Cobranças</h2><label style="font-size: 0.9rem; font-weight: 600;">Selecione o Grupo Alvo:</label><div class="lista-selecao" id="listaTagsCobranca" style="max-height: 100px; overflow-y: auto;"></div><label style="font-size: 0.9rem; font-weight: 600;">Sua Chave PIX (Opcional):</label><input type="text" id="pixCobranca" placeholder="Ex: 12.345.678/0001-90"><label style="font-size: 0.9rem; font-weight: 600;">Mensagem:</label><textarea id="textoCobranca" rows="4">Olá {nome}! Tudo bem? Passando para lembrar que sua fatura vence nos próximos dias. Segue a chave PIX:</textarea><div style="display: flex; gap: 10px; justify-content: flex-end;"><button class="btn btn-outline" onclick="fecharModalCobranca()">Cancelar</button><button class="btn btn-danger" onclick="iniciarDisparoCobranca()"><i class="fa-solid fa-paper-plane"></i> Enviar</button></div></div></div>
+    <div class="modal" id="modalImportar"><div class="modal-content"><h2 style="margin-top: 0; color: var(--primary);"><i class="fa-solid fa-upload"></i> Importar Contatos</h2><input type="file" accept=".csv, .vcf" id="arquivoCsv"><div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px;"><button class="btn btn-outline" onclick="fecharModalImportar()">Cancelar</button><button class="btn btn-primary" onclick="iniciarImportacao()">Salvar</button></div></div></div>
+    <div class="modal" id="modalTag"><div class="modal-content" style="width: 400px;"><h2 style="margin-top: 0; color: var(--primary);"><i class="fa-solid fa-tags"></i> Etiquetar Clientes</h2><div id="areaTagsExistentes" style="margin-bottom: 15px; display: none;"><label style="font-size: 0.85rem; font-weight: bold; color: #666;">Salvas:</label><div id="botoesTagsSalvas" style="display: flex; flex-wrap: wrap; gap: 5px;"></div></div><label style="font-size: 0.85rem; font-weight: bold;">Nova Tag:</label><input type="text" id="nomeNovaTag" placeholder="Ex: VIP"><div style="display: flex; gap: 10px; justify-content: flex-end;"><button class="btn btn-outline" onclick="fecharModalTag()">Cancelar</button><button class="btn btn-primary" onclick="salvarTagMassa()">Aplicar</button></div></div></div>
+    <div class="modal" id="modalAniversario"><div class="modal-content"><h2 style="margin-top: 0; color: var(--warning);"><i class="fa-solid fa-cake-candles"></i> Aniversário</h2><div class="upload-box"><input type="file" id="arquivoMidiaAniversario" accept="image/*"></div><label style="font-size: 0.9rem; font-weight: 600;">Texto (Use {nome}):</label><textarea id="textoAniversario" rows="4"></textarea><div style="display: flex; gap: 10px; justify-content: flex-end;"><button class="btn btn-outline" onclick="fecharModalAniversario()">Cancelar</button><button class="btn btn-warning" id="btnSalvarAniversario" onclick="salvarConfigAniversario()">Salvar</button></div></div></div>
+    <div class="modal" id="modalDisparo"><div class="modal-content"><h2 style="margin-top: 0; color: var(--primary);"><i class="fa-solid fa-rocket"></i> Disparo em Massa</h2><div class="tabs"><button class="tab-btn active" onclick="trocarAba('tags')" id="btn-tags">🏷️ Por Tag</button><button class="tab-btn" onclick="trocarAba('avulso')" id="btn-avulso">✏️ Números</button></div><div id="aba-tags" class="tab-content active"><div class="lista-selecao" id="listaTagsDisparo" style="max-height: 100px; overflow-y: auto;"></div></div><div id="aba-avulso" class="tab-content"><textarea id="listaNumeros" rows="3" placeholder="Cole números (um por linha)"></textarea></div><label style="font-size: 0.9rem; font-weight: 600;">Foto (Máx 5MB):</label><div class="upload-box" style="padding: 10px;"><input type="file" id="arquivoMidia" accept="image/*, application/pdf"></div><label style="font-size: 0.9rem; font-weight: 600;">Texto da Campanha:</label><textarea id="mensagemPromo" rows="4"></textarea><div style="display: flex; gap: 10px; justify-content: flex-end;"><button class="btn btn-outline" onclick="fecharModalDisparo()">Cancelar</button><button class="btn btn-primary" onclick="iniciarDisparo()"><i class="fa-solid fa-paper-plane"></i> Disparar Fila</button></div></div></div>
 
-        if (!sessoesPremium[idCliente]) sessoesPremium[idCliente] = {};
-        if (!sessoesPremium[idCliente][chatId]) sessoesPremium[idCliente][chatId] = { estado: 'LIVRE', pausadoAte: 0, timerCarrinho: null, bufferMensagens: [], timerBuffer: null };
-        const sessao = sessoesPremium[idCliente][chatId];
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // 🛡️ TRANSBORDO HUMANO
-        if (sessao.pausadoAte > Date.now()) return;
+        const firebaseConfig = { apiKey: "AIzaSyC4-2LavZt7iWPt2u71u-yRUYbIJu-Vzf0", authDomain: "central-omnichannel-saas.firebaseapp.com", projectId: "central-omnichannel-saas", storageBucket: "central-omnichannel-saas.firebasestorage.app", messagingSenderId: "869327159480", appId: "1:869327159480:web:605be5ec37ab688d44b44d" };
+        const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
 
-        if (['cancelar', 'sair', 'voltar', 'menu'].includes(textoUser)) {
-            sessao.estado = 'LIVRE'; clearTimeout(sessao.timerCarrinho); clearTimeout(sessao.timerBuffer); sessao.bufferMensagens = [];
+        window.listaContatos = []; window.idClienteLogado = ""; window.planoClienteLogado = "basico"; window.nomeLojista = ""; window.zapLojista = "";
+        window.ordemAtual = { coluna: '', direcao: 'asc' }; window.menuData = { tamanhos: [], bordas: [], sabores: [], porcoes: [] };
+
+        window.trocarPagina = function(idAba, el) { document.querySelectorAll('.page-section').forEach(e => e.classList.remove('active')); document.querySelectorAll('.nav-item').forEach(e => e.classList.remove('active')); document.getElementById('page-' + idAba).classList.add('active'); el.classList.add('active'); }
+        window.trocarAba = (a) => { document.querySelectorAll('#modalDisparo .tab-btn, #modalDisparo .tab-content').forEach(e=>e.classList.remove('active')); document.getElementById('aba-'+a).classList.add('active'); document.getElementById('btn-'+a).classList.add('active'); };
+        
+        // NAVEGAÇÃO DO KIOSK
+        window.trocarKiosk = function(aba) {
+            document.querySelectorAll('.kiosk-nav-btn').forEach(e=>e.classList.remove('active'));
+            document.getElementById('k-btn-'+aba).classList.add('active');
+            document.getElementById('k-aba-setup').style.display = 'none';
+            document.getElementById('k-aba-tamanhos').style.display = 'none';
+            document.getElementById('k-aba-sabores').style.display = 'none';
+            document.getElementById('k-aba-bordas').style.display = 'none';
+            document.getElementById('k-aba-porcoes').style.display = 'none';
+            document.getElementById('k-aba-'+aba).style.display = 'block';
         }
 
-        const empDoc = await dbSaas.collection('empresas').doc(idCliente).get();
-        const confDoc = await dbSaas.collection('configuracoes_loja').doc(idCliente).get();
-        const crmDoc = await dbSaas.collection('crm_clientes').doc(idCliente).get();
-
-        const nomeEmpresa = empDoc.exists ? empDoc.data().nomeEmpresa : "Nossa Loja";
-        const ramoLoja = confDoc.exists ? confDoc.data().ramo : "varejo";
-
-        let nomeCliente = ""; let numLimpo = String(chatId).replace(/\D/g, '').replace('55', '');
-        if (crmDoc.exists && crmDoc.data().contatos) {
-            const clienteCRM = crmDoc.data().contatos.find(c => c.telefone.includes(numLimpo));
-            if (clienteCRM) nomeCliente = clienteCRM.nome.split(' ')[0];
-        }
-        const saudacaoHora = obterSaudacao(); const chamamento = nomeCliente ? `${saudacaoHora}, *${nomeCliente}*!` : `${saudacaoHora}!`;
-
-        if (textoUser === 'falar com atendente' || textoUser === 'humano' || textoUser === 'atendente') {
-            await clienteBot.sendMessage(chatId, `Certo${nomeCliente ? ', ' + nomeCliente : ''}! Chamei a equipa. Eles vão te responder por aqui mesmo em instantes. ⏳`);
-            sessao.pausadoAte = Date.now() + (60 * 60 * 1000); sessao.estado = 'LIVRE'; return;
+        // ==========================================
+        // WHATSAPP (BOTÃO VERDE)
+        // ==========================================
+        window.conectarRoboPremium = async function() {
+            const btn = document.getElementById('btnConectarZapBase');
+            if(btn) { btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Acionando Oracle...'; btn.disabled = true; }
+            try {
+                const res = await fetch('/api-oracle/api/saas/conectar', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-senha': '123321' }, body: JSON.stringify({ idCliente: window.idClienteLogado }) });
+                if (!res.ok) throw new Error("Erro");
+                document.getElementById('area-qr-code').style.display = 'block'; document.getElementById('status-texto-qr').innerText = "Gerando QR Code..."; document.getElementById('qrcode-imagem').style.display = 'none';
+            } catch(e) { alert("❌ Verifique o vercel.json e o IP do servidor."); if(btn) { btn.innerHTML = '<i class="fa-brands fa-whatsapp"></i> Ligar Meu WhatsApp'; btn.disabled = false; } }
         }
 
-        // 🍕 FLUXO ALIMENTAÇÃO
-        if (['pizzaria', 'hamburgueria', 'restaurante'].includes(ramoLoja)) {
-            const cardapioDoc = await dbSaas.collection('cardapios_loja').doc(idCliente).get();
-            if (!cardapioDoc.exists || (!cardapioDoc.data().sabores && !cardapioDoc.data().porcoes)) {
-                if (sessao.estado === 'LIVRE') {
-                    await clienteBot.sendMessage(chatId, `${chamamento} Bem-vindo à *${nomeEmpresa}*!\n\nAguarde um instante, um atendente já vai falar com você. ⏳`);
-                    sessao.pausadoAte = Date.now() + (60 * 60 * 1000);
-                } return;
-            }
-            const dadosCardapio = cardapioDoc.data();
+        window.desconectarRoboPremium = async function() {
+            if(!confirm("⚠️ Desligar o robô de vendas do seu WhatsApp?")) return;
+            try { await fetch('/api-oracle/api/saas/desconectar', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-senha': '123321' }, body: JSON.stringify({ idCliente: window.idClienteLogado }) }); document.getElementById('area-qr-code').style.display = 'none'; } catch(e) {}
+        }
 
-            if (sessao.estado === 'LIVRE') {
-                sessao.estado = 'MENU_ALIMENTACAO';
-                await clienteBot.sendMessage(chatId, `${chamamento} Bem-vindo à *${nomeEmpresa}*! 🍕\n\nComo posso ajudar hoje?\n\n*1️⃣* - Fazer Pedido\n*2️⃣* - Falar com Atendente`); return;
-            }
-
-            if (sessao.estado === 'MENU_ALIMENTACAO') {
-                if (textoUser === '1' || textoUser.includes('pedido') || textoUser.includes('cardapio')) {
-                    sessao.estado = 'ESCOLHENDO_ITENS';
-                    let msgC = `👉 *Para pedir, digite exatamente o que deseja* (Ex: Quero uma Média de Calabresa com borda de Cheddar).`;
-                    if (dadosCardapio.imgMenuBase64) {
-                        try { await clienteBot.sendMessage(chatId, new MessageMedia(dadosCardapio.mimeMenu, dadosCardapio.imgMenuBase64, 'cardapio'), { caption: msgC }); } 
-                        catch(e) { await clienteBot.sendMessage(chatId, msgC); }
-                    } else { await clienteBot.sendMessage(chatId, msgC); }
-
-                    clearTimeout(sessao.timerCarrinho);
-                    sessao.timerCarrinho = setTimeout(async () => {
-                        if (sessoesPremium[idCliente][chatId] && sessoesPremium[idCliente][chatId].estado === 'ESCOLHENDO_ITENS') {
-                            await clienteBot.sendMessage(chatId, `Oi ${nomeCliente || 'amigo(a)'}! Bateu aquela dúvida no cardápio ou posso te ajudar a fechar o pedido de hoje? 🤤🍕`);
-                            sessoesPremium[idCliente][chatId].estado = 'LIVRE';
-                        }
-                    }, 30 * 60 * 1000); return;
+        onAuthStateChanged(auth, async function(user) {
+            if (user) {
+                window.idClienteLogado = user.uid;
+                const snap = await getDoc(doc(db, "empresas", user.uid));
+                if (snap.exists()) {
+                    const d = snap.data(); window.planoClienteLogado = d.plano || 'basico';
+                    window.nomeLojista = d.nomeEmpresa; window.zapLojista = d.whatsappLojista || "";
+                    document.getElementById('nomeCliente').innerText = d.nomeEmpresa; window.carregarContatosLocal(); 
+                    
+                    const areaBtn = document.getElementById('area-botao-conectar');
+                    if (d.plano === 'basico') { 
+                        document.getElementById('bolinha-status').className = 'status-indicator online'; document.getElementById('texto-status').innerText = "Motor Global Online"; areaBtn.innerHTML = '';
+                    } else { 
+                        onSnapshot(doc(db, "clientes_premium", window.idClienteLogado), (docSnap) => {
+                            if(docSnap.exists()) {
+                                const dataRobo = docSnap.data();
+                                if(dataRobo.status === 'iniciando') {
+                                    document.getElementById('area-qr-code').style.display = 'block'; document.getElementById('status-texto-qr').innerText = "Iniciando Motor...";
+                                } else if(dataRobo.qrCode) {
+                                    document.getElementById('area-qr-code').style.display = 'block'; document.getElementById('status-texto-qr').innerText = "Aponte o celular para o QR Code:";
+                                    QRCode.toDataURL(dataRobo.qrCode, { width: 250, margin: 2 }, function (err, url) { if(!err) { const img = document.getElementById('qrcode-imagem'); img.src = url; img.style.display = 'block'; } });
+                                    document.getElementById('bolinha-status').className = 'status-indicator'; document.getElementById('texto-status').innerText = "Aguardando leitura...";
+                                } else if(dataRobo.status === 'online') {
+                                    document.getElementById('area-qr-code').style.display = 'none'; document.getElementById('bolinha-status').className = 'status-indicator online'; document.getElementById('texto-status').innerText = "Conectado e Vendendo!";
+                                    if(areaBtn) areaBtn.innerHTML = `<button class="btn btn-outline" disabled style="border-color: var(--success); color: var(--success);"><i class="fa-solid fa-check-double"></i> WhatsApp Operante</button><button class="btn btn-danger" onclick="desconectarRoboPremium()"><i class="fa-solid fa-plug-circle-xmark"></i> Desconectar</button>`;
+                                } else {
+                                    document.getElementById('area-qr-code').style.display = 'none'; document.getElementById('bolinha-status').className = 'status-indicator'; document.getElementById('texto-status').innerText = "Motor Desligado";
+                                    if(areaBtn) areaBtn.innerHTML = `<button id="btnConectarZapBase" class="btn btn-whatsapp" onclick="conectarRoboPremium()"><i class="fa-brands fa-whatsapp"></i> Ligar Meu WhatsApp</button>`;
+                                }
+                            }
+                        });
+                    }
                 }
-            }
+                try { const sC = await getDoc(doc(db, "configuracoes_loja", window.idClienteLogado)); if(sC.exists() && sC.data().ramo) { document.getElementById('selectRamo').value = sC.data().ramo; window.verificarRamoAtivo(sC.data().ramo); } } catch(e) {}
+            } else window.location.href = "index.html";
+        });
 
-            if (sessao.estado === 'ESCOLHENDO_ITENS') {
-                sessao.bufferMensagens.push(msg.body);
-                clearTimeout(sessao.timerBuffer);
-                sessao.timerBuffer = setTimeout(async () => {
-                    let textoAgrupado = sessao.bufferMensagens.join(' '); sessao.bufferMensagens = []; clearTimeout(sessao.timerCarrinho); 
-                    await processarMensagemPizzaria(chatId, textoAgrupado, sessao, clienteBot, dadosCardapio, nomeCliente);
-                }, 6000); return;
-            }
+        // ==========================================
+        // 🍕 KIOSK: IMPORTADOR E GESTÃO
+        // ==========================================
+        window.salvarConfigRamo = async function() { const r = document.getElementById('selectRamo').value; if(!r) return; await setDoc(doc(db, "configuracoes_loja", window.idClienteLogado), { ramo: r }, { merge: true }); window.verificarRamoAtivo(r); alert('Salvo!'); }
+        window.verificarRamoAtivo = function(r) { const c = document.getElementById('cardFidelidade'); if (['pizzaria', 'hamburgueria', 'restaurante'].includes(r)) c.style.display = 'block'; else c.style.display = 'none'; }
 
-            if (sessao.estado === 'CONFIRMANDO_ENDERECO' || sessao.estado === 'CONFIRMANDO_RETIRADA') {
-                if (textoUser.includes('cancel')) { sessao.estado = 'LIVRE'; return await clienteBot.sendMessage(chatId, `Pedido cancelado. Voltamos ao início!`); }
-                let end = sessao.estado === 'CONFIRMANDO_ENDERECO' ? msg.body : 'Retirada no Balcão'; sessao.estado = 'LIVRE';
-                let respostaFinal = `🎉 *Pedido Finalizado com Sucesso!* 🎉\n\nEntregaremos em: ${end}\n${dadosCardapio.tempoEntrega ? '⏱️ Previsão: ' + dadosCardapio.tempoEntrega + '\n' : ''}\nO seu pedido já está a ser preparado! 👨‍🍳`;
-                
-                let metaF = parseInt(sessao.dadosUltimoPedido.metaFidelidade || 0);
-                if (metaF > 0) respostaFinal += `\n\n🎁 *Fidelidade:* Lembre-se, a cada ${metaF} pedidos, você ganha uma recompensa por nossa conta! Obrigado, ${nomeCliente || 'amigo(a)'}!`;
-
-                await clienteBot.sendMessage(chatId, respostaFinal);
-                sessao.pausadoAte = Date.now() + (2 * 60 * 60 * 1000); // Pausa 2h
-                return;
-            }
-        } 
-        else {
-            if (sessao.estado === 'LIVRE') {
-                await clienteBot.sendMessage(chatId, `${chamamento} Bem-vindo à *${nomeEmpresa}*!\n\nAguarde um instante, a equipa já vai falar com você. ⏳`);
-                sessao.pausadoAte = Date.now() + (60 * 60 * 1000);
-            }
+        window.abrirModalCardapio = async function() {
+            if (window.planoClienteLogado === 'basico') return alert("⚠️ Recurso Premium!");
+            document.getElementById('modalCardapio').style.display = 'flex';
+            try {
+                const s = await getDoc(doc(db, "cardapios_loja", window.idClienteLogado));
+                if(s.exists()) {
+                    let d = s.data(); window.menuData.tamanhos = d.tamanhos || []; window.menuData.bordas = d.bordas || []; 
+                    window.menuData.sabores = d.sabores || []; window.menuData.porcoes = d.porcoes || [];
+                    document.getElementById('tempoEntrega').value = d.tempoEntrega || ''; document.getElementById('taxaEntrega').value = d.taxaEntrega || '';
+                    document.getElementById('metaFidelidade').value = d.metaFidelidade || '';
+                    renderCards();
+                }
+            } catch(e) {}
         }
-    });
+        window.fecharModalCardapio = () => document.getElementById('modalCardapio').style.display = 'none';
 
-    clienteBot.initialize(); sessoesSaaS[idCliente] = clienteBot; 
-}
-
-// ==========================================
-// 9. CRON ANIVERSÁRIOS
-// ==========================================
-let ultimoDiaAniversario = null;
-async function processarAniversariantesSaaS() {
-    const hoje = new Date(); const dia = String(hoje.getDate()).padStart(2, '0'); const mes = String(hoje.getMonth() + 1).padStart(2, '0'); const dataHojeBr = `${dia}/${mes}`;
-    if (hoje.getHours() < 8 || ultimoDiaAniversario === dataHojeBr) return;
-    ultimoDiaAniversario = dataHojeBr; 
-
-    try {
-        const configuracoesLojas = await dbSaas.collection('configuracoes_loja').get();
-        for (let docConfig of configuracoesLojas.docs) {
-            const config = docConfig.data(); const idLojista = docConfig.id;
-            if (!config.msgAniversario) continue; 
-            const crmDoc = await dbSaas.collection('crm_clientes').doc(idLojista).get();
-            if (!crmDoc.exists || !crmDoc.data().contatos) continue;
-
-            const contatos = crmDoc.data().contatos; let aniversariantesDeHoje = [];
-            for(let i=0; i<contatos.length; i++) { if (contatos[i].aniversario === dataHojeBr) aniversariantesDeHoje.push(contatos[i]); }
-            if (aniversariantesDeHoje.length === 0) continue;
-
-            const empDoc = await dbSaas.collection('empresas').doc(idLojista).get();
-            let nomeDaEmpresa = empDoc.exists ? empDoc.data().nomeEmpresa : "A nossa Loja";
-            let planoDaEmpresa = empDoc.exists ? empDoc.data().plano : "basico";
-            let zapOficialDaLoja = empDoc.exists ? empDoc.data().whatsappLojista : "";
-            let roboParaDisparar = (planoDaEmpresa === 'premium' && sessoesSaaS[idLojista]) ? sessoesSaaS[idLojista] : client;
-            
-            for (let niver of aniversariantesDeHoje) {
-                let numLimpoAlvo = String(niver.telefone).replace(/\D/g, ''); if (!numLimpoAlvo.startsWith('55')) numLimpoAlvo = '55' + numLimpoAlvo; 
-                let idVerificado = await roboParaDisparar.getNumberId(numLimpoAlvo); if (!idVerificado) continue; 
-                let jid = idVerificado._serialized; let nomeCurto = niver.nome.split(' ')[0];
-                let textoFinalAniversario = config.msgAniversario.replace(/{nome}/gi, nomeCurto);
-
-                if (planoDaEmpresa === 'basico') { textoFinalAniversario += `\n\n*${nomeDaEmpresa}*\n_Mensagem automática._`; memoriaSaaSBasico[jid] = { nome: nomeDaEmpresa, zap: zapOficialDaLoja }; }
+        window.importarCardapioJson = function(event) {
+            const file = event.target.files[0]; if(!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
                 try {
-                    if (config.imgAniversario && config.mimeAniversario) { await roboParaDisparar.sendMessage(jid, new MessageMedia(config.mimeAniversario, config.imgAniversario, config.nomeAniversario || "aniversario.png"), { caption: textoFinalAniversario }); } 
-                    else { await roboParaDisparar.sendMessage(jid, textoFinalAniversario); }
-                    logConsole('SaaS', `✅ Parabéns enviado para ${niver.nome}`);
-                } catch (err) {}
-                await new Promise(r => setTimeout(r, Math.floor(Math.random() * (15000 - 8000 + 1)) + 8000));
-            }
+                    const j = JSON.parse(e.target.result);
+                    if(j.tamanhos) window.menuData.tamanhos = j.tamanhos; if(j.bordas) window.menuData.bordas = j.bordas;
+                    if(j.sabores) window.menuData.sabores = j.sabores; if(j.porcoes) window.menuData.porcoes = j.porcoes;
+                    renderCards(); alert("✅ JSON Importado! Salve na Oracle.");
+                } catch(err) { alert("❌ Arquivo inválido."); }
+            }; reader.readAsText(file); event.target.value = ''; 
         }
-    } catch(e) {}
-}
-setInterval(processarAniversariantesSaaS, 600000);
 
-// ==========================================
-// 10. INICIALIZAÇÃO
-// ==========================================
-app.listen(3000, () => logConsole('SISTEMA', '🚀 API Inciada na porta 3000'));
-client.initialize();
+        window.addObj = function(tipo) {
+            if(tipo === 'tamanhos') {
+                const n=document.getElementById('tamNome').value, q=document.getElementById('tamQtd').value, p=document.getElementById('tamPreco').value;
+                if(!n) return; window.menuData.tamanhos.push({nome: n, qtd: q||1, preco: p||0});
+                document.getElementById('tamNome').value=''; document.getElementById('tamQtd').value=''; document.getElementById('tamPreco').value='';
+            } else if(tipo === 'bordas') {
+                const n=document.getElementById('bordaNome').value, p=document.getElementById('bordaPreco').value;
+                if(!n) return; window.menuData.bordas.push({nome: n, preco: p||0});
+                document.getElementById('bordaNome').value=''; document.getElementById('bordaPreco').value='';
+            } else if(tipo === 'sabores') {
+                const n=document.getElementById('saborNome').value, c=document.getElementById('saborCategoria').value, p=document.getElementById('saborPreco').value;
+                if(!n) return; window.menuData.sabores.push({nome: n, cat: c, preco: p||0});
+                document.getElementById('saborNome').value=''; document.getElementById('saborPreco').value='';
+            } else if(tipo === 'porcoes') {
+                const n=document.getElementById('porcaoNome').value, p=document.getElementById('porcaoPreco').value;
+                if(!n) return; window.menuData.porcoes.push({nome: n, preco: p||0});
+                document.getElementById('porcaoNome').value=''; document.getElementById('porcaoPreco').value='';
+            } renderCards();
+        }
+        window.removeObj = (tipo, idx) => { window.menuData[tipo].splice(idx, 1); renderCards(); }
+
+        window.renderCards = function() {
+            const r = (arr, elId, t) => {
+                let h=''; if(!arr || arr.length===0) h='<p style="color:#999; font-size:0.8rem; text-align:center;">Vazio.</p>';
+                else arr.forEach((o, i) => { 
+                    h+=`<div class="product-card">
+                        <button class="del-btn" onclick="removeObj('${t}', ${i})"><i class="fa-solid fa-xmark"></i></button>
+                        ${o.cat ? `<div class="icon">${o.cat}</div>` : (t === 'porcoes' ? '<div class="icon">🍟</div>' : '')}
+                        <h4>${o.nome}</h4>
+                        <p>${o.preco > 0 ? 'R$ '+o.preco : (o.qtd ? 'Máx '+o.qtd+' Sabores' : 'Sem Custo')}</p>
+                    </div>` 
+                }); document.getElementById(elId).innerHTML = h;
+            };
+            r(window.menuData.tamanhos, 'listaTamanhos', 'tamanhos'); r(window.menuData.bordas, 'listaBordas', 'bordas');
+            r(window.menuData.sabores, 'listaSabores', 'sabores'); r(window.menuData.porcoes, 'listaPorcoes', 'porcoes');
+        }
+
+        window.salvarCardapioNuvem = async function() {
+            const btn = document.getElementById('btnSalvarCardapio'); btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; btn.disabled = true;
+            const im = document.getElementById('imgCardapio').files[0]; let b64=null, mi=null;
+            if(im) { if((im.size/1024/1024)>5){btn.innerHTML='Salvar na Oracle';btn.disabled=false;return alert("Máx 5MB.");} const l=new FileReader(); b64=await new Promise((r)=>{l.onload=(e)=>r(e.target.result.split(',')[1]);l.readAsDataURL(im);}); mi=im.type; }
+            try {
+                let payload = { tamanhos: window.menuData.tamanhos, bordas: window.menuData.bordas, sabores: window.menuData.sabores, porcoes: window.menuData.porcoes, tempoEntrega: document.getElementById('tempoEntrega').value, taxaEntrega: document.getElementById('taxaEntrega').value, metaFidelidade: document.getElementById('metaFidelidade').value };
+                if(b64){ payload.imgMenuBase64=b64; payload.mimeMenu=mi; }
+                await setDoc(doc(db,"cardapios_loja",window.idClienteLogado), payload, {merge:true}); alert("✅ Robô Atualizado!"); fecharModalCardapio();
+            } catch(e) {} btn.innerHTML='<i class="fa-solid fa-cloud-arrow-up"></i> Salvar na Oracle'; btn.disabled=false;
+        }
+
+        // ==========================================
+        // CRM RESTAURADO (Importação, Tabelas, Tags)
+        // ==========================================
+        window.salvarContatosLocal = async function() { if (window.idClienteLogado) { localStorage.setItem('crm_'+window.idClienteLogado, JSON.stringify(window.listaContatos)); try { await setDoc(doc(db,"crm_clientes",window.idClienteLogado),{contatos:window.listaContatos}); }catch(e){} document.getElementById('totalContatosCard').innerText=window.listaContatos.length; } }
+        window.carregarContatosLocal = function() { if (window.idClienteLogado) { const d=localStorage.getItem('crm_'+window.idClienteLogado); if(d) {window.listaContatos=JSON.parse(d); renderizarTabela(); document.getElementById('totalContatosCard').innerText=window.listaContatos.length;} } }
+        window.ordenarTabela = function(c) { if (window.ordemAtual.coluna===c) window.ordemAtual.direcao=window.ordemAtual.direcao==='asc'?'desc':'asc'; else {window.ordemAtual.coluna=c; window.ordemAtual.direcao='asc';} window.listaContatos.sort((a,b)=>{let vA='';let vB=''; if(c==='nome'){vA=a.nome.toLowerCase();vB=b.nome.toLowerCase();}else if(c==='nascimento'){vA=a.aniversario||'';vB=b.aniversario||'';}else if(c==='tags'){vA=(a.tags&&a.tags.length>0)?a.tags[0].toLowerCase():'z';vB=(b.tags&&b.tags.length>0)?b.tags[0].toLowerCase():'z';} if(vA<vB) return window.ordemAtual.direcao==='asc'?-1:1; if(vA>vB) return window.ordemAtual.direcao==='asc'?1:-1; return 0;}); renderizarTabela(); }
+        window.renderizarTabela = function() { const co=document.getElementById('tabelaContatos'), bu=document.getElementById('buscaContato').value.toLowerCase(); let lf=window.listaContatos.filter(c=>c.nome.toLowerCase().includes(bu)||c.telefone.includes(bu)); if(lf.length===0){co.innerHTML='<tr><td colspan="6" style="text-align: center; padding: 40px; color: #94a3b8;">Nenhum contato.</td></tr>';return;} let h=''; for(let i=0;i<lf.length;i++){let c=lf[i];let ht=''; if(c.tags){c.tags.forEach(t=>ht+=`<span class="tag-pill"><i class="fa-solid fa-tag" style="font-size:0.6rem;"></i> ${t} <button class="tag-remove" onclick="removerTagDoContato('${c.id}', '${t}')">×</button></span>`);} h+=`<tr><td><input type="checkbox" class="check-contato" value="${c.id}"></td><td><strong>${c.nome}</strong></td><td>${c.telefone}</td><td><input type="text" style="width:70px; padding:6px;" placeholder="DD/MM" value="${c.aniversario||''}" onchange="atualizarNascimento('${c.id}', this.value)"></td><td>${ht}</td><td><button class="btn btn-outline" style="padding: 5px 10px; color: var(--danger); border-color: #fca5a5;" onclick="apagarContato('${c.id}')"><i class="fa-solid fa-trash"></i></button></td></tr>`;} co.innerHTML=h; }
+        window.removerTagDoContato = function(id, tag) { if(!confirm(`Remover etiqueta "${tag}"?`)) return; window.listaContatos.forEach(c=>{if(c.id===id) c.tags=c.tags.filter(t=>t!==tag);}); renderizarTabela(); window.salvarContatosLocal(); }
+        window.atualizarNascimento = (id, nova) => { let d=nova.replace(/\D/g, '');if(d.length>=4)d=d.substring(0,2)+'/'+d.substring(2,4);for(let i=0;i<window.listaContatos.length;i++){if(window.listaContatos[i].id===id){window.listaContatos[i].aniversario=d;break;}}window.salvarContatosLocal(); }
+        window.apagarContato = (id) => { if(confirm("Apagar?")){window.listaContatos=window.listaContatos.filter(c=>c.id!==id);renderizarTabela();window.salvarContatosLocal();} }
+        window.apagarSelecionados = () => { const c=document.querySelectorAll('.check-contato:checked');if(c.length===0)return alert("⚠️ Selecione!");if(confirm(`Excluir ${c.length} contatos?`)){let i=Array.from(c).map(x=>x.value);window.listaContatos=window.listaContatos.filter(x=>!i.includes(x.id));renderizarTabela();window.salvarContatosLocal();document.getElementById('checkTodos').checked=false;} }
+        window.alternarTodosChecks = () => document.querySelectorAll('.check-contato').forEach(c=>c.checked=document.getElementById('checkTodos').checked);
+        
+        window.abrirModalTag = () => { const l=document.querySelectorAll('.check-contato:checked');if(l.length===0)return alert("⚠️ Marque clientes!");document.getElementById('modalTag').style.display='flex';let t=new Set();window.listaContatos.forEach(c=>c.tags&&c.tags.forEach(x=>t.add(x)));let a=Array.from(t);const c=document.getElementById('botoesTagsSalvas');const ar=document.getElementById('areaTagsExistentes');c.innerHTML='';if(a.length>0){ar.style.display='block';a.forEach(x=>{let b=document.createElement('button');b.className='btn btn-outline';b.style.padding='6px 12px';b.innerText="🏷️ "+x;b.onclick=()=>document.getElementById('nomeNovaTag').value=x;c.appendChild(b);});}else ar.style.display='none'; }
+        window.fecharModalTag = () => { document.getElementById('modalTag').style.display='none'; document.getElementById('nomeNovaTag').value=''; };
+        window.salvarTagMassa = () => { const t=document.getElementById('nomeNovaTag').value.trim();if(t==="")return alert("⚠️ Escreva.");const m=document.querySelectorAll('.check-contato:checked');m.forEach(c=>{let k=window.listaContatos.find(x=>x.id===c.value);if(k){if(!k.tags)k.tags=[];if(!k.tags.includes(t))k.tags.push(t);}});renderizarTabela();window.salvarContatosLocal();fecharModalTag();document.getElementById('checkTodos').checked=false;window.alternarTodosChecks();alert(`✅ Tag "${t}" aplicada.`); }
+        
+        window.abrirModalImportar = () => document.getElementById('modalImportar').style.display='flex';
+        window.fecharModalImportar = () => document.getElementById('modalImportar').style.display='none';
+        function decodificarNomeAndroid(t) {try{if(t.includes('=')){let l=t.replace(/=\r?\n/g,'').replace(/=([A-F0-9]{2})/gi,'%$1');return decodeURIComponent(l);}return t;}catch(e){return t.replace(/=([A-F0-9]{2})/gi,'');}}
+        function limparTelefoneDoBrasil(t) {let a=String(t).replace(/\D/g,'');if(a.startsWith('55')&&a.length>=12)a=a.substring(2);if(a.startsWith('0')){if(a.length>=13)a=a.substring(3);else if(a.length===11||a.length===12)a=a.substring(1);}if(a.length===10)a=a.substring(0,2)+'9'+a.substring(2);if(a==="")return null;return a;}
+        window.iniciarImportacao = () => { const c=document.getElementById('arquivoCsv');const a=c.files[0];if(!a)return alert("⚠️ Selecione!");const ex=a.name.split('.').pop().toLowerCase();const l=new FileReader();l.onload=function(e){const t=e.target.result;let li=0;let d=0;if(ex==='csv'){t.split('\n').forEach((x,i)=>{if(i===0)return;let p=x.split(/[,;]/);if(p.length>=2){let te=limparTelefoneDoBrasil(p[1]);if(te){if(!window.listaContatos.some(k=>k.telefone===te)){window.listaContatos.push({id:'ctt_'+Math.random().toString(36).substr(2,9),nome:p[0].trim(),telefone:te,tags:['CSV']});li++;}else d++;}}});}else if(ex==='vcf'){t.replace(/=\r?\n/g,'').split(/BEGIN:VCARD/i).forEach(x=>{if(x.trim()==="")return;let rn=x.match(/FN[^:]*:(.*)/i);let rt=x.match(/TEL[^:]*:(.*)/i);if(rn&&rt){let n=decodificarNomeAndroid(rn[1].trim());let te=limparTelefoneDoBrasil(rt[1].trim());if(te){if(!window.listaContatos.some(k=>k.telefone===te)){window.listaContatos.push({id:'ctt_'+Math.random().toString(36).substr(2,9),nome:n,telefone:te,tags:['Celular']});li++;}else d++;}}});}alert(`✅ ${li} novos. ${d} duplicados.`);fecharModalImportar();c.value='';renderizarTabela();window.salvarContatosLocal();};l.readAsText(a); }
+        window.exportarVCF = () => { let v="";window.listaContatos.forEach(c=>{v+=`BEGIN:VCARD\nVERSION:3.0\nFN:${c.nome}\nTEL;TYPE=CELL:+55${c.telefone}\nEND:VCARD\n`;});const b=new Blob([v],{type:'text/vcard'});const l=document.createElement('a');l.href=URL.createObjectURL(b);l.download='contatos.vcf';l.click(); }
+        window.etiquetarSelecionados = () => { if(document.querySelectorAll('.check-contato:checked').length===0)return alert("⚠️ Selecione!");document.getElementById('checkTodos').checked=false;window.abrirModalTag(); }
+        window.fazerLogout = () => signOut(auth).then(()=>window.location.href="index.html");
+        
+        // ==========================================
+        // MARKETING E DISPAROS
+        // ==========================================
+        window.abrirModalCobranca = function() { const d=document.getElementById('listaTagsCobranca');let h='';let t=new Set(); window.listaContatos.forEach(c=>c.tags&&c.tags.forEach(x=>t.add(x))); let a=Array.from(t); if(a.length===0) h='<p style="color:var(--danger);">Nenhuma etiqueta.</p>'; else a.forEach(x=>h+=`<label style="display:block; padding:10px; background:white; border-radius:8px; margin-bottom:5px; border: 1px solid #cbd5e1;"><input type="checkbox" value="${x}"> 🎯 Enviar para <b>${x}</b></label>`); d.innerHTML=h; document.getElementById('modalCobranca').style.display='flex'; }
+        window.fecharModalCobranca = () => document.getElementById('modalCobranca').style.display='none';
+        window.iniciarDisparoCobranca = async function() { const m=document.getElementById('textoCobranca').value, p=document.getElementById('pixCobranca').value, c=document.querySelectorAll('#listaTagsCobranca input:checked'); if(c.length===0)return alert("⚠️ Selecione o grupo!"); if(m==="")return alert("⚠️ Digite a mensagem."); let ts=Array.from(c).map(i=>i.value), n=window.listaContatos.filter(k=>k.tags&&k.tags.some(x=>ts.includes(x))).map(k=>k.telefone); if(n.length===0)return alert("⚠️ Ninguém encontrado."); if(window.planoClienteLogado==='basico'&&n.length>200)return alert(`⚠️ Máx 200 no Básico.`); let fm=p!==""?`${m}\n\n🏦 *CHAVE PIX:*\n${p}`:m; fecharModalCobranca(); document.getElementById('cardEnviado').classList.add('show'); try{await fetch('/api-oracle/api/saas/disparar',{method:'POST',headers:{'Content-Type':'application/json','x-senha':'123321'},body:JSON.stringify({idCliente:window.idClienteLogado,nomeEmpresa:window.nomeLojista,zapLojista:window.zapLojista,numeros:n,mensagem:fm,plano:window.planoClienteLogado})});}catch(e){} }
+        
+        window.atualizarListaTagsDisparo = () => { const d=document.getElementById('listaTagsDisparo');let h='<label style="display:block; padding:10px; background:white; border-radius:8px; margin-bottom:5px; border: 1px solid #cbd5e1; font-weight:bold;"><input type="checkbox" value="TODOS_OS_CONTATOS"> 📢 TODOS OS CONTATOS</label>';let t=new Set();window.listaContatos.forEach(c=>c.tags&&c.tags.forEach(x=>t.add(x)));Array.from(t).forEach(x=>h+=`<label style="display:block; padding:10px; background:white; border-radius:8px; margin-bottom:5px; border: 1px solid #cbd5e1;"><input type="checkbox" value="${x}"> 🏷️ ${x}</label>`);d.innerHTML=h; }
+        window.abrirModalDisparo = () => { window.atualizarListaTagsDisparo();document.getElementById('modalDisparo').style.display='flex'; };
+        window.fecharModalDisparo = () => document.getElementById('modalDisparo').style.display='none';
+        window.iniciarDisparo = async function() { const m=document.getElementById('mensagemPromo').value, ar=document.getElementById('arquivoMidia').files[0]; if(m===""&&!ar)return alert("⚠️ Preencha!"); let b=null, no="", mi=""; if(ar){if((ar.size/1024/1024)>5)return alert("⚠️ Limite 5MB."); const l=new FileReader(); b=await new Promise((r)=>{l.onload=(e)=>r(e.target.result.split(',')[1]);l.readAsDataURL(ar);}); no=ar.name;mi=ar.type;} let n=[]; const it=document.getElementById('aba-tags').classList.contains('active'); if(it){const c=document.querySelectorAll('#listaTagsDisparo input:checked');if(c.length===0)return alert("⚠️ Selecione tag!"); let t=Array.from(c).map(i=>i.value); if(t.includes("TODOS_OS_CONTATOS"))n=window.listaContatos.map(x=>x.telefone);else n=window.listaContatos.filter(x=>x.tags&&x.tags.some(y=>t.includes(y))).map(x=>x.telefone);}else n=document.getElementById('listaNumeros').value.split('\n').map(x=>x.trim()).filter(x=>x!==""); if(n.length===0)return alert("⚠️ Vazio."); if(window.planoClienteLogado==='basico'&&n.length>200)return alert(`⚠️ Máx 200 no Básico.`); fecharModalDisparo(); document.getElementById('cardEnviado').classList.add('show'); try{await fetch('/api-oracle/api/saas/disparar',{method:'POST',headers:{'Content-Type':'application/json','x-senha':'123321'},body:JSON.stringify({idCliente:window.idClienteLogado,nomeEmpresa:window.nomeLojista,zapLojista:window.zapLojista,numeros:n,mensagem:m,midia:b,midiaNome:no,midiaMime:mi,plano:window.planoClienteLogado})});}catch(e){} }
+        
+        window.abrirModalAniversario = async () => { document.getElementById('modalAniversario').style.display='flex';try{const s=await getDoc(doc(db,"configuracoes_loja",window.idClienteLogado));if(s.exists()&&s.data().msgAniversario)document.getElementById('textoAniversario').value=s.data().msgAniversario;}catch(e){} }
+        window.fecharModalAniversario = () => document.getElementById('modalAniversario').style.display='none';
+        window.salvarConfigAniversario = async () => { const t=document.getElementById('textoAniversario').value;const im=document.getElementById('arquivoMidiaAniversario');const b=document.getElementById('btnSalvarAniversario');if(!t)return alert("⚠️ Digite.");b.innerText="Salvando...";b.disabled=true;let mi=null,mim=null,n=null;if(im.files[0]){if((im.files[0].size/1024/1024)>5){b.innerText="Salvar";b.disabled=false;return alert("⚠️ Max 5MB.");}mi=await new Promise(r=>{let l=new FileReader();l.onload=(e)=>r(e.target.result.split(',')[1]);l.readAsDataURL(im.files[0]);});mim=im.files[0].type;n=im.files[0].name;}try{let p={msgAniversario:t};if(mi){p.imgAniversario=mi;p.mimeAniversario=mim;p.nomeAniversario=n;}await setDoc(doc(db,"configuracoes_loja",window.idClienteLogado),p,{merge:true});alert("✅ Salvo.");fecharModalAniversario();}catch(e){}b.innerText="Salvar";b.disabled=false; }
+        window.fecharCardLateral = () => document.getElementById('cardEnviado').classList.remove('show');
+    </script>
+</body>
+</html>
