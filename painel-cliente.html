@@ -9,17 +9,8 @@
     <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 
     <style>
-        :root { 
-            --primary: #2563eb; --primary-dark: #1e40af; 
-            --sidebar-bg: #0f172a; --sidebar-hover: #1e293b;
-            --bg-color: #f8fafc; --card-bg: #ffffff;
-            --text-main: #334155; --text-muted: #64748b;
-            --success: #10b981; --danger: #ef4444; --warning: #f59e0b;
-        }
-
+        :root { --primary: #2563eb; --primary-dark: #1e40af; --sidebar-bg: #0f172a; --bg-color: #f8fafc; --card-bg: #ffffff; --text-main: #334155; --text-muted: #64748b; --success: #10b981; --danger: #ef4444; --warning: #f59e0b; }
         body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); margin: 0; display: flex; height: 100vh; overflow: hidden; color: var(--text-main); }
-        
-        /* 📱 SIDEBAR (MENU LATERAL) */
         .sidebar { width: 260px; background-color: var(--sidebar-bg); color: white; display: flex; flex-direction: column; transition: 0.3s; z-index: 100; }
         .sidebar-header { padding: 20px; display: flex; align-items: center; gap: 10px; font-size: 1.2rem; font-weight: 700; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .sidebar-nav { flex: 1; padding: 20px 10px; overflow-y: auto; }
@@ -27,271 +18,212 @@
         .nav-item:hover, .nav-item.active { background-color: var(--primary); color: white; }
         .sidebar-footer { padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); }
         .logout-btn { color: #fca5a5; cursor: pointer; display: flex; align-items: center; gap: 10px; font-weight: 600; padding: 10px; transition: 0.2s; border-radius: 8px;}
-        .logout-btn:hover { background-color: rgba(239, 68, 68, 0.1); color: #ef4444; }
-
-        /* 🖥️ ÁREA DE CONTEÚDO PRINCIPAL */
         .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
-        
-        /* HEADER DO TOPO */
         .topbar { background: var(--card-bg); padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; }
-        .empresa-info { display: flex; align-items: center; gap: 15px; }
-        .empresa-info h2 { margin: 0; font-size: 1.2rem; color: #0f172a; }
+        .empresa-info { display: flex; align-items: center; gap: 15px; } .empresa-info h2 { margin: 0; font-size: 1.2rem; color: #0f172a; }
         .tag-plano { background: #dbeafe; color: var(--primary-dark); padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; display: flex; align-items: center; gap: 5px; }
         .mobile-logout { display: none; color: var(--danger); font-size: 1.2rem; cursor: pointer; }
-
-        /* GESTÃO DE ABAS (PÁGINAS) */
-        .page-section { display: none; padding: 30px; overflow-y: auto; height: 100%; box-sizing: border-box; }
-        .page-section.active { display: block; animation: fadeIn 0.3s ease; }
+        .page-section { display: none; padding: 30px; overflow-y: auto; height: 100%; box-sizing: border-box; } .page-section.active { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* CARDS PADRÕES */
         .grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
         .card { background: var(--card-bg); border-radius: 12px; padding: 25px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0; }
         .card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; color: #0f172a; font-size: 1.1rem; font-weight: 600; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px;}
-        .card-header i { color: var(--primary); }
-        
-        /* BOTÕES */
         .btn { border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
-        .btn-primary { background-color: var(--primary); color: white; }
-        .btn-primary:hover { background-color: var(--primary-dark); }
-        .btn-success { background-color: var(--success); color: white; }
-        .btn-danger { background-color: var(--danger); color: white; }
-        .btn-warning { background-color: var(--warning); color: white; }
+        .btn-primary { background-color: var(--primary); color: white; } .btn-success { background-color: var(--success); color: white; } .btn-danger { background-color: var(--danger); color: white; } .btn-warning { background-color: var(--warning); color: white; }
         .btn-outline { background-color: transparent; border: 1px solid #cbd5e1; color: var(--text-main); }
-        .btn-outline:hover { border-color: var(--primary); color: var(--primary); background: #f8fafc;}
         .btn-block { width: 100%; margin-bottom: 10px; padding: 12px; }
-
-        /* STATUS DE CONEXÃO */
         .status-box { display: flex; align-items: center; background-color: #f1f5f9; padding: 15px; border-radius: 10px; font-weight: 600; font-size: 0.95rem; margin-bottom: 15px;}
         .status-indicator { width: 12px; height: 12px; background-color: #94a3b8; border-radius: 50%; margin-right: 10px; display: inline-block; transition: 0.3s;}
         .status-indicator.online { background-color: var(--success); box-shadow: 0 0 8px var(--success); }
         .qr-container { text-align: center; margin-top: 15px; padding: 15px; border: 2px dashed #cbd5e1; border-radius: 10px; display: none; background: white;}
-
-        /* TABELAS (CRM E CARDÁPIO) */
         .crm-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
         .search-box { padding: 10px 15px; border: 1px solid #cbd5e1; border-radius: 8px; width: 300px; outline: none; }
-        .table-container { background: white; border-radius: 12px; border: 1px solid #e2e8f0; overflow-x: auto; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);}
-        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-        th { background-color: #f8fafc; padding: 15px; text-align: left; color: #475569; font-weight: 600; border-bottom: 1px solid #e2e8f0; }
-        td { padding: 15px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
-        tr:hover { background-color: #f8fafc; }
-        th.sortable { cursor: pointer; } th.sortable:hover { background: #e2e8f0; }
-
-        /* TAGS */
+        .table-container { background: white; border-radius: 12px; border: 1px solid #e2e8f0; overflow-x: auto;}
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; } th { background-color: #f8fafc; padding: 15px; text-align: left; color: #475569; border-bottom: 1px solid #e2e8f0; } td { padding: 15px; border-bottom: 1px solid #f1f5f9; } tr:hover { background-color: #f8fafc; }
         .tag-pill { background: #e2e8f0; color: #475569; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; margin: 2px; }
-        .tag-remove { border: none; background: none; color: #ef4444; cursor: pointer; font-size: 0.9rem; padding: 0 2px; }
-
-        /* MODAIS PADRÕES MANTIDOS E ESTILIZADOS */
+        .tag-remove { border: none; background: none; color: #ef4444; cursor: pointer; padding: 0 2px; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 10000; padding: 20px; }
         .modal-content { background: white; padding: 30px; border-radius: 15px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
-        .modal input[type="text"], .modal input[type="number"], .modal textarea, .modal select { width: 100%; padding: 12px; margin: 8px 0 15px 0; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; font-family: inherit; outline: none; }
-        .modal input:focus, .modal textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+        .modal input[type="text"], .modal input[type="number"], .modal textarea, .modal select { width: 100%; padding: 12px; margin: 8px 0 15px 0; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; outline: none; }
         .upload-box { border: 2px dashed #cbd5e1; padding: 20px; border-radius: 10px; background: #f8fafc; margin-bottom: 15px; text-align: center; }
-        
         .card-enviado-lateral { position: fixed; bottom: 20px; right: 20px; width: 320px; background: white; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); border-left: 5px solid var(--success); padding: 20px; z-index: 1500; display: none; }
-        .card-enviado-lateral.show { display: block; animation: slideInRight 0.3s ease-out; }
-        @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
-
-        .tabs { display: flex; border-bottom: 2px solid #e2e8f0; margin-bottom: 20px; }
-        .tab-btn { flex: 1; background: none; border: none; padding: 12px; font-weight: 600; color: #64748b; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+        .card-enviado-lateral.show { display: block; animation: slideInRight 0.3s ease-out; } @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
+        .tabs { display: flex; border-bottom: 2px solid #e2e8f0; margin-bottom: 20px; overflow-x: auto; }
+        .tab-btn { flex: 1; background: none; border: none; padding: 12px; font-weight: 600; color: #64748b; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; white-space: nowrap;}
         .tab-btn.active { color: var(--primary); border-color: var(--primary); }
         .tab-content { display: none; } .tab-content.active { display: block; }
         .lista-selecao { border: 1px solid #cbd5e1; border-radius: 8px; padding: 15px; max-height: 150px; overflow-y: auto; margin-bottom: 15px; background: #f8fafc; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
-        /* 📱 MAGIA DA RESPONSIVIDADE (BOTTOM APP BAR) */
         @media (max-width: 768px) {
             body { flex-direction: column; }
-            .sidebar { 
-                position: fixed; bottom: 0; left: 0; width: 100%; height: 70px; 
-                flex-direction: row; padding: 0; box-shadow: 0 -4px 15px rgba(0,0,0,0.1); 
-                justify-content: space-around; align-items: center; z-index: 9999;
-            }
-            .sidebar-header { display: none; }
-            .sidebar-footer { display: none; }
-            .sidebar-nav { display: flex; flex-direction: row; width: 100%; justify-content: space-around; padding: 0; overflow: visible; }
-            .nav-item { 
-                flex-direction: column; gap: 4px; padding: 10px; font-size: 0.65rem; 
-                border-radius: 0; margin: 0; flex: 1; text-align: center; color: #cbd5e1;
-            }
+            .sidebar { position: fixed; bottom: 0; left: 0; width: 100%; height: 70px; flex-direction: row; padding: 0; box-shadow: 0 -4px 15px rgba(0,0,0,0.1); justify-content: space-around; align-items: center; z-index: 9999; }
+            .sidebar-header, .sidebar-footer { display: none; }
+            .sidebar-nav { display: flex; flex-direction: row; width: 100%; justify-content: space-around; padding: 0; }
+            .nav-item { flex-direction: column; gap: 4px; padding: 10px; font-size: 0.65rem; border-radius: 0; margin: 0; flex: 1; text-align: center; color: #cbd5e1; }
             .nav-item i { font-size: 1.4rem; margin-bottom: 2px; }
             .nav-item.active { background: transparent; color: #38bdf8; border-top: 3px solid #38bdf8; }
-            .nav-item:hover { background: transparent; color: white; }
-            
             .topbar { padding: 15px; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.05);}
-            .empresa-info h2 { font-size: 1.1rem; }
-            .tag-plano { font-size: 0.65rem; }
-            .mobile-logout { display: block; } /* Mostra botão de sair no topo */
-            
+            .empresa-info h2 { font-size: 1.1rem; } .tag-plano { font-size: 0.65rem; } .mobile-logout { display: block; }
             .main-content { overflow-y: auto; height: calc(100vh - 70px); }
-            .page-section { padding: 15px; padding-bottom: 90px; } /* Evita cortar pelo menu inferior */
+            .page-section { padding: 15px; padding-bottom: 90px; } 
             .grid-cards { grid-template-columns: 1fr; }
-            .search-box { width: 100%; }
         }
     </style>
 </head>
 <body>
 
     <aside class="sidebar">
-        <div class="sidebar-header">
-            <i class="fa-solid fa-rocket" style="color: #60a5fa;"></i> Omnichannel
-        </div>
+        <div class="sidebar-header"><i class="fa-solid fa-rocket" style="color: #60a5fa;"></i> Omnichannel</div>
         <nav class="sidebar-nav">
             <div class="nav-item active" onclick="trocarPagina('inicio', this)"><i class="fa-solid fa-house"></i> Início</div>
             <div class="nav-item" onclick="trocarPagina('marketing', this)"><i class="fa-solid fa-bullhorn"></i> Marketing</div>
             <div class="nav-item" onclick="trocarPagina('crm', this)"><i class="fa-solid fa-users"></i> Contatos</div>
             <div class="nav-item" onclick="trocarPagina('config', this)"><i class="fa-solid fa-gear"></i> Ajustes</div>
         </nav>
-        <div class="sidebar-footer">
-            <div class="logout-btn" onclick="fazerLogout()"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sair do Painel</div>
-        </div>
+        <div class="sidebar-footer"><div class="logout-btn" onclick="fazerLogout()"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sair do Painel</div></div>
     </aside>
 
     <main class="main-content">
         <header class="topbar">
-            <div class="empresa-info">
-                <h2 id="nomeCliente">Carregando...</h2>
-                <div class="tag-plano" id="tagPlano"><i class="fa-solid fa-medal"></i> PRO</div>
-            </div>
+            <div class="empresa-info"><h2 id="nomeCliente">Carregando...</h2><div class="tag-plano" id="tagPlano"><i class="fa-solid fa-medal"></i> PRO</div></div>
             <div class="mobile-logout" onclick="fazerLogout()"><i class="fa-solid fa-arrow-right-from-bracket"></i></div>
         </header>
 
         <section id="page-inicio" class="page-section active">
             <h2 style="margin-top: 0; color: #0f172a;">Visão Geral</h2>
-            <p style="color: var(--text-muted); margin-bottom: 30px;">Gerencie o status do seu robô e conecte o seu WhatsApp.</p>
-            
             <div class="grid-cards">
                 <div class="card">
                     <div class="card-header"><i class="fa-solid fa-robot"></i> Status do Motor</div>
-                    <div class="status-box" id="area-conexao-status">
-                        <span class="status-indicator" id="bolinha-status"></span>
-                        <span id="texto-status">Verificando Servidor...</span>
-                    </div>
-                    
-                    <div id="area-botao-conectar">
-                        </div>
-
-                    <div class="qr-container" id="area-qr-code">
-                        <h4 id="status-texto-qr" style="color: var(--primary); margin-top: 0; margin-bottom: 10px;">Gerando QR Code...</h4>
-                        <img id="qrcode-imagem" style="max-width: 100%; border-radius: 8px; display: none; margin: 0 auto;">
-                    </div>
+                    <div class="status-box" id="area-conexao-status"><span class="status-indicator" id="bolinha-status"></span><span id="texto-status">Verificando Servidor...</span></div>
+                    <div id="area-botao-conectar"></div>
+                    <div class="qr-container" id="area-qr-code"><h4 id="status-texto-qr" style="color: var(--primary); margin-top: 0;">Gerando QR...</h4><img id="qrcode-imagem" style="max-width: 100%; border-radius: 8px; display: none; margin: 0 auto;"></div>
                 </div>
-
                 <div class="card">
-                    <div class="card-header"><i class="fa-solid fa-chart-simple"></i> Resumo Rápido</div>
-                    <p style="color: var(--text-muted); font-size: 0.9rem;">Acompanhe os números da sua operação.</p>
-                    <div style="background: #f1f5f9; padding: 20px; border-radius: 10px; text-align: center;">
-                        <h1 style="margin: 0; color: var(--primary); font-size: 2.5rem;" id="totalContatosCard">0</h1>
-                        <p style="margin: 5px 0 0 0; color: #64748b; font-weight: 500;">Contatos na Base CRM</p>
-                    </div>
+                    <div class="card-header"><i class="fa-solid fa-chart-simple"></i> Base de Contatos</div>
+                    <div style="background: #f1f5f9; padding: 20px; border-radius: 10px; text-align: center;"><h1 style="margin: 0; color: var(--primary); font-size: 2.5rem;" id="totalContatosCard">0</h1><p style="margin: 5px 0 0 0; color: #64748b; font-weight: 500;">Registros no CRM</p></div>
                 </div>
             </div>
         </section>
 
         <section id="page-marketing" class="page-section">
             <h2 style="margin-top: 0; color: #0f172a;">Central de Ferramentas</h2>
-            <p style="color: var(--text-muted); margin-bottom: 30px;">Agende disparos, configure automações e gerencie cobranças.</p>
-            
             <div class="grid-cards">
-                <div class="card">
-                    <div class="card-header"><i class="fa-solid fa-paper-plane"></i> Disparos e Promoções</div>
-                    <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 20px;">Envie fotos e textos para grupos de clientes específicos via etiquetas.</p>
-                    <button class="btn btn-primary btn-block" onclick="abrirModalDisparo()"><i class="fa-solid fa-rocket"></i> Criar Nova Campanha</button>
-                </div>
-
-                <div class="card">
-                    <div class="card-header" style="color: var(--danger); border-bottom-color: #fecaca;"><i class="fa-solid fa-file-invoice-dollar"></i> Módulo Financeiro</div>
-                    <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 20px;">Automatize a cobrança de faturas ou lembretes de vencimento via PIX.</p>
-                    <button class="btn btn-danger btn-block" onclick="abrirModalCobranca()"><i class="fa-solid fa-comments-dollar"></i> Enviar Cobranças</button>
-                </div>
-
-                <div class="card">
-                    <div class="card-header" style="color: var(--warning); border-bottom-color: #fef3c7;"><i class="fa-solid fa-cake-candles"></i> Motor de Aniversários</div>
-                    <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 20px;">O robô envia parabéns automaticamente para os clientes do dia.</p>
-                    <button class="btn btn-warning btn-block" onclick="abrirModalAniversario()"><i class="fa-solid fa-gift"></i> Configurar Parabéns</button>
-                </div>
+                <div class="card"><div class="card-header"><i class="fa-solid fa-paper-plane"></i> Disparos e Promoções</div><button class="btn btn-primary btn-block" onclick="abrirModalDisparo()"><i class="fa-solid fa-rocket"></i> Criar Campanha</button></div>
+                <div class="card"><div class="card-header" style="color: var(--danger);"><i class="fa-solid fa-file-invoice-dollar"></i> Módulo Financeiro</div><button class="btn btn-danger btn-block" onclick="abrirModalCobranca()"><i class="fa-solid fa-comments-dollar"></i> Cobranças</button></div>
+                <div class="card"><div class="card-header" style="color: var(--warning);"><i class="fa-solid fa-cake-candles"></i> Aniversários</div><button class="btn btn-warning btn-block" onclick="abrirModalAniversario()"><i class="fa-solid fa-gift"></i> Configurar</button></div>
             </div>
         </section>
 
         <section id="page-crm" class="page-section">
             <div class="crm-header">
-                <div>
-                    <h2 style="margin: 0; color: #0f172a;">Sua Carteira de Clientes</h2>
-                    <p style="color: var(--text-muted); margin: 5px 0 0 0; font-size: 0.9rem;">Organize com etiquetas para facilitar as campanhas.</p>
-                </div>
-                <div style="display: flex; gap: 10px;">
-                    <button class="btn btn-outline" onclick="exportarVCF()"><i class="fa-solid fa-download"></i> Exportar VCF</button>
-                    <button class="btn btn-primary" onclick="abrirModalImportar()"><i class="fa-solid fa-upload"></i> Importar</button>
-                </div>
+                <div><h2 style="margin: 0; color: #0f172a;">Gestão de Clientes</h2></div>
+                <div style="display: flex; gap: 10px;"><button class="btn btn-outline" onclick="exportarVCF()"><i class="fa-solid fa-download"></i> Exportar</button><button class="btn btn-primary" onclick="abrirModalImportar()"><i class="fa-solid fa-upload"></i> Importar</button></div>
             </div>
-
             <div class="table-container" style="padding: 20px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
-                    <div style="position: relative; width: 100%; max-width: 300px;">
-                        <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 12px; top: 12px; color: #94a3b8;"></i>
-                        <input type="text" id="buscaContato" class="search-box" style="padding-left: 35px; width: 100%;" placeholder="Buscar nome ou número..." onkeyup="renderizarTabela()">
-                    </div>
-                    <div style="display: flex; gap: 8px;">
-                        <button class="btn btn-outline" onclick="etiquetarSelecionados()"><i class="fa-solid fa-tags"></i> Etiquetar</button>
-                        <button class="btn btn-outline" style="color: var(--danger); border-color: #fca5a5;" onclick="apagarSelecionados()"><i class="fa-solid fa-trash"></i> Apagar</button>
-                    </div>
+                    <div style="position: relative; width: 100%; max-width: 300px;"><i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 12px; top: 12px; color: #94a3b8;"></i><input type="text" id="buscaContato" class="search-box" style="padding-left: 35px; width: 100%;" placeholder="Buscar..." onkeyup="renderizarTabela()"></div>
+                    <div style="display: flex; gap: 8px;"><button class="btn btn-outline" onclick="etiquetarSelecionados()"><i class="fa-solid fa-tags"></i> Etiquetar</button><button class="btn btn-outline" style="color: var(--danger); border-color: #fca5a5;" onclick="apagarSelecionados()"><i class="fa-solid fa-trash"></i> Apagar</button></div>
                 </div>
-
                 <div style="overflow-x: auto;">
                     <table>
-                        <thead>
-                            <tr>
-                                <th style="width: 40px;"><input type="checkbox" id="checkTodos" onclick="alternarTodosChecks()"></th>
-                                <th class="sortable" onclick="ordenarTabela('nome')">Nome do Cliente ↕</th>
-                                <th>WhatsApp</th>
-                                <th class="sortable" onclick="ordenarTabela('nascimento')">Nascimento ↕</th>
-                                <th class="sortable" onclick="ordenarTabela('tags')">Etiquetas ↕</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tabelaContatos">
-                            <tr><td colspan="6" style="text-align: center; color: #999; padding: 40px;">Carregando sua base...</td></tr>
-                        </tbody>
+                        <thead><tr><th style="width: 40px;"><input type="checkbox" id="checkTodos" onclick="alternarTodosChecks()"></th><th class="sortable" onclick="ordenarTabela('nome')">Nome ↕</th><th>WhatsApp</th><th class="sortable" onclick="ordenarTabela('nascimento')">Nasc ↕</th><th class="sortable" onclick="ordenarTabela('tags')">Etiquetas ↕</th><th>Ações</th></tr></thead>
+                        <tbody id="tabelaContatos"><tr><td colspan="6" style="text-align: center; color: #999; padding: 40px;">Carregando...</td></tr></tbody>
                     </table>
                 </div>
             </div>
         </section>
 
         <section id="page-config" class="page-section">
-            <h2 style="margin-top: 0; color: #0f172a;">Configurações do Negócio</h2>
-            <p style="color: var(--text-muted); margin-bottom: 30px;">Personalize o cérebro do robô para o seu nicho.</p>
-
+            <h2 style="margin-top: 0; color: #0f172a;">Ajustes do Negócio</h2>
             <div class="grid-cards">
                 <div class="card">
                     <div class="card-header"><i class="fa-solid fa-store"></i> Perfil do Ramo</div>
-                    <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 20px;">Defina seu setor para desbloquear funções exclusivas (ex: Cardápio).</p>
-                    <label style="font-weight: 600; font-size: 0.9rem; display: block; margin-bottom: 5px;">Seu Setor Atual:</label>
                     <select id="selectRamo" class="select-ramo" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; margin-bottom: 15px;">
                         <option value="">Selecione uma opção...</option>
                         <optgroup label="🍔 Setor de Alimentação"><option value="pizzaria">Pizzaria</option><option value="hamburgueria">Hamburgueria / Lanchonete</option><option value="restaurante">Restaurante / Delivery</option></optgroup>
                         <optgroup label="👗 Setor de Vestuário"><option value="roupas">Loja de Roupas</option><option value="calcados">Loja de Calçados</option></optgroup>
-                        <optgroup label="🛍️ Setor de Vendas / Comércio"><option value="moveis">Loja de Móveis</option><option value="construcao">Materiais de Construção</option><option value="cosmeticos">Cosméticos e Perfumaria</option><option value="varejo">Comércio Varejista Geral</option></optgroup>
-                        <optgroup label="✂️ Setor de Serviços"><option value="ar_condicionado">Instalação de Ar Condicionados</option><option value="jardinagem">Serviços de Jardinagem</option><option value="cabeleireiro">Cabeleireiro / Salão de Beleza</option><option value="imobiliaria">Corretor / Imobiliária</option></optgroup>
+                        <optgroup label="🛍️ Setor de Vendas / Comércio"><option value="moveis">Loja de Móveis</option><option value="construcao">Materiais de Construção</option><option value="cosmeticos">Cosméticos</option><option value="varejo">Varejo Geral</option></optgroup>
+                        <optgroup label="✂️ Setor de Serviços"><option value="ar_condicionado">Ar Condicionado</option><option value="jardinagem">Jardinagem</option><option value="cabeleireiro">Salão de Beleza</option><option value="imobiliaria">Imobiliária</option></optgroup>
                     </select>
                     <button class="btn btn-primary" onclick="salvarConfigRamo()"><i class="fa-solid fa-save"></i> Atualizar Perfil</button>
                 </div>
-
                 <div class="card" id="cardFidelidade" style="display: none; border-color: #fdba74;">
-                    <div class="card-header" style="color: #ea580c; border-bottom-color: #ffedd5;"><i class="fa-solid fa-pizza-slice"></i> Cardápio & Automação</div>
-                    <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 20px;">Você está no setor de alimentação! Configure seu menu para o robô vender sozinho.</p>
-                    <button class="btn btn-block" style="background-color: #ea580c; color: white;" onclick="abrirModalCardapio()"><i class="fa-solid fa-book-open"></i> Gerenciar Cardápio</button>
+                    <div class="card-header" style="color: #ea580c;"><i class="fa-solid fa-pizza-slice"></i> Cardápio e Pedidos VIP</div>
+                    <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 20px;">Configure produtos, bordas e taxas de entrega para o robô automatizar suas vendas.</p>
+                    <button class="btn btn-block" style="background-color: #ea580c; color: white;" onclick="abrirModalCardapio()"><i class="fa-solid fa-book-open"></i> Configurar Automação VIP</button>
                 </div>
             </div>
         </section>
     </main>
 
     <div class="card-enviado-lateral" id="cardEnviado">
-        <h4 style="margin-top: 0; color: var(--success); display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-circle-check"></i> Disparo Autorizado</h4>
-        <p style="font-size: 0.85rem; color: #666; margin-bottom: 10px;">A Central assumiu o controle e está enviando as mensagens.</p>
-        <div style="background: #e2e8f0; border-radius: 20px; height: 15px; overflow: hidden; margin-top: 10px;"><div id="barra-progresso-lateral" style="background: var(--success); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.65rem; font-weight: bold;">Fila Oracle Ativa</div></div>
-        <button class="btn-outline" style="width: 100%; padding: 5px; font-size: 0.75rem; margin-top: 10px;" onclick="fecharCardLateral()">Ocultar Aviso</button>
+        <h4 style="margin-top: 0; color: var(--success);"><i class="fa-solid fa-circle-check"></i> Fila Ativada</h4>
+        <div style="background: #e2e8f0; border-radius: 20px; height: 15px; overflow: hidden; margin-top: 10px;"><div id="barra-progresso-lateral" style="background: var(--success); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.65rem; font-weight: bold;">Oracle Processando...</div></div>
+        <button class="btn-outline" style="width: 100%; padding: 5px; font-size: 0.75rem; margin-top: 10px;" onclick="fecharCardLateral()">Ocultar</button>
     </div>
 
-    <div class="modal" id="modalCardapio"><div class="modal-content" style="max-width: 600px;"><h2 style="margin-top: 0; color: #ea580c;"><i class="fa-solid fa-book-open"></i> Gestão de Cardápio</h2><p style="font-size: 0.85rem; color: #666;">Configure a imagem e cadastre os itens.</p><div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;"><div style="flex: 1; min-width: 200px;"><label style="font-size: 0.9rem; font-weight: 600;">1. Foto do Menu (Máx 5MB):</label><div class="upload-box" style="padding: 10px;"><input type="file" id="imgCardapio" accept="image/*" style="width: 100%;"></div></div><div style="flex: 1; min-width: 200px;"><label style="font-size: 0.9rem; font-weight: 600;">Regra de Fidelidade (Ex: 10):</label><input type="number" id="metaFidelidade" placeholder="Pedidos p/ cortesia" style="margin-top: 5px;"></div></div><label style="font-size: 0.9rem; font-weight: 600; border-top: 1px solid #eee; padding-top: 15px; display: block;">2. Cadastrar Itens:</label><div style="display: flex; gap: 10px; align-items: center; background: #f8f9fa; padding: 10px; border-radius: 8px; margin-bottom: 10px;"><input type="number" id="itemNum" placeholder="Nº" style="width: 70px; margin: 0;"><input type="text" id="itemNome" placeholder="Sabor" style="flex: 2; margin: 0;"><input type="text" id="itemPreco" placeholder="R$ 0,00" style="flex: 1; margin: 0;"><button class="btn btn-success" onclick="adicionarItemCardapio()" style="padding: 10px;"><i class="fa-solid fa-plus"></i></button></div><div style="max-height: 200px; overflow-y: auto; border: 1px solid #eee; border-radius: 8px;"><table style="width: 100%; border-collapse: collapse;"><thead><tr><th style="padding: 8px; background: #f1f5f9;">Nº</th><th style="padding: 8px; background: #f1f5f9;">Produto</th><th style="padding: 8px; background: #f1f5f9;">Preço</th><th style="padding: 8px; background: #f1f5f9;">Ação</th></tr></thead><tbody id="listaItensCardapio"></tbody></table></div><div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;"><button class="btn btn-outline" onclick="fecharModalCardapio()">Cancelar</button><button class="btn" style="background-color: #ea580c; color: white;" onclick="salvarCardapioNuvem()" id="btnSalvarCardapio"><i class="fa-solid fa-cloud-arrow-up"></i> Salvar no Robô</button></div></div></div>
+    <div class="modal" id="modalCardapio">
+        <div class="modal-content" style="max-width: 650px;">
+            <h2 style="margin-top: 0; color: #ea580c;"><i class="fa-solid fa-store"></i> Automação de Pedidos</h2>
+            
+            <div class="tabs">
+                <button class="tab-btn active" onclick="trocarAbaMenu('geral')" id="btn-menu-geral">⚙️ Geral</button>
+                <button class="tab-btn" onclick="trocarAbaMenu('tamanhos')" id="btn-menu-tamanhos">📐 Tamanhos</button>
+                <button class="tab-btn" onclick="trocarAbaMenu('bordas')" id="btn-menu-bordas">🧀 Bordas/Extras</button>
+                <button class="tab-btn" onclick="trocarAbaMenu('sabores')" id="btn-menu-sabores">🍕 Sabores</button>
+            </div>
+
+            <div id="aba-menu-geral" class="tab-content active">
+                <label style="font-weight: 600; font-size: 0.9rem;">Imagem do Cardápio (Aparece pro cliente):</label>
+                <input type="file" id="imgCardapio" accept="image/*" style="margin-bottom: 15px;">
+                <div class="grid-2">
+                    <div><label style="font-size: 0.85rem; font-weight: bold;">Tempo Entrega Estimado:</label><input type="text" id="tempoEntrega" placeholder="Ex: 30 a 40 min"></div>
+                    <div><label style="font-size: 0.85rem; font-weight: bold;">Taxa de Entrega Padrão (R$):</label><input type="number" id="taxaEntrega" placeholder="Ex: 5.00"></div>
+                    <div><label style="font-size: 0.85rem; font-weight: bold;">Meta Fidelidade (Pedidos):</label><input type="number" id="metaFidelidade" placeholder="Ex: 10 (0 para desativar)"></div>
+                </div>
+            </div>
+
+            <div id="aba-menu-tamanhos" class="tab-content">
+                <p style="font-size: 0.85rem; color: #666; margin-bottom: 10px;">Defina os tamanhos e quantos sabores o cliente pode escolher em cada um.</p>
+                <div style="display: flex; gap: 8px; background: #f8f9fa; padding: 10px; border-radius: 8px; margin-bottom: 10px;">
+                    <input type="text" id="tamNome" placeholder="Ex: Grande 16 Ped." style="flex: 2; margin: 0;">
+                    <input type="number" id="tamQtd" placeholder="Máx Sabores" style="flex: 1; margin: 0;">
+                    <button class="btn btn-success" onclick="addObj('tamanhos')" style="padding: 10px;"><i class="fa-solid fa-plus"></i></button>
+                </div>
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;"><tbody id="listaTamanhos"></tbody></table>
+            </div>
+
+            <div id="aba-menu-bordas" class="tab-content">
+                <p style="font-size: 0.85rem; color: #666; margin-bottom: 10px;">Opções adicionais que o cliente pode pedir.</p>
+                <div style="display: flex; gap: 8px; background: #f8f9fa; padding: 10px; border-radius: 8px; margin-bottom: 10px;">
+                    <input type="text" id="bordaNome" placeholder="Ex: Borda de Chocolate" style="flex: 2; margin: 0;">
+                    <input type="number" id="bordaPreco" placeholder="Valor R$" style="flex: 1; margin: 0;">
+                    <button class="btn btn-success" onclick="addObj('bordas')" style="padding: 10px;"><i class="fa-solid fa-plus"></i></button>
+                </div>
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;"><tbody id="listaBordas"></tbody></table>
+            </div>
+
+            <div id="aba-menu-sabores" class="tab-content">
+                <p style="font-size: 0.85rem; color: #666; margin-bottom: 10px;">Liste os sabores para o robô interpretar as palavras-chave.</p>
+                <div style="display: flex; gap: 8px; background: #f8f9fa; padding: 10px; border-radius: 8px; margin-bottom: 10px;">
+                    <input type="text" id="saborNome" placeholder="Sabor (Ex: Calabresa)" style="flex: 2; margin: 0;">
+                    <select id="saborCategoria" style="flex: 1; margin: 0;"><option value="Salgada">Salgada</option><option value="Doce">Doce</option><option value="Bebida">Bebida</option></select>
+                    <input type="number" id="saborPreco" placeholder="Preço (Opcional)" style="flex: 1; margin: 0;">
+                    <button class="btn btn-success" onclick="addObj('sabores')" style="padding: 10px;"><i class="fa-solid fa-plus"></i></button>
+                </div>
+                <div style="max-height: 200px; overflow-y: auto; border: 1px solid #eee; border-radius: 8px;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;"><tbody id="listaSabores"></tbody></table>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px;">
+                <button class="btn btn-outline" onclick="fecharModalCardapio()">Cancelar</button>
+                <button class="btn" style="background-color: #ea580c; color: white;" onclick="salvarCardapioNuvem()" id="btnSalvarCardapio"><i class="fa-solid fa-cloud-arrow-up"></i> Gravar Inteligência no Robô</button>
+            </div>
+        </div>
+    </div>
+
     <div class="modal" id="modalCobranca"><div class="modal-content"><h2 style="margin-top: 0; color: #dc3545;"><i class="fa-solid fa-file-invoice-dollar"></i> Cobranças</h2><label style="font-size: 0.9rem; font-weight: 600;">Selecione o Grupo Alvo:</label><div class="lista-selecao" id="listaTagsCobranca" style="max-height: 100px;"></div><label style="font-size: 0.9rem; font-weight: 600;">Sua Chave PIX (Opcional):</label><input type="text" id="pixCobranca" placeholder="Ex: 12.345.678/0001-90"><label style="font-size: 0.9rem; font-weight: 600;">Mensagem:</label><textarea id="textoCobranca" rows="5">Olá {nome}! Tudo bem? Passando para lembrar que sua fatura vence nos próximos dias. Segue a chave PIX:</textarea><div style="display: flex; gap: 10px; justify-content: flex-end;"><button class="btn btn-outline" onclick="fecharModalCobranca()">Cancelar</button><button class="btn btn-danger" onclick="iniciarDisparoCobranca()"><i class="fa-solid fa-paper-plane"></i> Enviar p/ Fila</button></div></div></div>
     <div class="modal" id="modalImportar"><div class="modal-content"><h2 style="margin-top: 0; color: var(--primary);"><i class="fa-solid fa-upload"></i> Importar Contatos</h2><input type="file" accept=".csv, .vcf" id="arquivoCsv" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px;"><div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px;"><button class="btn btn-outline" onclick="fecharModalImportar()">Cancelar</button><button class="btn btn-primary" onclick="iniciarImportacao()">Salvar</button></div></div></div>
     <div class="modal" id="modalTag"><div class="modal-content" style="width: 400px;"><h2 style="margin-top: 0; color: var(--primary);"><i class="fa-solid fa-tags"></i> Etiquetar</h2><div id="areaTagsExistentes" style="margin-bottom: 15px; display: none;"><label style="font-size: 0.85rem; font-weight: bold; color: #666;">Salvas:</label><div id="botoesTagsSalvas" style="display: flex; flex-wrap: wrap; gap: 5px;"></div></div><label style="font-size: 0.85rem; font-weight: bold;">Nova Tag:</label><input type="text" id="nomeNovaTag" placeholder="Ex: VIP"><div style="display: flex; gap: 10px; justify-content: flex-end;"><button class="btn btn-outline" onclick="fecharModalTag()">Cancelar</button><button class="btn btn-primary" onclick="salvarTagMassa()">Aplicar</button></div></div></div>
@@ -307,7 +239,10 @@
         const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
 
         window.listaContatos = []; window.idClienteLogado = ""; window.planoClienteLogado = "basico"; window.nomeLojista = ""; window.zapLojista = "";
-        window.ordemAtual = { coluna: '', direcao: 'asc' }; window.itensCardapio = []; 
+        window.ordemAtual = { coluna: '', direcao: 'asc' }; 
+        
+        // Memória do Menu VIP
+        window.menuData = { tamanhos: [], bordas: [], sabores: [] };
 
         window.trocarPagina = function(idAba, elementoMenu) {
             document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
@@ -316,27 +251,21 @@
             elementoMenu.classList.add('active');
         }
 
-        // ==========================================
-        // 🚀 O BOTÃO QUE FALTAVA (GERAÇÃO FORÇADA DE QR CODE)
-        // ==========================================
+        window.trocarAbaMenu = function(aba) {
+            document.querySelectorAll('#modalCardapio .tab-btn').forEach(e=>e.classList.remove('active'));
+            document.querySelectorAll('#modalCardapio .tab-content').forEach(e=>e.classList.remove('active'));
+            document.getElementById('btn-menu-'+aba).classList.add('active');
+            document.getElementById('aba-menu-'+aba).classList.add('active');
+        }
+
         window.conectarRoboPremium = async function() {
             const btn = document.getElementById('btnConectarZapBase');
             if(btn) { btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Acionando Oracle...'; btn.disabled = true; }
-            
             try {
-                // A requisição bate no seu Vercel e o Vercel encaminha pra Oracle
-                const res = await fetch('/api-oracle/api/saas/conectar', {
-                    method: 'POST', headers: { 'Content-Type': 'application/json', 'x-senha': '123321' },
-                    body: JSON.stringify({ idCliente: window.idClienteLogado })
-                });
-                
-                if (!res.ok) throw new Error("Falha no servidor da Oracle.");
-                
-                document.getElementById('area-qr-code').style.display = 'block';
-                document.getElementById('status-texto-qr').innerText = "Gerando QR Code de Segurança... (Aguarde)";
-                document.getElementById('qrcode-imagem').style.display = 'none';
+                const res = await fetch('/api-oracle/api/saas/conectar', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-senha': '123321' }, body: JSON.stringify({ idCliente: window.idClienteLogado }) });
+                if (!res.ok) throw new Error("Falha no servidor.");
             } catch(e) {
-                alert("❌ Erro ao tentar ligar o motor na Oracle. Tente novamente em alguns segundos.");
+                alert("❌ Erro ao ligar o motor na Oracle. Tente novamente.");
                 if(btn) { btn.innerHTML = '<i class="fa-solid fa-mobile-screen"></i> Ligar Meu WhatsApp'; btn.disabled = false; }
             }
         }
@@ -353,68 +282,102 @@
                     const areaBtn = document.getElementById('area-botao-conectar');
                     if (d.plano === 'basico') { 
                         document.getElementById('tagPlano').innerHTML = "<i class='fa-solid fa-star'></i> Básico"; 
-                        document.getElementById('bolinha-status').className = 'status-indicator online';
-                        document.getElementById('texto-status').innerText = "Motor Global Online";
-                        areaBtn.innerHTML = '';
+                        document.getElementById('bolinha-status').className = 'status-indicator online'; document.getElementById('texto-status').innerText = "Motor Global Online"; areaBtn.innerHTML = '';
                     } else { 
                         document.getElementById('tagPlano').innerHTML = "<i class='fa-solid fa-crown'></i> Premium"; 
                         areaBtn.innerHTML = `<button id="btnConectarZapBase" class="btn btn-primary" onclick="conectarRoboPremium()"><i class="fa-solid fa-mobile-screen"></i> Ligar Meu WhatsApp</button>`;
                         
-                        // 🟢 ESCUTA EM TEMPO REAL DO FIREBASE PARA DESENHAR O QR CODE
                         onSnapshot(doc(db, "clientes_premium", window.idClienteLogado), (docSnap) => {
                             if(docSnap.exists()) {
                                 const dataRobo = docSnap.data();
-                                
                                 if(dataRobo.status === 'iniciando') {
-                                    document.getElementById('area-qr-code').style.display = 'block';
-                                    document.getElementById('status-texto-qr').innerText = "Iniciando Motor na Oracle. Aguarde...";
-                                    document.getElementById('qrcode-imagem').style.display = 'none';
-                                }
-                                else if(dataRobo.qrCode) {
-                                    document.getElementById('area-qr-code').style.display = 'block';
-                                    document.getElementById('status-texto-qr').innerText = "Aponte o WhatsApp para este QR Code:";
-                                    
-                                    // Transforma o texto do Banco de Dados num Quadrado QR Code
-                                    QRCode.toDataURL(dataRobo.qrCode, { width: 250, margin: 2 }, function (err, url) {
-                                        if(!err) {
-                                            const img = document.getElementById('qrcode-imagem');
-                                            img.src = url;
-                                            img.style.display = 'block';
-                                        }
-                                    });
-                                    document.getElementById('bolinha-status').className = 'status-indicator';
-                                    document.getElementById('texto-status').innerText = "Aguardando leitura...";
-                                }
-                                else if(dataRobo.status === 'online') {
-                                    document.getElementById('area-qr-code').style.display = 'none';
-                                    document.getElementById('bolinha-status').className = 'status-indicator online';
-                                    document.getElementById('texto-status').innerText = "Seu WhatsApp está Conectado!";
+                                    document.getElementById('area-qr-code').style.display = 'block'; document.getElementById('status-texto-qr').innerText = "Iniciando Motor na Oracle..."; document.getElementById('qrcode-imagem').style.display = 'none';
+                                } else if(dataRobo.qrCode) {
+                                    document.getElementById('area-qr-code').style.display = 'block'; document.getElementById('status-texto-qr').innerText = "Aponte o WhatsApp para este QR Code:";
+                                    QRCode.toDataURL(dataRobo.qrCode, { width: 250, margin: 2 }, function (err, url) { if(!err) { const img = document.getElementById('qrcode-imagem'); img.src = url; img.style.display = 'block'; } });
+                                    document.getElementById('bolinha-status').className = 'status-indicator'; document.getElementById('texto-status').innerText = "Aguardando leitura...";
+                                } else if(dataRobo.status === 'online') {
+                                    document.getElementById('area-qr-code').style.display = 'none'; document.getElementById('bolinha-status').className = 'status-indicator online'; document.getElementById('texto-status').innerText = "Conectado!";
                                     if(areaBtn) areaBtn.innerHTML = `<button class="btn btn-outline" disabled><i class="fa-solid fa-check"></i> Máquina Operante</button>`;
                                 }
                             }
                         });
                     }
                 }
-                
-                try {
-                    const snapConfig = await getDoc(doc(db, "configuracoes_loja", window.idClienteLogado));
-                    if(snapConfig.exists() && snapConfig.data().ramo) {
-                        document.getElementById('selectRamo').value = snapConfig.data().ramo;
-                        window.verificarRamoAtivo(snapConfig.data().ramo);
-                    }
-                } catch(e) {}
+                try { const snapConfig = await getDoc(doc(db, "configuracoes_loja", window.idClienteLogado)); if(snapConfig.exists() && snapConfig.data().ramo) { document.getElementById('selectRamo').value = snapConfig.data().ramo; window.verificarRamoAtivo(snapConfig.data().ramo); } } catch(e) {}
             } else window.location.href = "index.html";
         });
 
-        // Demais funções mantidas idênticas (Ramo, Tabela, Modal, Disparos)
-        window.salvarConfigRamo = async function() { const r = document.getElementById('selectRamo').value; if(!r) return alert("⚠️ Selecione!"); try { await setDoc(doc(db, "configuracoes_loja", window.idClienteLogado), { ramo: r }, { merge: true }); alert("✅ Salvo!"); window.verificarRamoAtivo(r); } catch(e) { alert("❌ Erro."); } }
-        window.verificarRamoAtivo = function(r) { const c = document.getElementById('cardFidelidade'); if (['pizzaria', 'hamburgueria', 'restaurante'].includes(r)) c.style.display = 'block'; else c.style.display = 'none'; }
-        window.abrirModalCardapio = async function() { if (window.planoClienteLogado === 'basico') return alert("⚠️ Recurso Premium!"); document.getElementById('modalCardapio').style.display = 'flex'; try { const s = await getDoc(doc(db, "cardapios_loja", window.idClienteLogado)); if(s.exists()) { let d = s.data(); window.itensCardapio = d.itens || []; if(d.metaFidelidade) document.getElementById('metaFidelidade').value = d.metaFidelidade; renderizarTabelaCardapio(); } } catch(e) {} }
+        // ⚙️ GESTÃO AVANÇADA DE CARDÁPIO
+        window.abrirModalCardapio = async function() {
+            if (window.planoClienteLogado === 'basico') return alert("⚠️ Recurso Premium! Faça o upgrade para o robô gerenciar seus tamanhos e sabores automaticamente.");
+            document.getElementById('modalCardapio').style.display = 'flex';
+            try {
+                const s = await getDoc(doc(db, "cardapios_loja", window.idClienteLogado));
+                if(s.exists()) {
+                    let d = s.data(); 
+                    window.menuData.tamanhos = d.tamanhos || []; window.menuData.bordas = d.bordas || []; window.menuData.sabores = d.sabores || [];
+                    document.getElementById('metaFidelidade').value = d.metaFidelidade || '';
+                    document.getElementById('tempoEntrega').value = d.tempoEntrega || '';
+                    document.getElementById('taxaEntrega').value = d.taxaEntrega || '';
+                    renderAllLists();
+                }
+            } catch(e) {}
+        }
         window.fecharModalCardapio = () => document.getElementById('modalCardapio').style.display = 'none';
-        window.adicionarItemCardapio = function() { const n=document.getElementById('itemNum').value, no=document.getElementById('itemNome').value, p=document.getElementById('itemPreco').value; if(!n||!no||!p) return alert("Preencha tudo!"); window.itensCardapio.push({num:n, nome:no, preco:p}); renderizarTabelaCardapio(); document.getElementById('itemNum').value=''; document.getElementById('itemNome').value=''; document.getElementById('itemPreco').value=''; }
-        window.removerItemCardapio = (i) => { window.itensCardapio.splice(i, 1); renderizarTabelaCardapio(); }
-        window.renderizarTabelaCardapio = function() { const tb = document.getElementById('listaItensCardapio'); let h = ''; if(window.itensCardapio.length===0) h='<tr><td colspan="4" style="text-align:center; color:#999; padding:15px;">Vazio.</td></tr>'; else window.itensCardapio.forEach((i, idx) => h+=`<tr><td><b>${i.num}</b></td><td>${i.nome}</td><td>${i.preco}</td><td><button class="btn-outline" style="padding:2px 8px; color:var(--danger); border-color:var(--danger);" onclick="removerItemCardapio(${idx})">X</button></td></tr>`); tb.innerHTML=h; }
-        window.salvarCardapioNuvem = async function() { const b=document.getElementById('btnSalvarCardapio'), im=document.getElementById('imgCardapio').files[0], m=document.getElementById('metaFidelidade').value; if (window.itensCardapio.length===0) return alert("Cadastre 1 item."); b.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i>...'; b.disabled=true; let b64=null, mi=null; if(im) { if((im.size/1024/1024)>5){b.innerHTML='Salvar';b.disabled=false;return alert("Máx 5MB.");} const l=new FileReader(); b64=await new Promise((r)=>{l.onload=(e)=>r(e.target.result.split(',')[1]);l.readAsDataURL(im);}); mi=im.type; } try { let p={itens:window.itensCardapio, metaFidelidade:m||10}; if(b64){p.imgMenuBase64=b64;p.mimeMenu=mi;} await setDoc(doc(db,"cardapios_loja",window.idClienteLogado),p,{merge:true}); alert("✅ Salvo!"); fecharModalCardapio(); } catch(e){} b.innerHTML='<i class="fa-solid fa-cloud-arrow-up"></i> Salvar no Robô'; b.disabled=false; }
+
+        window.addObj = function(tipo) {
+            if(tipo === 'tamanhos') {
+                const n = document.getElementById('tamNome').value; const q = document.getElementById('tamQtd').value;
+                if(!n || !q) return; window.menuData.tamanhos.push({nome: n, qtd: q}); document.getElementById('tamNome').value=''; document.getElementById('tamQtd').value='';
+            } else if(tipo === 'bordas') {
+                const n = document.getElementById('bordaNome').value; const p = document.getElementById('bordaPreco').value;
+                if(!n) return; window.menuData.bordas.push({nome: n, preco: p||0}); document.getElementById('bordaNome').value=''; document.getElementById('bordaPreco').value='';
+            } else if(tipo === 'sabores') {
+                const n = document.getElementById('saborNome').value; const c = document.getElementById('saborCategoria').value; const p = document.getElementById('saborPreco').value;
+                if(!n) return; window.menuData.sabores.push({nome: n, cat: c, preco: p||0}); document.getElementById('saborNome').value=''; document.getElementById('saborPreco').value='';
+            }
+            renderAllLists();
+        }
+        
+        window.removeObj = (tipo, idx) => { window.menuData[tipo].splice(idx, 1); renderAllLists(); }
+
+        window.renderAllLists = function() {
+            const render = (arr, elId, fields) => {
+                let h=''; if(arr.length===0) h='<tr><td style="padding:15px; color:#999; text-align:center;">Nenhum item.</td></tr>';
+                else arr.forEach((o, i) => { h+=`<tr>${fields.map(f=>`<td style="padding:8px; border-bottom:1px solid #eee;">${o[f]}</td>`).join('')} <td style="text-align:right;"><button class="btn-outline" style="padding:2px 8px; color:var(--danger); border:none;" onclick="removeObj('${elId.replace('lista','')}', ${i})">X</button></td></tr>` });
+                document.getElementById(elId).innerHTML = h;
+            };
+            render(window.menuData.tamanhos, 'listaTamanhos', ['nome', 'qtd']);
+            render(window.menuData.bordas, 'listaBordas', ['nome', 'preco']);
+            render(window.menuData.sabores, 'listaSabores', ['nome', 'cat', 'preco']);
+        }
+
+        window.salvarCardapioNuvem = async function() {
+            const btn = document.getElementById('btnSalvarCardapio');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Gravando Inteligência...'; btn.disabled = true;
+            
+            const im = document.getElementById('imgCardapio').files[0];
+            let b64=null, mi=null;
+            if(im) { if((im.size/1024/1024)>5){btn.innerHTML='Gravar Inteligência no Robô';btn.disabled=false;return alert("Máx 5MB.");} const l=new FileReader(); b64=await new Promise((r)=>{l.onload=(e)=>r(e.target.result.split(',')[1]);l.readAsDataURL(im);}); mi=im.type; }
+            
+            try {
+                let payload = {
+                    tamanhos: window.menuData.tamanhos, bordas: window.menuData.bordas, sabores: window.menuData.sabores,
+                    metaFidelidade: document.getElementById('metaFidelidade').value,
+                    tempoEntrega: document.getElementById('tempoEntrega').value,
+                    taxaEntrega: document.getElementById('taxaEntrega').value
+                };
+                if(b64){ payload.imgMenuBase64=b64; payload.mimeMenu=mi; }
+                await setDoc(doc(db,"cardapios_loja",window.idClienteLogado), payload, {merge:true});
+                alert("✅ Robô foi treinado com o novo cardápio!"); fecharModalCardapio();
+            } catch(e) { alert("❌ Falha na comunicação com a Oracle."); }
+            btn.innerHTML='<i class="fa-solid fa-cloud-arrow-up"></i> Gravar Inteligência no Robô'; btn.disabled=false;
+        }
+
+        // Funções Padrões do Painel
+        window.salvarConfigRamo = async function() { const r = document.getElementById('selectRamo').value; if(!r) return alert("⚠️ Selecione!"); try { await setDoc(doc(db, "configuracoes_loja", window.idClienteLogado), { ramo: r }, { merge: true }); alert("✅ Salvo!"); window.verificarRamoAtivo(r); } catch(e) {} }
+        window.verificarRamoAtivo = function(r) { const c = document.getElementById('cardFidelidade'); if (['pizzaria', 'hamburgueria', 'restaurante'].includes(r)) c.style.display = 'block'; else c.style.display = 'none'; }
         window.ordenarTabela = function(c) { if (window.ordemAtual.coluna===c) window.ordemAtual.direcao=window.ordemAtual.direcao==='asc'?'desc':'asc'; else {window.ordemAtual.coluna=c; window.ordemAtual.direcao='asc';} window.listaContatos.sort((a,b)=>{let vA='';let vB=''; if(c==='nome'){vA=a.nome.toLowerCase();vB=b.nome.toLowerCase();}else if(c==='nascimento'){vA=a.aniversario||'';vB=b.aniversario||'';}else if(c==='tags'){vA=(a.tags&&a.tags.length>0)?a.tags[0].toLowerCase():'z';vB=(b.tags&&b.tags.length>0)?b.tags[0].toLowerCase():'z';} if(vA<vB) return window.ordemAtual.direcao==='asc'?-1:1; if(vA>vB) return window.ordemAtual.direcao==='asc'?1:-1; return 0;}); renderizarTabela(); }
         window.salvarContatosLocal = async function() { if (window.idClienteLogado) { localStorage.setItem('crm_'+window.idClienteLogado, JSON.stringify(window.listaContatos)); try { await setDoc(doc(db,"crm_clientes",window.idClienteLogado),{contatos:window.listaContatos}); }catch(e){} document.getElementById('totalContatosCard').innerText=window.listaContatos.length; } }
         window.carregarContatosLocal = function() { if (window.idClienteLogado) { const d=localStorage.getItem('crm_'+window.idClienteLogado); if(d) {window.listaContatos=JSON.parse(d); renderizarTabela(); document.getElementById('totalContatosCard').innerText=window.listaContatos.length;} } }
@@ -447,6 +410,4 @@
         window.alternarTodosChecks = () => document.querySelectorAll('.check-contato').forEach(c=>c.checked=document.getElementById('checkTodos').checked);
         window.fazerLogout = () => signOut(auth).then(()=>window.location.href="index.html");
         window.atualizarListaTagsDisparo = () => { const d=document.getElementById('listaTagsDisparo');let h='<label style="display:block; padding:10px; background:white; border-radius:8px; margin-bottom:5px; border: 1px solid #cbd5e1; font-weight:bold;"><input type="checkbox" value="TODOS_OS_CONTATOS"> 📢 TODOS OS CONTATOS</label>';let t=new Set();window.listaContatos.forEach(c=>c.tags&&c.tags.forEach(x=>t.add(x)));Array.from(t).forEach(x=>h+=`<label style="display:block; padding:10px; background:white; border-radius:8px; margin-bottom:5px; border: 1px solid #cbd5e1;"><input type="checkbox" value="${x}"> 🏷️ ${x}</label>`);d.innerHTML=h; }
-    </script>
-</body>
-</html>
+    </script
