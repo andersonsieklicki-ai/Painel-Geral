@@ -1,369 +1,410 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Painel Administrativo - Omnichannel PRO</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
+const qrcode = require('qrcode-terminal');
+const admin = require('firebase-admin');
+const express = require('express');
+const cors = require('cors');
+const os = require('os'); 
 
-    <style>
-        :root { --primary: #2563eb; --primary-dark: #1e40af; --sidebar-bg: #0f172a; --bg-color: #f8fafc; --card-bg: #ffffff; --text-main: #334155; --text-muted: #64748b; --success: #10b981; --danger: #ef4444; --warning: #f59e0b; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); margin: 0; display: flex; height: 100vh; overflow: hidden; color: var(--text-main); }
-        .sidebar { width: 260px; background-color: var(--sidebar-bg); color: white; display: flex; flex-direction: column; transition: 0.3s; z-index: 100; }
-        .sidebar-header { padding: 20px; display: flex; align-items: center; gap: 10px; font-size: 1.2rem; font-weight: 700; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .sidebar-nav { flex: 1; padding: 20px 10px; overflow-y: auto; }
-        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 15px; color: #cbd5e1; text-decoration: none; border-radius: 8px; margin-bottom: 5px; cursor: pointer; transition: 0.2s; font-weight: 500; }
-        .nav-item:hover, .nav-item.active { background-color: var(--primary); color: white; }
-        .sidebar-footer { padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); }
-        .logout-btn { color: #fca5a5; cursor: pointer; display: flex; align-items: center; gap: 10px; font-weight: 600; padding: 10px; transition: 0.2s; border-radius: 8px;}
-        .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
-        .topbar { background: var(--card-bg); padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; }
-        .empresa-info { display: flex; align-items: center; gap: 15px; } .empresa-info h2 { margin: 0; font-size: 1.2rem; color: #0f172a; }
-        .tag-plano { background: #dbeafe; color: var(--primary-dark); padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; display: flex; align-items: center; gap: 5px; }
-        .mobile-logout { display: none; color: var(--danger); font-size: 1.2rem; cursor: pointer; }
-        .page-section { display: none; padding: 30px; overflow-y: auto; height: 100%; box-sizing: border-box; } .page-section.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-        .grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-        .card { background: var(--card-bg); border-radius: 12px; padding: 25px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0; }
-        .card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; color: #0f172a; font-size: 1.1rem; font-weight: 600; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px;}
-        .btn { border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
-        .btn-primary { background-color: var(--primary); color: white; } .btn-success { background-color: var(--success); color: white; } .btn-danger { background-color: var(--danger); color: white; } .btn-warning { background-color: var(--warning); color: white; }
-        .btn-outline { background-color: transparent; border: 1px solid #cbd5e1; color: var(--text-main); }
-        .status-box { display: flex; align-items: center; background-color: #f1f5f9; padding: 15px; border-radius: 10px; font-weight: 600; font-size: 0.95rem; margin-bottom: 15px;}
-        .status-indicator { width: 12px; height: 12px; background-color: #94a3b8; border-radius: 50%; margin-right: 10px; display: inline-block; transition: 0.3s;}
-        .status-indicator.online { background-color: var(--success); box-shadow: 0 0 8px var(--success); }
-        .qr-container { text-align: center; margin-top: 15px; padding: 15px; border: 2px dashed #cbd5e1; border-radius: 10px; display: none; background: white;}
-        
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 10000; padding: 20px; }
-        .modal-content { background: white; padding: 30px; border-radius: 15px; width: 100%; max-width: 650px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
-        .modal input[type="text"], .modal input[type="number"], .modal textarea, .modal select { width: 100%; padding: 12px; margin: 8px 0 15px 0; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; outline: none; }
-        
-        .tabs { display: flex; border-bottom: 2px solid #e2e8f0; margin-bottom: 20px; overflow-x: auto; }
-        .tab-btn { flex: 1; background: none; border: none; padding: 12px; font-weight: 600; color: #64748b; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; white-space: nowrap;}
-        .tab-btn.active { color: var(--primary); border-color: var(--primary); }
-        .tab-content { display: none; } .tab-content.active { display: block; }
-        
-        .grid-itens { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-top: 15px; }
-        .item-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-        .item-card .icon-cat { font-size: 1.5rem; margin-bottom: 8px; }
-        .item-card h4 { margin: 0 0 5px 0; font-size: 0.9rem; color: #0f172a; }
-        .item-card p { margin: 0; font-size: 0.85rem; color: var(--primary); font-weight: 600; }
-        .item-card .btn-del { position: absolute; top: 8px; right: 8px; color: #ef4444; background: #fee2e2; border: none; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .form-add-mobile { display: flex; flex-direction: column; gap: 5px; background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 10px; border: 1px solid #e2e8f0;}
+// ==========================================
+// 1. CONFIGURAÇÕES GERAIS E TELEGRAM
+// ==========================================
+const TELEGRAM_TOKEN = '8273223604:AAF92Sjiwg7YqjOy6prbB4PlhhCvSpwP06Y';
+const TELEGRAM_CHAT_ID = '780991117';
 
-        @media (max-width: 768px) {
-            body { flex-direction: column; }
-            .sidebar { position: fixed; bottom: 0; left: 0; width: 100%; height: 70px; flex-direction: row; padding: 0; box-shadow: 0 -4px 15px rgba(0,0,0,0.1); justify-content: space-around; align-items: center; z-index: 9999; }
-            .sidebar-header, .sidebar-footer { display: none; }
-            .sidebar-nav { display: flex; flex-direction: row; width: 100%; justify-content: space-around; padding: 0; }
-            .nav-item { flex-direction: column; gap: 4px; padding: 10px; font-size: 0.65rem; border-radius: 0; margin: 0; flex: 1; text-align: center; color: #cbd5e1; }
-            .nav-item i { font-size: 1.4rem; margin-bottom: 2px; }
-            .nav-item.active { background: transparent; color: #38bdf8; border-top: 3px solid #38bdf8; }
-            .topbar { padding: 15px; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.05);}
-            .empresa-info h2 { font-size: 1.1rem; } .tag-plano { font-size: 0.65rem; } .mobile-logout { display: block; }
-            .main-content { overflow-y: auto; height: calc(100vh - 70px); }
-            .page-section { padding: 15px; padding-bottom: 90px; } 
-            .grid-cards { grid-template-columns: 1fr; }
-            .modal-content { padding: 20px; }
+async function avisarTelegram(mensagem) {
+    const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage?chat_id=${TELEGRAM_CHAT_ID}&text=${encodeURIComponent(mensagem)}`;
+    try { await fetch(url); } catch (erro) { console.log('Erro Telegram', erro); }
+}
+
+const terminalLogs = [];
+function logConsole(modulo, mensagem) {
+    const dataHora = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+    const linha = `[${dataHora}] [${modulo}] ${mensagem}`;
+    console.log(linha);
+    terminalLogs.push(linha);
+    if (terminalLogs.length > 100) terminalLogs.shift();
+}
+
+// ==========================================
+// 2. CONEXÃO FIREBASE (SaaS Exclusivo)
+// ==========================================
+const serviceAccountSaas = require('./firebase-key-saas.json');
+const appSaas = admin.initializeApp({ credential: admin.credential.cert(serviceAccountSaas) }); 
+const dbSaas = appSaas.firestore();
+
+logConsole('SISTEMA', '⚡ Conexão estabelecida: Servidor Omnichannel SaaS (Limpo)');
+
+// ==========================================
+// 3. API DO PAINEL DE CONTROLE WEB
+// ==========================================
+const app = express();
+app.use(cors());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
+
+const PALAVRA_PASSE = "123321"; 
+app.use('/api', function(req, res, next) {
+    const passRecebida = req.headers['x-senha'];
+    if (passRecebida === PALAVRA_PASSE) next(); 
+    else res.status(401).json({ erro: "Acesso Negado!" }); 
+});
+
+app.get('/api/logs', (req, res) => res.json(terminalLogs));
+
+app.get('/api/hardware', function(req, res) {
+    const memTotal = os.totalmem(); const memLivre = os.freemem();
+    const ramUsada = (((memTotal - memLivre) / memTotal) * 100).toFixed(1);
+    const cpus = os.cpus().length; const cargaCores = os.loadavg()[0]; 
+    let cpuUso = ((cargaCores / cpus) * 100).toFixed(1);
+    if (cpuUso > 100) cpuUso = 100;
+    res.json({ ram: ramUsada, cpu: cpuUso });
+});
+
+// ROTAS DO WHATSAPP PREMIUM (CONECTAR E DESCONECTAR)
+app.post('/api/saas/conectar', async function(req, res) {
+    const { idCliente } = req.body;
+    if (!idCliente) return res.status(400).json({ erro: "ID necessário" });
+    try {
+        const docEmpresa = await dbSaas.collection('empresas').doc(idCliente).get();
+        if (!docEmpresa.exists) return res.status(404).json({ erro: "Cliente não cadastrado" });
+        
+        await dbSaas.collection('clientes_premium').doc(idCliente).set({ qrCode: null, status: 'iniciando', timestamp: admin.firestore.FieldValue.serverTimestamp() }, { merge: true });
+        if (sessoesSaaS[idCliente]) { try { await sessoesSaaS[idCliente].destroy(); } catch(e){} delete sessoesSaaS[idCliente]; }
+        await iniciarRoboCliente(idCliente);
+        res.json({ success: true, mensagem: "Gerando QR Code..." });
+    } catch (e) { res.status(500).json({ erro: "Falha: " + e.message }); }
+});
+
+app.post('/api/saas/desconectar', async function(req, res) {
+    const { idCliente } = req.body;
+    if (!idCliente) return res.status(400).json({ erro: "ID necessário" });
+    try {
+        if (sessoesSaaS[idCliente]) {
+            logConsole('SaaS', `🔌 Desconectando sessão do cliente ${idCliente}...`);
+            try { await sessoesSaaS[idCliente].logout(); } catch(e) {}
+            try { await sessoesSaaS[idCliente].destroy(); } catch(e) {}
+            delete sessoesSaaS[idCliente];
         }
-    </style>
-</head>
-<body>
+        await dbSaas.collection('clientes_premium').doc(idCliente).update({ qrCode: null, status: 'desconectado' });
+        res.json({ success: true, mensagem: "Desconectado com sucesso." });
+    } catch (e) { res.status(500).json({ erro: "Falha ao desconectar: " + e.message }); }
+});
 
-    <aside class="sidebar">
-        <div class="sidebar-header"><i class="fa-solid fa-rocket" style="color: #60a5fa;"></i> Omnichannel</div>
-        <nav class="sidebar-nav">
-            <div class="nav-item active" onclick="trocarPagina('inicio', this)"><i class="fa-solid fa-house"></i> Início</div>
-            <div class="nav-item" onclick="trocarPagina('crm', this)"><i class="fa-solid fa-users"></i> Contatos</div>
-            <div class="nav-item" onclick="trocarPagina('config', this)"><i class="fa-solid fa-gear"></i> Ajustes</div>
-        </nav>
-        <div class="sidebar-footer"><div class="logout-btn" onclick="fazerLogout()"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sair do Painel</div></div>
-    </aside>
+// ==========================================
+// 4. MEMÓRIA SAAS E CACHE DE LOJAS
+// ==========================================
+const sessoesSaaS = {}; 
+const sessoesPremium = {}; 
+const memoriaSaaSBasico = {}; 
+const cacheSaaSEmpresas = {}; 
 
-    <main class="main-content">
-        <header class="topbar">
-            <div class="empresa-info"><h2 id="nomeCliente">Carregando...</h2><div class="tag-plano" id="tagPlano"><i class="fa-solid fa-medal"></i> PRO</div></div>
-            <div class="mobile-logout" onclick="fazerLogout()"><i class="fa-solid fa-arrow-right-from-bracket"></i></div>
-        </header>
-
-        <section id="page-inicio" class="page-section active">
-            <h2 style="margin-top: 0; color: #0f172a;">Visão Geral</h2>
-            <div class="grid-cards">
-                <div class="card">
-                    <div class="card-header"><i class="fa-solid fa-robot"></i> Status do Motor</div>
-                    <div class="status-box" id="area-conexao-status"><span class="status-indicator" id="bolinha-status"></span><span id="texto-status">Verificando Servidor...</span></div>
-                    <div id="area-botao-conectar" style="display: flex; flex-direction: column; gap: 8px;"></div>
-                    <div class="qr-container" id="area-qr-code"><h4 id="status-texto-qr" style="color: var(--primary); margin-top: 0;">Gerando QR...</h4><img id="qrcode-imagem" style="max-width: 100%; border-radius: 8px; display: none; margin: 0 auto;"></div>
-                </div>
-            </div>
-        </section>
-
-        <section id="page-crm" class="page-section"><h2>Gestão de Clientes</h2><p>As funções de Importar VCF e Disparo estão mantidas no seu código original.</p></section>
-        
-        <section id="page-config" class="page-section">
-            <h2 style="margin-top: 0; color: #0f172a;">Ajustes do Negócio</h2>
-            <div class="grid-cards">
-                <div class="card">
-                    <div class="card-header"><i class="fa-solid fa-store"></i> Perfil do Ramo</div>
-                    <select id="selectRamo" class="select-ramo" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; margin-bottom: 15px;">
-                        <option value="">Selecione uma opção...</option>
-                        <optgroup label="🍔 Setor de Alimentação"><option value="pizzaria">Pizzaria</option><option value="hamburgueria">Hamburgueria / Lanchonete</option></optgroup>
-                        <optgroup label="🛍️ Setor de Vendas"><option value="varejo">Comércio Geral</option></optgroup>
-                    </select>
-                    <button class="btn btn-primary" onclick="salvarConfigRamo()"><i class="fa-solid fa-save"></i> Atualizar Perfil</button>
-                </div>
-                <div class="card" id="cardFidelidade" style="display: none; border-color: #fdba74;">
-                    <div class="card-header" style="color: #ea580c;"><i class="fa-solid fa-pizza-slice"></i> Cardápio App</div>
-                    <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 20px;">Adicione produtos visuais para o robô automatizar vendas.</p>
-                    <button class="btn btn-block" style="background-color: #ea580c; color: white;" onclick="abrirModalCardapio()"><i class="fa-solid fa-mobile-screen"></i> Gerenciar Kiosk</button>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <div class="modal" id="modalCardapio">
-        <div class="modal-content">
-            <h2 style="margin-top: 0; color: #ea580c; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
-                <span><i class="fa-solid fa-store"></i> Automação de Pedidos</span>
-                <button class="btn btn-primary" style="font-size: 0.8rem; padding: 5px 10px;" onclick="document.getElementById('importarJsonCardapio').click()"><i class="fa-solid fa-upload"></i> Importar JSON</button>
-                <input type="file" id="importarJsonCardapio" accept=".json" style="display:none;" onchange="importarCardapioJson(event)">
-            </h2>
-            
-            <div class="tabs">
-                <button class="tab-btn active" onclick="trocarAbaMenu('geral')" id="btn-menu-geral">⚙️ Setup</button>
-                <button class="tab-btn" onclick="trocarAbaMenu('tamanhos')" id="btn-menu-tamanhos">📐 Tamanhos</button>
-                <button class="tab-btn" onclick="trocarAbaMenu('bordas')" id="btn-menu-bordas">🧀 Bordas</button>
-                <button class="tab-btn" onclick="trocarAbaMenu('sabores')" id="btn-menu-sabores">🍕 Sabores</button>
-                <button class="tab-btn" onclick="trocarAbaMenu('porcoes')" id="btn-menu-porcoes">🍟 Porções</button>
-            </div>
-
-            <div id="aba-menu-geral" class="tab-content active">
-                <label style="font-weight: 600; font-size: 0.9rem;">Imagem do Cardápio (Enviada pro Cliente):</label>
-                <input type="file" id="imgCardapio" accept="image/*" style="margin-bottom: 15px;">
-                <div style="display: flex; flex-direction: column; gap: 10px;">
-                    <div><label style="font-size: 0.85rem; font-weight: bold;">Tempo Entrega:</label><input type="text" id="tempoEntrega" placeholder="Ex: 30 min"></div>
-                    <div><label style="font-size: 0.85rem; font-weight: bold;">Taxa Entrega Padrão (R$):</label><input type="number" id="taxaEntrega" placeholder="Ex: 5.00"></div>
-                </div>
-            </div>
-
-            <div id="aba-menu-tamanhos" class="tab-content">
-                <div class="form-add-mobile">
-                    <input type="text" id="tamNome" placeholder="Ex: Grande">
-                    <div style="display: flex; gap: 8px;"><input type="number" id="tamQtd" placeholder="Máx Sabores" style="flex: 1;"><input type="number" id="tamPreco" placeholder="R$ Adicional" style="flex: 1;"></div>
-                    <button class="btn btn-primary" onclick="addObj('tamanhos')"><i class="fa-solid fa-plus"></i> Adicionar</button>
-                </div>
-                <div class="grid-itens" id="listaTamanhos"></div>
-            </div>
-            
-            <div id="aba-menu-bordas" class="tab-content">
-                <div class="form-add-mobile">
-                    <input type="text" id="bordaNome" placeholder="Ex: Borda Cheddar">
-                    <input type="number" id="bordaPreco" placeholder="R$ Adicional">
-                    <button class="btn btn-primary" onclick="addObj('bordas')"><i class="fa-solid fa-plus"></i> Adicionar</button>
-                </div>
-                <div class="grid-itens" id="listaBordas"></div>
-            </div>
-
-            <div id="aba-menu-sabores" class="tab-content">
-                <div class="form-add-mobile">
-                    <input type="text" id="saborNome" placeholder="Nome (Ex: Calabresa)">
-                    <div style="display: flex; gap: 8px;"><select id="saborCategoria" style="flex: 1;"><option value="🍕">Salgada</option><option value="🍫">Doce</option></select><input type="number" id="saborPreco" placeholder="Preço" style="flex: 1;"></div>
-                    <button class="btn btn-primary" onclick="addObj('sabores')"><i class="fa-solid fa-plus"></i> Adicionar</button>
-                </div>
-                <div class="grid-itens" id="listaSabores" style="max-height: 250px; overflow-y: auto; padding: 5px;"></div>
-            </div>
-
-            <div id="aba-menu-porcoes" class="tab-content">
-                <div class="form-add-mobile">
-                    <input type="text" id="porcaoNome" placeholder="Ex: Batata Frita Média">
-                    <input type="number" id="porcaoPreco" placeholder="Preço (R$)">
-                    <button class="btn btn-primary" onclick="addObj('porcoes')"><i class="fa-solid fa-plus"></i> Adicionar Porção</button>
-                </div>
-                <div class="grid-itens" id="listaPorcoes" style="max-height: 250px; overflow-y: auto; padding: 5px;"></div>
-            </div>
-
-            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px;">
-                <button class="btn btn-outline" onclick="fecharModalCardapio()">Cancelar</button>
-                <button class="btn" style="background-color: #ea580c; color: white;" onclick="salvarCardapioNuvem()" id="btnSalvarCardapio"><i class="fa-solid fa-cloud-arrow-up"></i> Gravar Inteligência no Robô</button>
-            </div>
-        </div>
-    </div>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-
-        const firebaseConfig = { apiKey: "AIzaSyC4-2LavZt7iWPt2u71u-yRUYbIJu-Vzf0", authDomain: "central-omnichannel-saas.firebaseapp.com", projectId: "central-omnichannel-saas", storageBucket: "central-omnichannel-saas.firebasestorage.app", messagingSenderId: "869327159480", appId: "1:869327159480:web:605be5ec37ab688d44b44d", measurementId: "G-984WSSJBHP" };
-        const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
-
-        window.idClienteLogado = ""; window.planoClienteLogado = "basico"; 
-        
-        // Memória do Menu VIP + Porções
-        window.menuData = { tamanhos: [], bordas: [], sabores: [], porcoes: [] };
-
-        window.trocarPagina = function(idAba, el) { document.querySelectorAll('.page-section').forEach(e => e.classList.remove('active')); document.querySelectorAll('.nav-item').forEach(e => e.classList.remove('active')); document.getElementById('page-' + idAba).classList.add('active'); el.classList.add('active'); }
-        window.trocarAbaMenu = function(aba) { document.querySelectorAll('#modalCardapio .tab-btn').forEach(e=>e.classList.remove('active')); document.querySelectorAll('#modalCardapio .tab-content').forEach(e=>e.classList.remove('active')); document.getElementById('btn-menu-'+aba).classList.add('active'); document.getElementById('aba-menu-'+aba).classList.add('active'); }
-
-        // ==========================================
-        // IMPORTADOR DE JSON MÁGICO
-        // ==========================================
-        window.importarCardapioJson = function(event) {
-            const file = event.target.files[0];
-            if(!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const json = JSON.parse(e.target.result);
-                    if(json.tamanhos) window.menuData.tamanhos = json.tamanhos;
-                    if(json.bordas) window.menuData.bordas = json.bordas;
-                    if(json.sabores) window.menuData.sabores = json.sabores;
-                    if(json.porcoes) window.menuData.porcoes = json.porcoes;
-                    
-                    renderCards();
-                    alert("✅ JSON Importado com sucesso!\nVerifique as abas para confirmar os produtos e depois clique em 'Gravar Inteligência no Robô' para salvar na nuvem.");
-                } catch(err) {
-                    alert("❌ O arquivo selecionado não é um JSON válido.");
-                }
-            };
-            reader.readAsText(file);
-            event.target.value = ''; // Limpa o input para poder importar de novo se precisar
-        }
-
-        window.conectarRoboPremium = async function() {
-            const btn = document.getElementById('btnConectarZapBase');
-            if(btn) { btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Acionando Oracle...'; btn.disabled = true; }
-            try {
-                const res = await fetch('/api-oracle/api/saas/conectar', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-senha': '123321' }, body: JSON.stringify({ idCliente: window.idClienteLogado }) });
-                if (!res.ok) throw new Error("Erro");
-                document.getElementById('area-qr-code').style.display = 'block'; document.getElementById('status-texto-qr').innerText = "Gerando QR Code..."; document.getElementById('qrcode-imagem').style.display = 'none';
-            } catch(e) { alert("❌ Erro Oracle."); if(btn) { btn.innerHTML = '<i class="fa-solid fa-mobile-screen"></i> Ligar WhatsApp'; btn.disabled = false; } }
-        }
-
-        window.desconectarRoboPremium = async function() {
-            if(!confirm("⚠️ Tem certeza que deseja desligar o robô de vendas do seu WhatsApp?")) return;
-            try {
-                await fetch('/api-oracle/api/saas/desconectar', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-senha': '123321' }, body: JSON.stringify({ idCliente: window.idClienteLogado }) });
-                document.getElementById('area-qr-code').style.display = 'none';
-            } catch(e) { alert("❌ Erro ao desconectar."); }
-        }
-
-        onAuthStateChanged(auth, async function(user) {
-            if (user) {
-                window.idClienteLogado = user.uid;
-                const snap = await getDoc(doc(db, "empresas", user.uid));
-                if (snap.exists()) {
-                    const d = snap.data(); window.planoClienteLogado = d.plano || 'basico';
-                    const areaBtn = document.getElementById('area-botao-conectar');
-                    
-                    if (d.plano === 'basico') { 
-                        document.getElementById('bolinha-status').className = 'status-indicator online'; document.getElementById('texto-status').innerText = "Motor Global Online"; areaBtn.innerHTML = '';
-                    } else { 
-                        onSnapshot(doc(db, "clientes_premium", window.idClienteLogado), (docSnap) => {
-                            if(docSnap.exists()) {
-                                const dataRobo = docSnap.data();
-                                if(dataRobo.status === 'iniciando') {
-                                    document.getElementById('area-qr-code').style.display = 'block'; document.getElementById('status-texto-qr').innerText = "Iniciando Motor...";
-                                } else if(dataRobo.qrCode) {
-                                    document.getElementById('area-qr-code').style.display = 'block'; document.getElementById('status-texto-qr').innerText = "Aponte o celular para o QR Code:";
-                                    QRCode.toDataURL(dataRobo.qrCode, { width: 250, margin: 2 }, function (err, url) { if(!err) { const img = document.getElementById('qrcode-imagem'); img.src = url; img.style.display = 'block'; } });
-                                    document.getElementById('bolinha-status').className = 'status-indicator'; document.getElementById('texto-status').innerText = "Aguardando leitura...";
-                                } else if(dataRobo.status === 'online') {
-                                    document.getElementById('area-qr-code').style.display = 'none'; document.getElementById('bolinha-status').className = 'status-indicator online'; document.getElementById('texto-status').innerText = "Conectado e Vendendo!";
-                                    if(areaBtn) areaBtn.innerHTML = `<button class="btn btn-outline" disabled style="border-color: var(--success); color: var(--success);"><i class="fa-solid fa-check-double"></i> WhatsApp Operante</button><button class="btn btn-danger" onclick="desconectarRoboPremium()"><i class="fa-solid fa-plug-circle-xmark"></i> Desconectar</button>`;
-                                } else {
-                                    document.getElementById('area-qr-code').style.display = 'none'; document.getElementById('bolinha-status').className = 'status-indicator'; document.getElementById('texto-status').innerText = "Motor Desligado";
-                                    if(areaBtn) areaBtn.innerHTML = `<button id="btnConectarZapBase" class="btn btn-primary" onclick="conectarRoboPremium()"><i class="fa-solid fa-mobile-screen"></i> Ligar Meu WhatsApp</button>`;
-                                }
-                            }
-                        });
-                    }
-                }
-                try { const sC = await getDoc(doc(db, "configuracoes_loja", window.idClienteLogado)); if(sC.exists() && sC.data().ramo) { document.getElementById('selectRamo').value = sC.data().ramo; window.verificarRamoAtivo(sC.data().ramo); } } catch(e) {}
+async function atualizarCacheSaaS() {
+    try {
+        const snap = await dbSaas.collection('empresas').get();
+        snap.forEach(doc => {
+            let numRaw = doc.data().whatsappLojista;
+            if (numRaw) { 
+                let n = String(numRaw).replace(/\D/g, ''); 
+                cacheSaaSEmpresas[n.length > 8 ? n.slice(-8) : n] = { id: doc.id, nome: doc.data().nomeEmpresa, plano: doc.data().plano || 'basico', zapOficial: n }; 
             }
         });
+    } catch(e) {}
+}
+setInterval(atualizarCacheSaaS, 60000); atualizarCacheSaaS();
 
-        // 🍕 GESTÃO AVANÇADA DE CARDÁPIO UI 
-        window.salvarConfigRamo = async function() { const r = document.getElementById('selectRamo').value; if(!r) return; await setDoc(doc(db, "configuracoes_loja", window.idClienteLogado), { ramo: r }, { merge: true }); window.verificarRamoAtivo(r); alert('Salvo!'); }
-        window.verificarRamoAtivo = function(r) { const c = document.getElementById('cardFidelidade'); if (['pizzaria', 'hamburgueria', 'restaurante'].includes(r)) c.style.display = 'block'; else c.style.display = 'none'; }
+function obterSaudacao() {
+    const hora = parseInt(new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: 'numeric', hour12: false }), 10);
+    if (hora >= 5 && hora < 12) return 'Bom dia'; if (hora >= 12 && hora < 18) return 'Boa tarde'; return 'Boa noite';
+}
 
-        window.abrirModalCardapio = async function() {
-            if (window.planoClienteLogado === 'basico') return alert("⚠️ Recurso Premium!");
-            document.getElementById('modalCardapio').style.display = 'flex';
-            try {
-                const s = await getDoc(doc(db, "cardapios_loja", window.idClienteLogado));
-                if(s.exists()) {
-                    let d = s.data(); 
-                    window.menuData.tamanhos = d.tamanhos || []; window.menuData.bordas = d.bordas || []; 
-                    window.menuData.sabores = d.sabores || []; window.menuData.porcoes = d.porcoes || [];
-                    document.getElementById('tempoEntrega').value = d.tempoEntrega || ''; document.getElementById('taxaEntrega').value = d.taxaEntrega || '';
-                    renderCards();
-                }
-            } catch(e) {}
-        }
-        window.fecharModalCardapio = () => document.getElementById('modalCardapio').style.display = 'none';
+// ==========================================
+// 5. MOTOR DA CENTRAL (Plano Básico)
+// ==========================================
+const client = new Client({
+    authStrategy: new LocalAuth({ clientId: 'central-bot' }),
+    puppeteer: { headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu', '--disable-web-security'], protocolTimeout: 300000 }
+});
 
-        window.addObj = function(tipo) {
-            if(tipo === 'tamanhos') {
-                const n=document.getElementById('tamNome').value, q=document.getElementById('tamQtd').value, p=document.getElementById('tamPreco').value;
-                if(!n) return; window.menuData.tamanhos.push({nome: n, qtd: q||1, preco: p||0});
-                document.getElementById('tamNome').value=''; document.getElementById('tamQtd').value=''; document.getElementById('tamPreco').value='';
-            } else if(tipo === 'bordas') {
-                const n=document.getElementById('bordaNome').value, p=document.getElementById('bordaPreco').value;
-                if(!n) return; window.menuData.bordas.push({nome: n, preco: p||0});
-                document.getElementById('bordaNome').value=''; document.getElementById('bordaPreco').value='';
-            } else if(tipo === 'sabores') {
-                const n=document.getElementById('saborNome').value, c=document.getElementById('saborCategoria').value, p=document.getElementById('saborPreco').value;
-                if(!n) return; window.menuData.sabores.push({nome: n, cat: c, preco: p||0});
-                document.getElementById('saborNome').value=''; document.getElementById('saborPreco').value='';
-            } else if(tipo === 'porcoes') {
-                const n=document.getElementById('porcaoNome').value, p=document.getElementById('porcaoPreco').value;
-                if(!n) return; window.menuData.porcoes.push({nome: n, preco: p||0});
-                document.getElementById('porcaoNome').value=''; document.getElementById('porcaoPreco').value='';
-            }
-            renderCards();
-        }
-        window.removeObj = (tipo, idx) => { window.menuData[tipo].splice(idx, 1); renderCards(); }
+client.on('qr', (qr) => logConsole('SISTEMA', 'O plano básico necessita da leitura do QR na Oracle (Opcional se focar só no Premium).'));
+client.on('disconnected', async (motivo) => { logConsole('SISTEMA', "❌ Central Desconectou! " + motivo); await avisarTelegram(`🚨 A CENTRAL SaaS caiu! Motivo: ${motivo}`); });
 
-        window.renderCards = function() {
-            const r = (arr, elId, t) => {
-                let h=''; if(!arr || arr.length===0) h='<p style="color:#999; font-size:0.8rem; width:100%; text-align:center;">Vazio.</p>';
-                else arr.forEach((o, i) => { 
-                    h+=`<div class="item-card">
-                        <button class="btn-del" onclick="removeObj('${t}', ${i})"><i class="fa-solid fa-xmark"></i></button>
-                        ${o.cat ? `<div class="icon-cat">${o.cat}</div>` : (t === 'porcoes' ? '<div class="icon-cat">🍟</div>' : '')}
-                        <h4>${o.nome}</h4>
-                        <p>${o.preco > 0 ? 'R$ '+o.preco : (o.qtd ? 'Máx '+o.qtd+' Sabores' : 'Sem Adicional')}</p>
-                    </div>` 
-                }); document.getElementById(elId).innerHTML = h;
-            };
-            r(window.menuData.tamanhos, 'listaTamanhos', 'tamanhos');
-            r(window.menuData.bordas, 'listaBordas', 'bordas');
-            r(window.menuData.sabores, 'listaSabores', 'sabores');
-            r(window.menuData.porcoes, 'listaPorcoes', 'porcoes');
-        }
+client.on('message', async function(msg) {
+    if (msg.from === 'status@broadcast' || msg.from.includes('@g.us') || msg.from.includes('@newsletter') || msg.from === client.info.wid._serialized) return;
+    if (['e2e_notification', 'protocol', 'call_log', 'revoked'].includes(msg.type)) return;
+    
+    const chatId = msg.from || ''; 
+    // Interceptador do SaaS Básico (Avisa o cliente para falar direto no zap da loja)
+    if (memoriaSaaSBasico[chatId]) {
+        const loja = memoriaSaaSBasico[chatId];
+        const linkWa = loja.zap ? `wa.me/${loja.zap}` : `o número de atendimento da loja`;
+        await msg.reply(`🤖 *Atendimento Automático*\n\nVocê respondeu a uma campanha de *${loja.nome}*.\n\nFale diretamente com a loja clicando no link abaixo:\n👉 ${linkWa}`);
+        delete memoriaSaaSBasico[chatId]; 
+        return; 
+    }
+});
 
-        window.salvarCardapioNuvem = async function() {
-            const btn = document.getElementById('btnSalvarCardapio'); btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; btn.disabled = true;
-            const im = document.getElementById('imgCardapio').files[0];
-            let b64=null, mi=null;
-            if(im) { if((im.size/1024/1024)>5){btn.innerHTML='Gravar Inteligência no Robô';btn.disabled=false;return alert("Máx 5MB.");} const l=new FileReader(); b64=await new Promise((r)=>{l.onload=(e)=>r(e.target.result.split(',')[1]);l.readAsDataURL(im);}); mi=im.type; }
+// ==========================================
+// 6. FILA GLOBAL DE ENVIOS (O Coração do Disparo)
+// ==========================================
+const filaDeEnviosSaaS = []; 
+let isProcessandoFilaSaaS = false;
+
+app.post('/api/saas/disparar', async (req, res) => {
+    const d = req.body; 
+    res.json({ success: true, total: d.numeros.length, mensagem: "Adicionado à Fila Global" });
+    for (let num of d.numeros) filaDeEnviosSaaS.push({ ...d, numOriginal: num });
+    logConsole('SaaS', `📥 ${d.numeros.length} envios recebidos de ${d.nomeEmpresa}.`);
+}); 
+
+setInterval(async function() {
+    if (isProcessandoFilaSaaS || filaDeEnviosSaaS.length === 0) return;
+    isProcessandoFilaSaaS = true;
+
+    while (filaDeEnviosSaaS.length > 0) {
+        const disparo = filaDeEnviosSaaS.shift(); 
+        let roboParaDisparo = disparo.plano === 'premium' ? sessoesSaaS[disparo.idCliente] : client;
+        if (!roboParaDisparo) roboParaDisparo = client; 
+
+        try {
+            let numLimpo = String(disparo.numOriginal).replace(/\D/g, ''); 
+            if (!numLimpo.startsWith('55')) numLimpo = '55' + numLimpo; 
             
-            try {
-                let payload = {
-                    tamanhos: window.menuData.tamanhos, bordas: window.menuData.bordas, 
-                    sabores: window.menuData.sabores, porcoes: window.menuData.porcoes,
-                    tempoEntrega: document.getElementById('tempoEntrega').value, 
-                    taxaEntrega: document.getElementById('taxaEntrega').value
-                };
-                if(b64){ payload.imgMenuBase64=b64; payload.mimeMenu=mi; }
-                await setDoc(doc(db,"cardapios_loja",window.idClienteLogado), payload, {merge:true});
-                alert("✅ Robô foi treinado com o novo cardápio!"); fecharModalCardapio();
-            } catch(e) {}
-            btn.innerHTML='<i class="fa-solid fa-cloud-arrow-up"></i> Gravar Inteligência no Robô'; btn.disabled=false;
+            let idValido = await roboParaDisparo.getNumberId(numLimpo);
+            if (!idValido) continue;
+
+            let jid = idValido._serialized; 
+            let msgFinal = disparo.mensagem || "";
+            
+            if (disparo.plano === 'basico') { 
+                msgFinal += msgFinal ? `\n\n*${disparo.nomeEmpresa}*\n_Mensagem automática._` : `*${disparo.nomeEmpresa}*\n_Mensagem automática._`; 
+                memoriaSaaSBasico[jid] = { nome: disparo.nomeEmpresa, zap: disparo.zapLojista }; 
+            }
+
+            if (disparo.midiaBase64 && disparo.midiaMime) {
+                const arquivoEnvio = new MessageMedia(disparo.midiaMime, disparo.midiaBase64, disparo.midiaNome || "arquivo");
+                await roboParaDisparo.sendMessage(jid, arquivoEnvio, { caption: msgFinal });
+            } else {
+                await roboParaDisparo.sendMessage(jid, msgFinal);
+            }
+
+            const pausa = (disparo.midiaBase64) ? 15000 : 8000;
+            await new Promise(r => setTimeout(r, pausa + Math.random() * 5000));
+        } catch (e) { }
+    }
+    isProcessandoFilaSaaS = false;
+}, 3000); 
+
+// ==========================================
+// 7. CÉREBRO NLP DA PIZZARIA (CLIENTES PREMIUM)
+// ==========================================
+async function processarMensagemPizzaria(chatId, textoCompleto, sessao, clienteBot, dadosCardapio, nomeCliente) {
+    textoCompleto = textoCompleto.toLowerCase();
+    
+    let tamanhoEscolhido = null; if (dadosCardapio.tamanhos) { for (let t of dadosCardapio.tamanhos) { if (textoCompleto.includes(t.nome.toLowerCase())) { tamanhoEscolhido = t; break; } } }
+    let bordaEscolhida = null; if (dadosCardapio.bordas) { for (let b of dadosCardapio.bordas) { if (textoCompleto.includes(b.nome.toLowerCase())) { bordaEscolhida = b; break; } } }
+    let saboresEscolhidos = []; if (dadosCardapio.sabores) { for (let s of dadosCardapio.sabores) { if (textoCompleto.includes(s.nome.toLowerCase())) { saboresEscolhidos.push(s); } } }
+    let porcoesEscolhidas = []; if (dadosCardapio.porcoes) { for (let p of dadosCardapio.porcoes) { if (textoCompleto.includes(p.nome.toLowerCase())) { porcoesEscolhidas.push(p); } } }
+    
+    let isRetirada = textoCompleto.includes('buscar') || textoCompleto.includes('retirar') || textoCompleto.includes('balcão') || textoCompleto.includes('balcao') || textoCompleto.includes('pegamos');
+
+    if (saboresEscolhidos.length > 0) {
+        if (!tamanhoEscolhido && dadosCardapio.tamanhos && dadosCardapio.tamanhos.length > 0) return await clienteBot.sendMessage(chatId, `Desculpe, qual o tamanho da pizza? (${dadosCardapio.tamanhos.map(t=>t.nome).join(', ')})`);
+        if (tamanhoEscolhido && saboresEscolhidos.length > parseInt(tamanhoEscolhido.qtd)) return await clienteBot.sendMessage(chatId, `⚠️ A pizza ${tamanhoEscolhido.nome} permite no máximo ${tamanhoEscolhido.qtd} sabores. Você escolheu ${saboresEscolhidos.length}. Pode ajustar?`);
+    } else if (porcoesEscolhidas.length === 0) {
+        return await clienteBot.sendMessage(chatId, `❌ Não identifiquei os sabores ou porções no seu pedido. Pode me dizer de uma forma mais simples, por favor?`);
+    }
+
+    let precoMaiorSabor = 0; saboresEscolhidos.forEach(s => { let p = parseFloat(s.preco || 0); if (p > precoMaiorSabor) precoMaiorSabor = p; });
+    let precoBorda = bordaEscolhida ? parseFloat(bordaEscolhida.preco || 0) : 0;
+    let precoPorcoes = 0; porcoesEscolhidas.forEach(p => precoPorcoes += parseFloat(p.preco || 0));
+    let taxaEnt = isRetirada ? 0 : parseFloat(dadosCardapio.taxaEntrega || 0);
+    let total = precoMaiorSabor + precoBorda + precoPorcoes + taxaEnt;
+
+    let resumo = `✅ *Anotado, ${nomeCliente || 'amigo(a)'}!* Confira:\n\n`;
+    if (saboresEscolhidos.length > 0) {
+        if (tamanhoEscolhido) resumo += `🍕 *Tamanho:* ${tamanhoEscolhido.nome}\n`;
+        resumo += `🧂 *Sabores:* ${saboresEscolhidos.map(s=>s.nome).join(', ')}\n`;
+        if (bordaEscolhida) resumo += `🧀 *Borda:* ${bordaEscolhida.nome} (+R$ ${precoBorda.toFixed(2)})\n`;
+    }
+    if (porcoesEscolhidas.length > 0) { resumo += `🍟 *Porções/Extras:* ${porcoesEscolhidas.map(p=>p.nome).join(', ')} (+R$ ${precoPorcoes.toFixed(2)})\n`; }
+    resumo += `\n🚚 *Logística:* ${isRetirada ? 'Retirada no Balcão' : 'Entrega'} ${!isRetirada && taxaEnt > 0 ? '(Taxa: R$ '+taxaEnt.toFixed(2)+')' : ''}\n\n💰 *Total: R$ ${total.toFixed(2)}*\n\n`;
+    
+    if (isRetirada) { resumo += `Digite *Sim* para confirmar ou *Cancelar*.`; sessao.estado = 'CONFIRMANDO_RETIRADA'; } 
+    else { resumo += `Para finalizar, digite o *Endereço de Entrega*.`; sessao.estado = 'CONFIRMANDO_ENDERECO'; }
+    
+    sessao.resumoPedido = resumo; sessao.dadosUltimoPedido = { total: total, isRetirada: isRetirada, metaFidelidade: dadosCardapio.metaFidelidade };
+    await clienteBot.sendMessage(chatId, resumo);
+}
+
+// ==========================================
+// 8. O MOTOR PREMIUM (CADA LOJA TEM O SEU)
+// ==========================================
+async function iniciarRoboCliente(idCliente) {
+    if (sessoesSaaS[idCliente]) return; 
+    logConsole('SaaS', `🤖 Iniciando instância Premium para: ${idCliente}`);
+    
+    const clienteBot = new Client({
+        authStrategy: new LocalAuth({ clientId: `cliente-${idCliente}` }),
+        puppeteer: { headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu', '--disable-web-security'] }
+    });
+    
+    clienteBot.on('qr', function(qr) { dbSaas.collection('clientes_premium').doc(idCliente).update({ qrCode: qr, status: 'aguardando_leitura' }); });
+    clienteBot.on('ready', function() { dbSaas.collection('clientes_premium').doc(idCliente).update({ qrCode: null, status: 'online' }); });
+    
+    clienteBot.on('message', async function(msg) {
+        if (msg.from === 'status@broadcast' || msg.from.includes('@g.us') || msg.from.includes('@newsletter') || msg.from === clienteBot.info.wid._serialized) return;
+        if (['e2e_notification', 'protocol', 'call_log', 'revoked'].includes(msg.type)) return;
+        if (!msg.body && !msg.hasMedia) return;
+
+        const chatId = msg.from;
+        const textoUser = msg.body.trim().toLowerCase();
+
+        if (!sessoesPremium[idCliente]) sessoesPremium[idCliente] = {};
+        if (!sessoesPremium[idCliente][chatId]) sessoesPremium[idCliente][chatId] = { estado: 'LIVRE', pausadoAte: 0, timerCarrinho: null, bufferMensagens: [], timerBuffer: null };
+        const sessao = sessoesPremium[idCliente][chatId];
+
+        // 🛡️ TRANSBORDO HUMANO
+        if (sessao.pausadoAte > Date.now()) return;
+
+        if (['cancelar', 'sair', 'voltar', 'menu'].includes(textoUser)) {
+            sessao.estado = 'LIVRE'; clearTimeout(sessao.timerCarrinho); clearTimeout(sessao.timerBuffer); sessao.bufferMensagens = [];
         }
-    </script>
-</body>
-</html>
+
+        const empDoc = await dbSaas.collection('empresas').doc(idCliente).get();
+        const confDoc = await dbSaas.collection('configuracoes_loja').doc(idCliente).get();
+        const crmDoc = await dbSaas.collection('crm_clientes').doc(idCliente).get();
+
+        const nomeEmpresa = empDoc.exists ? empDoc.data().nomeEmpresa : "Nossa Loja";
+        const ramoLoja = confDoc.exists ? confDoc.data().ramo : "varejo";
+
+        let nomeCliente = ""; let numLimpo = String(chatId).replace(/\D/g, '').replace('55', '');
+        if (crmDoc.exists && crmDoc.data().contatos) {
+            const clienteCRM = crmDoc.data().contatos.find(c => c.telefone.includes(numLimpo));
+            if (clienteCRM) nomeCliente = clienteCRM.nome.split(' ')[0];
+        }
+        const saudacaoHora = obterSaudacao(); const chamamento = nomeCliente ? `${saudacaoHora}, *${nomeCliente}*!` : `${saudacaoHora}!`;
+
+        if (textoUser === 'falar com atendente' || textoUser === 'humano' || textoUser === 'atendente') {
+            await clienteBot.sendMessage(chatId, `Certo${nomeCliente ? ', ' + nomeCliente : ''}! Chamei a equipa. Eles vão te responder por aqui mesmo em instantes. ⏳`);
+            sessao.pausadoAte = Date.now() + (60 * 60 * 1000); sessao.estado = 'LIVRE'; return;
+        }
+
+        // 🍕 FLUXO ALIMENTAÇÃO
+        if (['pizzaria', 'hamburgueria', 'restaurante'].includes(ramoLoja)) {
+            const cardapioDoc = await dbSaas.collection('cardapios_loja').doc(idCliente).get();
+            if (!cardapioDoc.exists || (!cardapioDoc.data().sabores && !cardapioDoc.data().porcoes)) {
+                if (sessao.estado === 'LIVRE') {
+                    await clienteBot.sendMessage(chatId, `${chamamento} Bem-vindo à *${nomeEmpresa}*!\n\nAguarde um instante, um atendente já vai falar com você. ⏳`);
+                    sessao.pausadoAte = Date.now() + (60 * 60 * 1000);
+                } return;
+            }
+            const dadosCardapio = cardapioDoc.data();
+
+            if (sessao.estado === 'LIVRE') {
+                sessao.estado = 'MENU_ALIMENTACAO';
+                await clienteBot.sendMessage(chatId, `${chamamento} Bem-vindo à *${nomeEmpresa}*! 🍕\n\nComo posso ajudar hoje?\n\n*1️⃣* - Fazer Pedido\n*2️⃣* - Falar com Atendente`); return;
+            }
+
+            if (sessao.estado === 'MENU_ALIMENTACAO') {
+                if (textoUser === '1' || textoUser.includes('pedido') || textoUser.includes('cardapio')) {
+                    sessao.estado = 'ESCOLHENDO_ITENS';
+                    let msgC = `👉 *Para pedir, digite exatamente o que deseja* (Ex: Quero uma Média de Calabresa com borda de Cheddar).`;
+                    if (dadosCardapio.imgMenuBase64) {
+                        try { await clienteBot.sendMessage(chatId, new MessageMedia(dadosCardapio.mimeMenu, dadosCardapio.imgMenuBase64, 'cardapio'), { caption: msgC }); } 
+                        catch(e) { await clienteBot.sendMessage(chatId, msgC); }
+                    } else { await clienteBot.sendMessage(chatId, msgC); }
+
+                    clearTimeout(sessao.timerCarrinho);
+                    sessao.timerCarrinho = setTimeout(async () => {
+                        if (sessoesPremium[idCliente][chatId] && sessoesPremium[idCliente][chatId].estado === 'ESCOLHENDO_ITENS') {
+                            await clienteBot.sendMessage(chatId, `Oi ${nomeCliente || 'amigo(a)'}! Bateu aquela dúvida no cardápio ou posso te ajudar a fechar o pedido de hoje? 🤤🍕`);
+                            sessoesPremium[idCliente][chatId].estado = 'LIVRE';
+                        }
+                    }, 30 * 60 * 1000); return;
+                }
+            }
+
+            if (sessao.estado === 'ESCOLHENDO_ITENS') {
+                sessao.bufferMensagens.push(msg.body);
+                clearTimeout(sessao.timerBuffer);
+                sessao.timerBuffer = setTimeout(async () => {
+                    let textoAgrupado = sessao.bufferMensagens.join(' '); sessao.bufferMensagens = []; clearTimeout(sessao.timerCarrinho); 
+                    await processarMensagemPizzaria(chatId, textoAgrupado, sessao, clienteBot, dadosCardapio, nomeCliente);
+                }, 6000); return;
+            }
+
+            if (sessao.estado === 'CONFIRMANDO_ENDERECO' || sessao.estado === 'CONFIRMANDO_RETIRADA') {
+                if (textoUser.includes('cancel')) { sessao.estado = 'LIVRE'; return await clienteBot.sendMessage(chatId, `Pedido cancelado. Voltamos ao início!`); }
+                let end = sessao.estado === 'CONFIRMANDO_ENDERECO' ? msg.body : 'Retirada no Balcão'; sessao.estado = 'LIVRE';
+                let respostaFinal = `🎉 *Pedido Finalizado com Sucesso!* 🎉\n\nEntregaremos em: ${end}\n${dadosCardapio.tempoEntrega ? '⏱️ Previsão: ' + dadosCardapio.tempoEntrega + '\n' : ''}\nO seu pedido já está a ser preparado! 👨‍🍳`;
+                
+                let metaF = parseInt(sessao.dadosUltimoPedido.metaFidelidade || 0);
+                if (metaF > 0) respostaFinal += `\n\n🎁 *Fidelidade:* Lembre-se, a cada ${metaF} pedidos, você ganha uma recompensa por nossa conta! Obrigado, ${nomeCliente || 'amigo(a)'}!`;
+
+                await clienteBot.sendMessage(chatId, respostaFinal);
+                sessao.pausadoAte = Date.now() + (2 * 60 * 60 * 1000); // Pausa 2h
+                return;
+            }
+        } 
+        else {
+            if (sessao.estado === 'LIVRE') {
+                await clienteBot.sendMessage(chatId, `${chamamento} Bem-vindo à *${nomeEmpresa}*!\n\nAguarde um instante, a equipa já vai falar com você. ⏳`);
+                sessao.pausadoAte = Date.now() + (60 * 60 * 1000);
+            }
+        }
+    });
+
+    clienteBot.initialize(); sessoesSaaS[idCliente] = clienteBot; 
+}
+
+// ==========================================
+// 9. CRON ANIVERSÁRIOS
+// ==========================================
+let ultimoDiaAniversario = null;
+async function processarAniversariantesSaaS() {
+    const hoje = new Date(); const dia = String(hoje.getDate()).padStart(2, '0'); const mes = String(hoje.getMonth() + 1).padStart(2, '0'); const dataHojeBr = `${dia}/${mes}`;
+    if (hoje.getHours() < 8 || ultimoDiaAniversario === dataHojeBr) return;
+    ultimoDiaAniversario = dataHojeBr; 
+
+    try {
+        const configuracoesLojas = await dbSaas.collection('configuracoes_loja').get();
+        for (let docConfig of configuracoesLojas.docs) {
+            const config = docConfig.data(); const idLojista = docConfig.id;
+            if (!config.msgAniversario) continue; 
+            const crmDoc = await dbSaas.collection('crm_clientes').doc(idLojista).get();
+            if (!crmDoc.exists || !crmDoc.data().contatos) continue;
+
+            const contatos = crmDoc.data().contatos; let aniversariantesDeHoje = [];
+            for(let i=0; i<contatos.length; i++) { if (contatos[i].aniversario === dataHojeBr) aniversariantesDeHoje.push(contatos[i]); }
+            if (aniversariantesDeHoje.length === 0) continue;
+
+            const empDoc = await dbSaas.collection('empresas').doc(idLojista).get();
+            let nomeDaEmpresa = empDoc.exists ? empDoc.data().nomeEmpresa : "A nossa Loja";
+            let planoDaEmpresa = empDoc.exists ? empDoc.data().plano : "basico";
+            let zapOficialDaLoja = empDoc.exists ? empDoc.data().whatsappLojista : "";
+            let roboParaDisparar = (planoDaEmpresa === 'premium' && sessoesSaaS[idLojista]) ? sessoesSaaS[idLojista] : client;
+            
+            for (let niver of aniversariantesDeHoje) {
+                let numLimpoAlvo = String(niver.telefone).replace(/\D/g, ''); if (!numLimpoAlvo.startsWith('55')) numLimpoAlvo = '55' + numLimpoAlvo; 
+                let idVerificado = await roboParaDisparar.getNumberId(numLimpoAlvo); if (!idVerificado) continue; 
+                let jid = idVerificado._serialized; let nomeCurto = niver.nome.split(' ')[0];
+                let textoFinalAniversario = config.msgAniversario.replace(/{nome}/gi, nomeCurto);
+
+                if (planoDaEmpresa === 'basico') { textoFinalAniversario += `\n\n*${nomeDaEmpresa}*\n_Mensagem automática._`; memoriaSaaSBasico[jid] = { nome: nomeDaEmpresa, zap: zapOficialDaLoja }; }
+                try {
+                    if (config.imgAniversario && config.mimeAniversario) { await roboParaDisparar.sendMessage(jid, new MessageMedia(config.mimeAniversario, config.imgAniversario, config.nomeAniversario || "aniversario.png"), { caption: textoFinalAniversario }); } 
+                    else { await roboParaDisparar.sendMessage(jid, textoFinalAniversario); }
+                    logConsole('SaaS', `✅ Parabéns enviado para ${niver.nome}`);
+                } catch (err) {}
+                await new Promise(r => setTimeout(r, Math.floor(Math.random() * (15000 - 8000 + 1)) + 8000));
+            }
+        }
+    } catch(e) {}
+}
+setInterval(processarAniversariantesSaaS, 600000);
+
+// ==========================================
+// 10. INICIALIZAÇÃO
+// ==========================================
+app.listen(3000, () => logConsole('SISTEMA', '🚀 API Inciada na porta 3000'));
+client.initialize();
