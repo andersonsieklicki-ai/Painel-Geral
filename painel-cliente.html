@@ -33,7 +33,6 @@
             color: var(--text-main); 
         }
         
-        /* SIDEBAR E LAYOUT BÁSICO */
         .sidebar { width: 260px; background-color: var(--sidebar-bg); color: white; display: flex; flex-direction: column; z-index: 100; }
         .sidebar-header { padding: 20px; display: flex; align-items: center; gap: 10px; font-size: 1.2rem; font-weight: 700; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .sidebar-nav { flex: 1; padding: 20px 10px; overflow-y: auto; }
@@ -57,7 +56,6 @@
         .card { background: var(--card-bg); border-radius: 12px; padding: 25px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0; }
         .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; color: #0f172a; font-size: 1.1rem; font-weight: 600; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px;}
         
-        /* BOTÕES & FORMS */
         .btn { border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
         .btn-primary { background-color: var(--primary); color: white; } 
         .btn-success { background-color: var(--success); color: white; } 
@@ -67,21 +65,19 @@
         .btn-outline { background-color: transparent; border: 1px solid #cbd5e1; color: var(--text-main); }
         .btn-block { width: 100%; margin-bottom: 10px; padding: 12px; }
         
-        input[type="text"], input[type="number"], textarea, select { width: 100%; padding: 12px; margin: 8px 0 15px 0; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; font-family: inherit; outline: none; }
+        input[type="text"], input[type="number"], input[type="datetime-local"], textarea, select { width: 100%; padding: 12px; margin: 8px 0 15px 0; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; font-family: inherit; outline: none; }
         
         .status-box { display: flex; align-items: center; background-color: #f1f5f9; padding: 15px; border-radius: 10px; font-weight: 600; font-size: 0.95rem; margin-bottom: 15px;}
         .status-indicator { width: 12px; height: 12px; background-color: #94a3b8; border-radius: 50%; margin-right: 10px;}
         .status-indicator.online { background-color: var(--success); box-shadow: 0 0 8px var(--success); }
         .qr-container { text-align: center; margin-top: 15px; padding: 15px; border: 2px dashed #cbd5e1; border-radius: 10px; display: none; background: white;}
 
-        /* CRM TABLE */
         .table-container { background: white; border-radius: 12px; border: 1px solid #e2e8f0; overflow-x: auto; padding: 20px;}
         table { width: 100%; border-collapse: collapse; font-size: 0.9rem; white-space: nowrap;}
         th { background-color: #f8fafc; padding: 15px; text-align: left; border-bottom: 1px solid #e2e8f0; font-weight: 600; cursor: pointer; color: var(--primary);}
         td { padding: 15px; border-bottom: 1px solid #f1f5f9; }
         .tag-pill { background: #e2e8f0; color: #475569; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; margin: 2px; }
         
-        /* MODAIS E KIOSK */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 10000; padding: 20px; }
         .modal-content { background: white; padding: 30px; border-radius: 15px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
         .kiosk-modal { max-width: 900px !important; display: flex; flex-direction: column; padding: 0; overflow: hidden;}
@@ -112,12 +108,10 @@
         .card-enviado-lateral.show { display: block; animation: slideInRight 0.3s ease-out; } 
         @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
 
-        /* DASHBOARD RELATORIOS */
         .dash-metric { background: #f8fafc; padding: 15px; border-radius: 10px; text-align: center; border: 1px solid #e2e8f0; }
         .dash-metric h3 { margin: 0; font-size: 2rem; color: var(--primary); }
         .dash-metric p { margin: 5px 0 0 0; font-size: 0.8rem; color: #64748b; font-weight: 600; text-transform: uppercase;}
 
-        /* CSS DA BARRA DE PROGRESSO */
         .progress-container { width: 100%; background-color: #e2e8f0; border-radius: 8px; overflow: hidden; margin-top: 10px; height: 10px;}
         .progress-bar { height: 100%; background-color: var(--success); width: 0%; transition: width 0.5s ease; }
         
@@ -491,16 +485,23 @@
                 <button class="tab-btn active" onclick="trocarAba('tags')" id="btn-tags">🏷️ Por Tag</button>
                 <button class="tab-btn" onclick="trocarAba('avulso')" id="btn-avulso">✏️ Números</button>
             </div>
+            
             <div id="aba-tags" class="tab-content active">
                 <div class="lista-selecao" id="listaTagsDisparo" style="max-height: 100px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; border-radius: 8px;"></div>
             </div>
             <div id="aba-avulso" class="tab-content">
                 <textarea id="listaNumeros" rows="3" placeholder="Cole números (um por linha)"></textarea>
             </div>
+
+            <label style="font-size: 0.9rem; font-weight: 600; display: block; margin-top: 15px;">Agendar Envio (Opcional):</label>
+            <input type="datetime-local" id="dataAgendamento" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1;">
+
             <label style="font-size: 0.9rem; font-weight: 600; display: block; margin-top: 15px;">Foto (Máx 5MB):</label>
             <input type="file" id="arquivoMidia" accept="image/*, application/pdf">
+            
             <label style="font-size: 0.9rem; font-weight: 600; display: block; margin-top: 10px;">Texto da Campanha:</label>
             <textarea id="mensagemPromo" rows="4"></textarea>
+            
             <div style="display: flex; gap: 10px; justify-content: flex-end;">
                 <button class="btn btn-outline" onclick="fecharModalDisparo()">Cancelar</button>
                 <button class="btn btn-primary" onclick="iniciarDisparo()"><i class="fa-solid fa-paper-plane"></i> Disparar</button>
@@ -1229,7 +1230,6 @@
             const a=c.files[0];
             if(!a) return alert("⚠️ Selecione um arquivo!");
             
-            // BLOQUEIO DO PLANO BÁSICO PARA IMPORTAÇÃO
             if (window.planoClienteLogado === 'basico' && window.listaContatos.length >= 50) {
                 return alert("⚠️ Limite de 50 contatos do plano Básico atingido. Faça upgrade para Premium!");
             }
@@ -1316,7 +1316,6 @@
         };
         
         window.salvarNovoContato = () => {
-            // BLOQUEIO DO PLANO BÁSICO PARA NOVO CONTATO MANUAL
             if (window.planoClienteLogado === 'basico' && window.listaContatos.length >= 50) { 
                 return alert("⚠️ Limite de 50 contatos do plano Básico atingido. Faça o upgrade para a versão Premium!"); 
             }
@@ -1343,7 +1342,7 @@
             alert("✅ Contato adicionado com sucesso!");
         };
 
-        // MARKETING, COBRANÇAS E DISPAROS
+        // MARKETING E DISPAROS (COM AGENDAMENTO)
         window.abrirModalCobranca = function() { 
             const d=document.getElementById('listaTagsCobranca');
             let h='';
@@ -1393,7 +1392,8 @@
                         zapLojista: window.zapLojista,
                         contatos: n,
                         mensagem: fm,
-                        plano: window.planoClienteLogado
+                        plano: window.planoClienteLogado,
+                        isCobranca: true
                     })
                 });
             } catch(e) {} 
@@ -1415,17 +1415,27 @@
         
         window.fecharModalDisparo = () => {
             document.getElementById('modalDisparo').style.display='none';
+            document.getElementById('dataAgendamento').value = ''; 
         };
         
         window.iniciarDisparo = async function() { 
             const m = document.getElementById('mensagemPromo').value;
             const ar = document.getElementById('arquivoMidia').files[0]; 
+            const agendamento = document.getElementById('dataAgendamento').value;
             
             if(m === "" && !ar) return alert("⚠️ Preencha a mensagem ou anexe uma foto/pdf!"); 
 
-            // BLOQUEIO DO PLANO BÁSICO PARA MÍDIA
             if(window.planoClienteLogado === 'basico' && ar) return alert("⚠️ O plano Básico não suporta envio de fotos ou PDFs. Faça o upgrade da sua conta!");
             
+            // VERIFICAÇÃO DE AGENDAMENTO PARA O PLANO BÁSICO (MÁX 24H)
+            if (agendamento && window.planoClienteLogado === 'basico') {
+                const tempoMarcado = new Date(agendamento).getTime();
+                const limite24h = Date.now() + (24 * 60 * 60 * 1000);
+                if (tempoMarcado > limite24h) {
+                    return alert("⚠️ O plano Básico só permite agendar para no máximo 24 horas à frente. Para datas futuras maiores, adquira o Premium!");
+                }
+            }
+
             let b = null, no = "", mi = ""; 
             if(ar) {
                 if((ar.size/1024/1024) > 5) return alert("⚠️ Limite 5MB."); 
@@ -1458,15 +1468,20 @@
             
             if(contatosAlvo.length === 0) return alert("⚠️ Nenhum contato na lista."); 
 
-            // BLOQUEIO DO PLANO BÁSICO PARA NÚMERO DE DISPAROS
             if(window.planoClienteLogado === 'basico' && contatosAlvo.length > 20) {
                 return alert(`⚠️ Limite do Básico: Máximo de 20 disparos por campanha. A sua lista tem ${contatosAlvo.length}.`); 
             }
             
             window.fecharModalDisparo(); 
             document.getElementById('cardEnviado').classList.add('show'); 
-            document.getElementById('titulo-aviso-envio').innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Preparando...`;
-            document.getElementById('texto-aviso-envio').innerText = "Iniciando fila no servidor.";
+            
+            if (agendamento) {
+                document.getElementById('titulo-aviso-envio').innerHTML = `<i class="fa-solid fa-clock"></i> Campanha Agendada!`;
+                document.getElementById('texto-aviso-envio').innerText = `O servidor disparará no dia marcado.`;
+            } else {
+                document.getElementById('titulo-aviso-envio').innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Preparando...`;
+                document.getElementById('texto-aviso-envio').innerText = "Iniciando fila no servidor.";
+            }
             
             try {
                 await fetch('/api-oracle/api/saas/disparar', {
@@ -1481,7 +1496,8 @@
                         midia: b,      
                         midiaNome: no, 
                         midiaMime: mi, 
-                        plano: window.planoClienteLogado
+                        plano: window.planoClienteLogado,
+                        agendamento: agendamento
                     })
                 });
             } catch(e) { console.log(e); } 
