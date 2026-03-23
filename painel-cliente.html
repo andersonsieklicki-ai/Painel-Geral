@@ -683,9 +683,10 @@
                                     document.getElementById('progresso-barra').style.width = `${perc}%`;
                                     
                                     if(perc >= 100) {
-                                        document.getElementById('titulo-aviso-envio').innerHTML = `<i class="fa-solid fa-party-horn"></i> Campanha Finalizada!`;
-                                        document.getElementById('texto-aviso-envio').innerText = "Todos os clientes receberam a mensagem com sucesso.";
-                                        db.collection('clientes_premium').doc(window.idClienteLogado).update({'progressoDisparo.ativo': false});
+    document.getElementById('titulo-aviso-envio').innerHTML = `<i class="fa-solid fa-party-horn"></i> Campanha Finalizada!`;
+    document.getElementById('texto-aviso-envio').innerText = "Todos os clientes receberam a mensagem com sucesso.";
+    setDoc(doc(db, "clientes_premium", window.idClienteLogado), { progressoDisparo: { ativo: false } }, { merge: true });
+}
                                     }
                                 } else {
                                     document.getElementById('area-barra-progresso').style.display = 'none';
