@@ -86,6 +86,7 @@
         .tab-btn.active { color: var(--primary); border-color: var(--primary); }
         .tab-content { display: none; } .tab-content.active { display: block; }
         .lista-selecao { border: 1px solid #cbd5e1; border-radius: 8px; padding: 15px; max-height: 150px; overflow-y: auto; margin-bottom: 15px; background: #f8fafc; }
+        
         .card-enviado-lateral { position: fixed; bottom: 20px; right: 20px; width: 320px; background: white; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); border-left: 5px solid var(--success); padding: 20px; z-index: 1500; display: none; }
         .card-enviado-lateral.show { display: block; animation: slideInRight 0.3s ease-out; } @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
 
@@ -138,7 +139,15 @@
             <div class="grid-cards">
                 <div class="card">
                     <div class="card-header"><div><i class="fa-solid fa-robot"></i> Status do Motor</div></div>
-                    <div class="status-box" id="area-conexao-status"><span class="status-indicator" id="bolinha-status"></span><span id="texto-status">Verificando Servidor...</span></div>
+                    <div class="status-box" id="area-conexao-status">
+                        <span class="status-indicator" id="bolinha-status"></span>
+                        <span id="texto-status">Verificando Servidor...</span>
+                        
+                        <span id="tempo-online" style="margin-left: auto; font-size: 0.8rem; color: var(--success); font-weight: bold; display: none;">
+                            <i class="fa-solid fa-clock"></i> <span id="contador-tempo">00:00:00</span>
+                        </span>
+                        
+                    </div>
                     <div id="area-botao-conectar" style="display: flex; flex-direction: column; gap: 8px;"></div>
                     <div class="qr-container" id="area-qr-code"><h4 id="status-texto-qr" style="color: var(--primary); margin-top: 0;">Gerando QR...</h4><img id="qrcode-imagem" style="max-width: 100%; border-radius: 8px; display: none; margin: 0 auto;"></div>
                 </div>
@@ -165,6 +174,8 @@
                     <p style="color: var(--text-muted); margin: 5px 0 0 0; font-size: 0.9rem;">Gerencie seus clientes e veja relatórios de consumo.</p>
                 </div>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn btn-success" onclick="abrirModalNovoContato()"><i class="fa-solid fa-plus"></i> Novo Contato</button>
+                    
                     <button class="btn btn-warning" onclick="gerarRelatorioVendas()"><i class="fa-solid fa-chart-pie"></i> Relatório de Vendas</button>
                     <button class="btn btn-primary" onclick="abrirModalImportar()"><i class="fa-solid fa-upload"></i> Importar</button>
                     <button class="btn btn-outline" onclick="exportarVCF()"><i class="fa-solid fa-download"></i></button>
@@ -297,20 +308,42 @@
         </div>
     </div>
 
+    <div class="modal" id="modalNovoContato">
+        <div class="modal-content" style="max-width: 400px;">
+            <h2 style="margin-top: 0; color: var(--success);"><i class="fa-solid fa-user-plus"></i> Adicionar Contato</h2>
+            
+            <label style="font-size: 0.85rem; font-weight: bold;">Nome do Cliente:</label>
+            <input type="text" id="novoContatoNome" placeholder="Ex: João Silva">
+            
+            <label style="font-size: 0.85rem; font-weight: bold;">WhatsApp (com DDD):</label>
+            <input type="number" id="novoContatoZap" placeholder="Ex: 45999999999">
+            
+            <label style="font-size: 0.85rem; font-weight: bold;">Aniversário (Opcional):</label>
+            <input type="text" id="novoContatoNasc" placeholder="DD/MM">
+            
+            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px;">
+                <button class="btn btn-outline" onclick="fecharModalNovoContato()">Cancelar</button>
+                <button class="btn btn-success" onclick="salvarNovoContato()"><i class="fa-solid fa-save"></i> Salvar</button>
+            </div>
+        </div>
+    </div>
+
     <div class="modal" id="modalCobranca"><div class="modal-content"><h2 style="margin-top: 0; color: #dc3545;"><i class="fa-solid fa-file-invoice-dollar"></i> Cobranças</h2><label style="font-size: 0.9rem; font-weight: 600;">Selecione o Grupo Alvo:</label><div class="lista-selecao" id="listaTagsCobranca" style="max-height: 100px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; border-radius: 8px;"></div><label style="font-size: 0.9rem; font-weight: 600;">Sua Chave PIX:</label><input type="text" id="pixCobranca" placeholder="Ex: 12.345.678/0001-90"><label style="font-size: 0.9rem; font-weight: 600;">Mensagem:</label><textarea id="textoCobranca" rows="4">Olá {nome}! Tudo bem? Passando para lembrar que sua fatura vence nos próximos dias. Segue a chave PIX:</textarea><div style="display: flex; gap: 10px; justify-content: flex-end;"><button class="btn btn-outline" onclick="fecharModalCobranca()">Cancelar</button><button class="btn btn-danger" onclick="iniciarDisparoCobranca()"><i class="fa-solid fa-paper-plane"></i> Enviar</button></div></div></div>
     <div class="modal" id="modalImportar"><div class="modal-content"><h2 style="margin-top: 0; color: var(--primary);"><i class="fa-solid fa-upload"></i> Importar Contatos</h2><input type="file" accept=".csv, .vcf" id="arquivoCsv"><div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px;"><button class="btn btn-outline" onclick="fecharModalImportar()">Cancelar</button><button class="btn btn-primary" onclick="iniciarImportacao()">Salvar Base</button></div></div></div>
     <div class="modal" id="modalTag"><div class="modal-content" style="width: 400px;"><h2 style="margin-top: 0; color: var(--primary);"><i class="fa-solid fa-tags"></i> Etiquetar Clientes</h2><div id="areaTagsExistentes" style="margin-bottom: 15px; display: none;"><label style="font-size: 0.85rem; font-weight: bold; color: #666;">Salvas:</label><div id="botoesTagsSalvas" style="display: flex; flex-wrap: wrap; gap: 5px;"></div></div><label style="font-size: 0.85rem; font-weight: bold;">Nova Tag:</label><input type="text" id="nomeNovaTag" placeholder="Ex: VIP"><div style="display: flex; gap: 10px; justify-content: flex-end;"><button class="btn btn-outline" onclick="fecharModalTag()">Cancelar</button><button class="btn btn-primary" onclick="salvarTagMassa()">Aplicar</button></div></div></div>
     <div class="modal" id="modalAniversario"><div class="modal-content"><h2 style="margin-top: 0; color: var(--warning);"><i class="fa-solid fa-cake-candles"></i> Aniversário</h2><input type="file" id="arquivoMidiaAniversario" accept="image/*"><label style="font-size: 0.9rem; font-weight: 600;">Texto (Use {nome}):</label><textarea id="textoAniversario" rows="4"></textarea><div style="display: flex; gap: 10px; justify-content: flex-end;"><button class="btn btn-outline" onclick="fecharModalAniversario()">Cancelar</button><button class="btn btn-warning" id="btnSalvarAniversario" onclick="salvarConfigAniversario()">Salvar</button></div></div></div>
     <div class="modal" id="modalDisparo"><div class="modal-content"><h2 style="margin-top: 0; color: var(--primary);"><i class="fa-solid fa-rocket"></i> Disparo em Massa</h2><div class="tabs"><button class="tab-btn active" onclick="trocarAba('tags')" id="btn-tags">🏷️ Por Tag</button><button class="tab-btn" onclick="trocarAba('avulso')" id="btn-avulso">✏️ Números</button></div><div id="aba-tags" class="tab-content active"><div class="lista-selecao" id="listaTagsDisparo" style="max-height: 100px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; border-radius: 8px;"></div></div><div id="aba-avulso" class="tab-content"><textarea id="listaNumeros" rows="3" placeholder="Cole números (um por linha)"></textarea></div><label style="font-size: 0.9rem; font-weight: 600; display: block; margin-top: 15px;">Foto (Máx 5MB):</label><input type="file" id="arquivoMidia" accept="image/*, application/pdf"><label style="font-size: 0.9rem; font-weight: 600; display: block; margin-top: 10px;">Texto da Campanha:</label><textarea id="mensagemPromo" rows="4"></textarea><div style="display: flex; gap: 10px; justify-content: flex-end;"><button class="btn btn-outline" onclick="fecharModalDisparo()">Cancelar</button><button class="btn btn-primary" onclick="iniciarDisparo()"><i class="fa-solid fa-paper-plane"></i> Disparar</button></div></div></div>
-<div id="cardEnviado" class="card-enviado-lateral">
+
+    <div id="cardEnviado" class="card-enviado-lateral">
         <h3 style="margin-top: 0; color: var(--success); display: flex; align-items: center; gap: 8px;">
             <i class="fa-solid fa-circle-check"></i> Disparo Iniciado!
         </h3>
         <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 15px;">
-            Sua campanha foi enviada para o servidor e as mensagens já estão na fila de envio do seu WhatsApp.
+            Sua campanha foi enviada para o servidor e as mensagens já estão na fila de envio.
         </p>
         <button class="btn btn-outline" style="width: 100%; border-color: #cbd5e1;" onclick="fecharCardLateral()">Entendi</button>
     </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
@@ -323,6 +356,20 @@
         window.idClienteLogado = ""; window.planoClienteLogado = "basico"; window.nomeLojista = ""; window.zapLojista = "";
         window.ordemAtual = { coluna: '', direcao: 'asc' }; 
         window.menuData = { tamanhos: [], bordas: [], sabores: [], porcoes: [], combos: [] };
+        
+        // VARIÁVEIS DO RELÓGIO ONLINE
+        window.intervaloTempoOnline = null;
+        window.atualizarTempoOnline = function() {
+            const desde = localStorage.getItem('online_since_' + window.idClienteLogado);
+            if(desde) {
+                const diff = Math.floor((Date.now() - parseInt(desde)) / 1000);
+                const h = String(Math.floor(diff / 3600)).padStart(2, '0');
+                const m = String(Math.floor((diff % 3600) / 60)).padStart(2, '0');
+                const s = String(diff % 60).padStart(2, '0');
+                const el = document.getElementById('contador-tempo');
+                if(el) el.innerText = `${h}:${m}:${s}`;
+            }
+        };
 
         window.trocarPagina = function(idAba, el) { 
             document.querySelectorAll('.page-section').forEach(e => e.classList.remove('active')); 
@@ -344,7 +391,7 @@
         }
 
         // ==========================================
-        // WHATSAPP (BOTÃO VERDE)
+        // WHATSAPP (BOTÃO VERDE) E STATUS
         // ==========================================
         window.conectarRoboPremium = async function() {
             const btn = document.getElementById('btnConectarZapBase'); 
@@ -377,30 +424,37 @@
                             if(docSnap.exists()) {
                                 const dataRobo = docSnap.data();
                                 
-                                // Nova lógica otimizada para exibir o QR Code mais rápido e com prioridade
                                 if(dataRobo.status === 'online') {
                                     document.getElementById('area-qr-code').style.display = 'none'; 
                                     document.getElementById('bolinha-status').className = 'status-indicator online'; 
                                     document.getElementById('texto-status').innerText = "Conectado e Vendendo!";
+                                    
+                                    // INICIA RELÓGIO ONLINE
+                                    document.getElementById('tempo-online').style.display = 'block';
+                                    if(!localStorage.getItem('online_since_' + window.idClienteLogado)) {
+                                        localStorage.setItem('online_since_' + window.idClienteLogado, Date.now());
+                                    }
+                                    if(!window.intervaloTempoOnline) window.intervaloTempoOnline = setInterval(window.atualizarTempoOnline, 1000);
+
                                     if(areaBtn) areaBtn.innerHTML = `<button class="btn btn-outline" disabled style="border-color: var(--success); color: var(--success);"><i class="fa-solid fa-check-double"></i> WhatsApp Operante</button><button class="btn btn-danger" onclick="desconectarRoboPremium()"><i class="fa-solid fa-power-off"></i> Desconectar</button>`;
                                 } 
                                 else if(dataRobo.qrCode && dataRobo.qrCode !== "") {
-                                    // Prioridade máxima para mostrar o QR Code imediatamente assim que gerado
+                                    // DESLIGA RELÓGIO
+                                    document.getElementById('tempo-online').style.display = 'none'; localStorage.removeItem('online_since_' + window.idClienteLogado); clearInterval(window.intervaloTempoOnline); window.intervaloTempoOnline = null;
+                                    
                                     document.getElementById('area-qr-code').style.display = 'block'; 
                                     document.getElementById('status-texto-qr').innerText = "Aponte o celular para o QR Code:";
                                     QRCode.toDataURL(dataRobo.qrCode, { width: 250, margin: 2 }, function (err, url) { 
-                                        if(!err) { 
-                                            const img = document.getElementById('qrcode-imagem'); 
-                                            img.src = url; 
-                                            img.style.display = 'block'; 
-                                        } 
+                                        if(!err) { const img = document.getElementById('qrcode-imagem'); img.src = url; img.style.display = 'block'; } 
                                     });
                                     document.getElementById('bolinha-status').className = 'status-indicator'; 
                                     document.getElementById('texto-status').innerText = "Aguardando leitura...";
-                                    // Botão extra de ajuda se o cliente achar que o QR code anterior venceu e não atualizou
                                     if(areaBtn) areaBtn.innerHTML = `<button class="btn btn-warning" onclick="conectarRoboPremium()"><i class="fa-solid fa-rotate"></i> Forçar Novo QR Code</button>`;
                                 } 
                                 else if(dataRobo.status === 'iniciando') {
+                                    // DESLIGA RELÓGIO
+                                    document.getElementById('tempo-online').style.display = 'none'; localStorage.removeItem('online_since_' + window.idClienteLogado); clearInterval(window.intervaloTempoOnline); window.intervaloTempoOnline = null;
+
                                     document.getElementById('area-qr-code').style.display = 'block'; 
                                     document.getElementById('status-texto-qr').innerText = "Iniciando Motor...";
                                     document.getElementById('qrcode-imagem').style.display = 'none';
@@ -409,6 +463,9 @@
                                     if(areaBtn) areaBtn.innerHTML = '';
                                 } 
                                 else {
+                                    // DESLIGA RELÓGIO
+                                    document.getElementById('tempo-online').style.display = 'none'; localStorage.removeItem('online_since_' + window.idClienteLogado); clearInterval(window.intervaloTempoOnline); window.intervaloTempoOnline = null;
+
                                     document.getElementById('area-qr-code').style.display = 'none'; 
                                     document.getElementById('bolinha-status').className = 'status-indicator'; 
                                     document.getElementById('texto-status').innerText = "Motor Desligado";
@@ -427,40 +484,23 @@
         // ==========================================
         window.gerarRelatorioVendas = function() {
             let totalPed = 0; let clientesUnicos = 0; let rankSabores = {};
-            
-            // Analisa a lista do CRM em tempo real
             window.listaContatos.forEach(c => {
-                if (c.qtdPedidos && c.qtdPedidos > 0) {
-                    totalPed += parseInt(c.qtdPedidos);
-                    clientesUnicos++;
-                }
-                if (c.saboresFavoritos && Array.isArray(c.saboresFavoritos)) {
-                    c.saboresFavoritos.forEach(s => {
-                        rankSabores[s] = (rankSabores[s] || 0) + 1;
-                    });
-                }
+                if (c.qtdPedidos && c.qtdPedidos > 0) { totalPed += parseInt(c.qtdPedidos); clientesUnicos++; }
+                if (c.saboresFavoritos && Array.isArray(c.saboresFavoritos)) { c.saboresFavoritos.forEach(s => { rankSabores[s] = (rankSabores[s] || 0) + 1; }); }
             });
 
             let media = clientesUnicos > 0 ? (totalPed / clientesUnicos).toFixed(1) : 0;
-            document.getElementById('rel-total-pedidos').innerText = totalPed;
-            document.getElementById('rel-total-clientes').innerText = clientesUnicos;
-            document.getElementById('rel-media-pedidos').innerText = media;
+            document.getElementById('rel-total-pedidos').innerText = totalPed; document.getElementById('rel-total-clientes').innerText = clientesUnicos; document.getElementById('rel-media-pedidos').innerText = media;
 
-            // Top Clientes
             let topClientes = [...window.listaContatos].sort((a,b) => (b.qtdPedidos || 0) - (a.qtdPedidos || 0)).slice(0, 5);
             let hClientes = '<tr><th style="padding: 8px;">Nome</th><th style="padding: 8px;">Pedidos</th><th style="padding: 8px;">Última Compra</th></tr>';
-            topClientes.forEach(c => {
-                if(c.qtdPedidos) hClientes += `<tr><td style="padding: 8px;">${c.nome}</td><td style="padding: 8px;"><b>${c.qtdPedidos}</b></td><td style="padding: 8px; color: #666;">${c.ultimaCompra || '-'}</td></tr>`;
-            });
+            topClientes.forEach(c => { if(c.qtdPedidos) hClientes += `<tr><td style="padding: 8px;">${c.nome}</td><td style="padding: 8px;"><b>${c.qtdPedidos}</b></td><td style="padding: 8px; color: #666;">${c.ultimaCompra || '-'}</td></tr>`; });
             document.getElementById('rel-top-clientes').innerHTML = hClientes;
 
-            // Top Sabores
             let arraySabores = Object.entries(rankSabores).sort((a,b) => b[1] - a[1]).slice(0, 5);
             let hSabores = '<tr><th style="padding: 8px;">Sabor/Produto</th><th style="padding: 8px;">Vezes Pedido</th></tr>';
             if (arraySabores.length === 0) hSabores += '<tr><td colspan="2" style="padding: 8px; text-align:center;">Nenhum pedido processado ainda.</td></tr>';
-            arraySabores.forEach(s => {
-                hSabores += `<tr><td style="padding: 8px;">${s[0]}</td><td style="padding: 8px;"><b>${s[1]}x</b></td></tr>`;
-            });
+            arraySabores.forEach(s => { hSabores += `<tr><td style="padding: 8px;">${s[0]}</td><td style="padding: 8px;"><b>${s[1]}x</b></td></tr>`; });
             document.getElementById('rel-top-sabores').innerHTML = hSabores;
 
             document.getElementById('modalRelatorio').style.display = 'flex';
@@ -674,6 +714,43 @@
         window.fazerLogout = () => signOut(auth).then(()=>window.location.href="index.html");
         
         // ==========================================
+        // FUNCIONALIDADES DO NOVO CONTATO MANUAL
+        // ==========================================
+        window.abrirModalNovoContato = () => document.getElementById('modalNovoContato').style.display = 'flex';
+        
+        window.fecharModalNovoContato = () => { 
+            document.getElementById('modalNovoContato').style.display = 'none'; 
+            document.getElementById('novoContatoNome').value = ''; 
+            document.getElementById('novoContatoZap').value = ''; 
+            document.getElementById('novoContatoNasc').value = ''; 
+        };
+        
+        window.salvarNovoContato = () => {
+            let nome = document.getElementById('novoContatoNome').value.trim();
+            let zap = document.getElementById('novoContatoZap').value.trim();
+            let nasc = document.getElementById('novoContatoNasc').value.trim();
+            
+            if(!nome || !zap) return alert("⚠️ Nome e WhatsApp são obrigatórios!");
+            
+            let numLimpo = zap.replace(/\D/g, '');
+            if(window.listaContatos.some(c => c.telefone === numLimpo)) return alert("⚠️ Este número já existe no CRM!");
+            
+            window.listaContatos.push({
+                id: 'ctt_' + Math.random().toString(36).substr(2, 9),
+                nome: nome,
+                telefone: numLimpo,
+                aniversario: nasc,
+                qtdPedidos: 0,
+                tags: ['Manual']
+            });
+            
+            window.renderizarTabela();
+            window.salvarContatosLocal();
+            window.fecharModalNovoContato();
+            alert("✅ Contato adicionado com sucesso!");
+        };
+
+        // ==========================================
         // MARKETING E DISPAROS
         // ==========================================
         window.abrirModalCobranca = function() { const d=document.getElementById('listaTagsCobranca');let h='';let t=new Set(); window.listaContatos.forEach(c=>c.tags&&c.tags.forEach(x=>t.add(x))); let a=Array.from(t); if(a.length===0) h='<p style="color:var(--danger);">Nenhuma etiqueta.</p>'; else a.forEach(x=>h+=`<label style="display:block; padding:10px; background:white; border-radius:8px; margin-bottom:5px; border: 1px solid #cbd5e1;"><input type="checkbox" value="${x}"> 🎯 Enviar para <b>${x}</b></label>`); d.innerHTML=h; document.getElementById('modalCobranca').style.display='flex'; }
@@ -684,7 +761,6 @@
         window.abrirModalDisparo = () => { window.atualizarListaTagsDisparo();document.getElementById('modalDisparo').style.display='flex'; };
         window.fecharModalDisparo = () => document.getElementById('modalDisparo').style.display='none';
         
-        // A MÁGICA DO NOME PERSONALIZADO ESTÁ AQUI
         window.iniciarDisparo = async function() { 
             const m = document.getElementById('mensagemPromo').value;
             const ar = document.getElementById('arquivoMidia').files[0]; 
@@ -745,6 +821,7 @@
         window.abrirModalAniversario = async () => { document.getElementById('modalAniversario').style.display='flex';try{const s=await getDoc(doc(db,"configuracoes_loja",window.idClienteLogado));if(s.exists()&&s.data().msgAniversario)document.getElementById('textoAniversario').value=s.data().msgAniversario;}catch(e){} }
         window.fecharModalAniversario = () => document.getElementById('modalAniversario').style.display='none';
         window.salvarConfigAniversario = async () => { const t=document.getElementById('textoAniversario').value;const im=document.getElementById('arquivoMidiaAniversario');const b=document.getElementById('btnSalvarAniversario');if(!t)return alert("⚠️ Digite.");b.innerText="Salvando...";b.disabled=true;let mi=null,mim=null,n=null;if(im.files[0]){if((im.files[0].size/1024/1024)>5){b.innerText="Salvar";b.disabled=false;return alert("⚠️ Max 5MB.");}mi=await new Promise(r=>{let l=new FileReader();l.onload=(e)=>r(e.target.result.split(',')[1]);l.readAsDataURL(im.files[0]);});mim=im.files[0].type;n=im.files[0].name;}try{let p={msgAniversario:t};if(mi){p.imgAniversario=mi;p.mimeAniversario=mim;p.nomeAniversario=n;}await setDoc(doc(db,"configuracoes_loja",window.idClienteLogado),p,{merge:true});alert("✅ Salvo.");fecharModalAniversario();}catch(e){}b.innerText="Salvar";b.disabled=false; }
+        
         window.fecharCardLateral = () => document.getElementById('cardEnviado').classList.remove('show');
     </script>
 </body>
