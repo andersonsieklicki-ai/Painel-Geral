@@ -368,17 +368,42 @@
                         onSnapshot(doc(db, "clientes_premium", window.idClienteLogado), (docSnap) => {
                             if(docSnap.exists()) {
                                 const dataRobo = docSnap.data();
-                                if(dataRobo.status === 'iniciando') {
-                                    document.getElementById('area-qr-code').style.display = 'block'; document.getElementById('status-texto-qr').innerText = "Iniciando Motor...";
-                                } else if(dataRobo.qrCode) {
-                                    document.getElementById('area-qr-code').style.display = 'block'; document.getElementById('status-texto-qr').innerText = "Aponte o celular para o QR Code:";
-                                    QRCode.toDataURL(dataRobo.qrCode, { width: 250, margin: 2 }, function (err, url) { if(!err) { const img = document.getElementById('qrcode-imagem'); img.src = url; img.style.display = 'block'; } });
-                                    document.getElementById('bolinha-status').className = 'status-indicator'; document.getElementById('texto-status').innerText = "Aguardando leitura...";
-                                } else if(dataRobo.status === 'online') {
-                                    document.getElementById('area-qr-code').style.display = 'none'; document.getElementById('bolinha-status').className = 'status-indicator online'; document.getElementById('texto-status').innerText = "Conectado e Vendendo!";
+                                
+                                // Nova lógica otimizada para exibir o QR Code mais rápido e com prioridade
+                                if(dataRobo.status === 'online') {
+                                    document.getElementById('area-qr-code').style.display = 'none'; 
+                                    document.getElementById('bolinha-status').className = 'status-indicator online'; 
+                                    document.getElementById('texto-status').innerText = "Conectado e Vendendo!";
                                     if(areaBtn) areaBtn.innerHTML = `<button class="btn btn-outline" disabled style="border-color: var(--success); color: var(--success);"><i class="fa-solid fa-check-double"></i> WhatsApp Operante</button><button class="btn btn-danger" onclick="desconectarRoboPremium()"><i class="fa-solid fa-power-off"></i> Desconectar</button>`;
-                                } else {
-                                    document.getElementById('area-qr-code').style.display = 'none'; document.getElementById('bolinha-status').className = 'status-indicator'; document.getElementById('texto-status').innerText = "Motor Desligado";
+                                } 
+                                else if(dataRobo.qrCode && dataRobo.qrCode !== "") {
+                                    // Prioridade máxima para mostrar o QR Code imediatamente assim que gerado
+                                    document.getElementById('area-qr-code').style.display = 'block'; 
+                                    document.getElementById('status-texto-qr').innerText = "Aponte o celular para o QR Code:";
+                                    QRCode.toDataURL(dataRobo.qrCode, { width: 250, margin: 2 }, function (err, url) { 
+                                        if(!err) { 
+                                            const img = document.getElementById('qrcode-imagem'); 
+                                            img.src = url; 
+                                            img.style.display = 'block'; 
+                                        } 
+                                    });
+                                    document.getElementById('bolinha-status').className = 'status-indicator'; 
+                                    document.getElementById('texto-status').innerText = "Aguardando leitura...";
+                                    // Botão extra de ajuda se o cliente achar que o QR code anterior venceu e não atualizou
+                                    if(areaBtn) areaBtn.innerHTML = `<button class="btn btn-warning" onclick="conectarRoboPremium()"><i class="fa-solid fa-rotate"></i> Forçar Novo QR Code</button>`;
+                                } 
+                                else if(dataRobo.status === 'iniciando') {
+                                    document.getElementById('area-qr-code').style.display = 'block'; 
+                                    document.getElementById('status-texto-qr').innerText = "Iniciando Motor...";
+                                    document.getElementById('qrcode-imagem').style.display = 'none';
+                                    document.getElementById('bolinha-status').className = 'status-indicator'; 
+                                    document.getElementById('texto-status').innerText = "Aguardando servidor...";
+                                    if(areaBtn) areaBtn.innerHTML = '';
+                                } 
+                                else {
+                                    document.getElementById('area-qr-code').style.display = 'none'; 
+                                    document.getElementById('bolinha-status').className = 'status-indicator'; 
+                                    document.getElementById('texto-status').innerText = "Motor Desligado";
                                     if(areaBtn) areaBtn.innerHTML = `<button id="btnConectarZapBase" class="btn btn-whatsapp" onclick="conectarRoboPremium()"><i class="fa-brands fa-whatsapp"></i> Ligar Meu WhatsApp</button>`;
                                 }
                             }
@@ -417,7 +442,7 @@
             let topClientes = [...window.listaContatos].sort((a,b) => (b.qtdPedidos || 0) - (a.qtdPedidos || 0)).slice(0, 5);
             let hClientes = '<tr><th style="padding: 8px;">Nome</th><th style="padding: 8px;">Pedidos</th><th style="padding: 8px;">Última Compra</th></tr>';
             topClientes.forEach(c => {
-                if(c.qtdPedidos) hClientes += `<tr><td style="padding: 8px;">${c.nome}</td><td style="padding: 8px;"><b>${c.qtdPedidos}</b></td><td style="padding: 8px; color: #666;">${c.ultimaCompra || '-'}</td></tr>`;
+                if(c.qtdPedidos) hClientes += `<tr><td style="padding: 8px;"><b>${c.nome}</b></td><td style="padding: 8px;"><b>${c.qtdPedidos}</b></td><td style="padding: 8px; color: #666;">${c.ultimaCompra || '-'}</td></tr>`;
             });
             document.getElementById('rel-top-clientes').innerHTML = hClientes;
 
