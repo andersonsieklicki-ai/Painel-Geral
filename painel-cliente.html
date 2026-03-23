@@ -86,7 +86,6 @@
         .tab-btn.active { color: var(--primary); border-color: var(--primary); }
         .tab-content { display: none; } .tab-content.active { display: block; }
         .lista-selecao { border: 1px solid #cbd5e1; border-radius: 8px; padding: 15px; max-height: 150px; overflow-y: auto; margin-bottom: 15px; background: #f8fafc; }
-        
         .card-enviado-lateral { position: fixed; bottom: 20px; right: 20px; width: 320px; background: white; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); border-left: 5px solid var(--success); padding: 20px; z-index: 1500; display: none; }
         .card-enviado-lateral.show { display: block; animation: slideInRight 0.3s ease-out; } @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
 
@@ -311,16 +310,12 @@
     <div class="modal" id="modalNovoContato">
         <div class="modal-content" style="max-width: 400px;">
             <h2 style="margin-top: 0; color: var(--success);"><i class="fa-solid fa-user-plus"></i> Adicionar Contato</h2>
-            
             <label style="font-size: 0.85rem; font-weight: bold;">Nome do Cliente:</label>
             <input type="text" id="novoContatoNome" placeholder="Ex: João Silva">
-            
             <label style="font-size: 0.85rem; font-weight: bold;">WhatsApp (com DDD):</label>
             <input type="number" id="novoContatoZap" placeholder="Ex: 45999999999">
-            
             <label style="font-size: 0.85rem; font-weight: bold;">Aniversário (Opcional):</label>
             <input type="text" id="novoContatoNasc" placeholder="DD/MM">
-            
             <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px;">
                 <button class="btn btn-outline" onclick="fecharModalNovoContato()">Cancelar</button>
                 <button class="btn btn-success" onclick="salvarNovoContato()"><i class="fa-solid fa-save"></i> Salvar</button>
@@ -332,6 +327,7 @@
     <div class="modal" id="modalImportar"><div class="modal-content"><h2 style="margin-top: 0; color: var(--primary);"><i class="fa-solid fa-upload"></i> Importar Contatos</h2><input type="file" accept=".csv, .vcf" id="arquivoCsv"><div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px;"><button class="btn btn-outline" onclick="fecharModalImportar()">Cancelar</button><button class="btn btn-primary" onclick="iniciarImportacao()">Salvar Base</button></div></div></div>
     <div class="modal" id="modalTag"><div class="modal-content" style="width: 400px;"><h2 style="margin-top: 0; color: var(--primary);"><i class="fa-solid fa-tags"></i> Etiquetar Clientes</h2><div id="areaTagsExistentes" style="margin-bottom: 15px; display: none;"><label style="font-size: 0.85rem; font-weight: bold; color: #666;">Salvas:</label><div id="botoesTagsSalvas" style="display: flex; flex-wrap: wrap; gap: 5px;"></div></div><label style="font-size: 0.85rem; font-weight: bold;">Nova Tag:</label><input type="text" id="nomeNovaTag" placeholder="Ex: VIP"><div style="display: flex; gap: 10px; justify-content: flex-end;"><button class="btn btn-outline" onclick="fecharModalTag()">Cancelar</button><button class="btn btn-primary" onclick="salvarTagMassa()">Aplicar</button></div></div></div>
     <div class="modal" id="modalAniversario"><div class="modal-content"><h2 style="margin-top: 0; color: var(--warning);"><i class="fa-solid fa-cake-candles"></i> Aniversário</h2><input type="file" id="arquivoMidiaAniversario" accept="image/*"><label style="font-size: 0.9rem; font-weight: 600;">Texto (Use {nome}):</label><textarea id="textoAniversario" rows="4"></textarea><div style="display: flex; gap: 10px; justify-content: flex-end;"><button class="btn btn-outline" onclick="fecharModalAniversario()">Cancelar</button><button class="btn btn-warning" id="btnSalvarAniversario" onclick="salvarConfigAniversario()">Salvar</button></div></div></div>
+    
     <div class="modal" id="modalDisparo"><div class="modal-content"><h2 style="margin-top: 0; color: var(--primary);"><i class="fa-solid fa-rocket"></i> Disparo em Massa</h2><div class="tabs"><button class="tab-btn active" onclick="trocarAba('tags')" id="btn-tags">🏷️ Por Tag</button><button class="tab-btn" onclick="trocarAba('avulso')" id="btn-avulso">✏️ Números</button></div><div id="aba-tags" class="tab-content active"><div class="lista-selecao" id="listaTagsDisparo" style="max-height: 100px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; border-radius: 8px;"></div></div><div id="aba-avulso" class="tab-content"><textarea id="listaNumeros" rows="3" placeholder="Cole números (um por linha)"></textarea></div><label style="font-size: 0.9rem; font-weight: 600; display: block; margin-top: 15px;">Foto (Máx 5MB):</label><input type="file" id="arquivoMidia" accept="image/*, application/pdf"><label style="font-size: 0.9rem; font-weight: 600; display: block; margin-top: 10px;">Texto da Campanha:</label><textarea id="mensagemPromo" rows="4"></textarea><div style="display: flex; gap: 10px; justify-content: flex-end;"><button class="btn btn-outline" onclick="fecharModalDisparo()">Cancelar</button><button class="btn btn-primary" onclick="iniciarDisparo()"><i class="fa-solid fa-paper-plane"></i> Disparar</button></div></div></div>
 
     <div id="cardEnviado" class="card-enviado-lateral">
@@ -480,7 +476,7 @@
         });
 
         // ==========================================
-        // 📊 RELATÓRIOS E INTELIGÊNCIA (NOVO)
+        // 📊 RELATÓRIOS E INTELIGÊNCIA
         // ==========================================
         window.gerarRelatorioVendas = function() {
             let totalPed = 0; let clientesUnicos = 0; let rankSabores = {};
@@ -605,7 +601,7 @@
                 const d=localStorage.getItem('crm_'+window.idClienteLogado); 
                 if(d) {
                     window.listaContatos=JSON.parse(d); 
-                    renderizarTabela(); 
+                    window.renderizarTabela(); 
                     document.getElementById('totalContatosCard').innerText=window.listaContatos.length;
                 } 
             } 
@@ -631,7 +627,7 @@
                     return 0;
                 }
             }); 
-            renderizarTabela(); 
+            window.renderizarTabela(); 
         }
 
         window.renderizarTabela = function() { 
@@ -659,15 +655,15 @@
             co.innerHTML=h; 
         }
 
-        window.removerTagDoContato = function(id, tag) { if(!confirm(`Remover etiqueta "${tag}"?`)) return; window.listaContatos.forEach(c=>{if(c.id===id) c.tags=c.tags.filter(t=>t!==tag);}); renderizarTabela(); window.salvarContatosLocal(); }
+        window.removerTagDoContato = function(id, tag) { if(!confirm(`Remover etiqueta "${tag}"?`)) return; window.listaContatos.forEach(c=>{if(c.id===id) c.tags=c.tags.filter(t=>t!==tag);}); window.renderizarTabela(); window.salvarContatosLocal(); }
         window.atualizarNascimento = (id, nova) => { let d=nova.replace(/\D/g, '');if(d.length>=4)d=d.substring(0,2)+'/'+d.substring(2,4);for(let i=0;i<window.listaContatos.length;i++){if(window.listaContatos[i].id===id){window.listaContatos[i].aniversario=d;break;}}window.salvarContatosLocal(); }
-        window.apagarContato = (id) => { if(confirm("Apagar?")){window.listaContatos=window.listaContatos.filter(c=>c.id!==id);renderizarTabela();window.salvarContatosLocal();} }
-        window.apagarSelecionados = () => { const c=document.querySelectorAll('.check-contato:checked');if(c.length===0)return alert("⚠️ Selecione!");if(confirm(`Excluir ${c.length} contatos?`)){let i=Array.from(c).map(x=>x.value);window.listaContatos=window.listaContatos.filter(x=>!i.includes(x.id));renderizarTabela();window.salvarContatosLocal();document.getElementById('checkTodos').checked=false;} }
+        window.apagarContato = (id) => { if(confirm("Apagar?")){window.listaContatos=window.listaContatos.filter(c=>c.id!==id);window.renderizarTabela();window.salvarContatosLocal();} }
+        window.apagarSelecionados = () => { const c=document.querySelectorAll('.check-contato:checked');if(c.length===0)return alert("⚠️ Selecione!");if(confirm(`Excluir ${c.length} contatos?`)){let i=Array.from(c).map(x=>x.value);window.listaContatos=window.listaContatos.filter(x=>!i.includes(x.id));window.renderizarTabela();window.salvarContatosLocal();document.getElementById('checkTodos').checked=false;} }
         window.alternarTodosChecks = () => document.querySelectorAll('.check-contato').forEach(c=>c.checked=document.getElementById('checkTodos').checked);
         
         window.abrirModalTag = () => { const l=document.querySelectorAll('.check-contato:checked');if(l.length===0)return alert("⚠️ Marque clientes!");document.getElementById('modalTag').style.display='flex';let t=new Set();window.listaContatos.forEach(c=>c.tags&&c.tags.forEach(x=>t.add(x)));let a=Array.from(t);const c=document.getElementById('botoesTagsSalvas');const ar=document.getElementById('areaTagsExistentes');c.innerHTML='';if(a.length>0){ar.style.display='block';a.forEach(x=>{let b=document.createElement('button');b.className='btn btn-outline';b.style.padding='6px 12px';b.innerText="🏷️ "+x;b.onclick=()=>document.getElementById('nomeNovaTag').value=x;c.appendChild(b);});}else ar.style.display='none'; }
         window.fecharModalTag = () => { document.getElementById('modalTag').style.display='none'; document.getElementById('nomeNovaTag').value=''; };
-        window.salvarTagMassa = () => { const t=document.getElementById('nomeNovaTag').value.trim();if(t==="")return alert("⚠️ Escreva.");const m=document.querySelectorAll('.check-contato:checked');m.forEach(c=>{let k=window.listaContatos.find(x=>x.id===c.value);if(k){if(!k.tags)k.tags=[];if(!k.tags.includes(t))k.tags.push(t);}});renderizarTabela();window.salvarContatosLocal();fecharModalTag();document.getElementById('checkTodos').checked=false;window.alternarTodosChecks();alert(`✅ Tag "${t}" aplicada.`); }
+        window.salvarTagMassa = () => { const t=document.getElementById('nomeNovaTag').value.trim();if(t==="")return alert("⚠️ Escreva.");const m=document.querySelectorAll('.check-contato:checked');m.forEach(c=>{let k=window.listaContatos.find(x=>x.id===c.value);if(k){if(!k.tags)k.tags=[];if(!k.tags.includes(t))k.tags.push(t);}});window.renderizarTabela();window.salvarContatosLocal();window.fecharModalTag();document.getElementById('checkTodos').checked=false;window.alternarTodosChecks();alert(`✅ Tag "${t}" aplicada.`); }
         
         window.abrirModalImportar = () => document.getElementById('modalImportar').style.display='flex';
         window.fecharModalImportar = () => document.getElementById('modalImportar').style.display='none';
@@ -705,7 +701,7 @@
                         }
                     });
                 }
-                alert(`✅ ${li} novos. ${d} duplicados.`);fecharModalImportar();c.value='';renderizarTabela();window.salvarContatosLocal();
+                alert(`✅ ${li} novos. ${d} duplicados.`);window.fecharModalImportar();c.value='';window.renderizarTabela();window.salvarContatosLocal();
             };l.readAsText(a); 
         }
         
@@ -755,23 +751,29 @@
         // ==========================================
         window.abrirModalCobranca = function() { const d=document.getElementById('listaTagsCobranca');let h='';let t=new Set(); window.listaContatos.forEach(c=>c.tags&&c.tags.forEach(x=>t.add(x))); let a=Array.from(t); if(a.length===0) h='<p style="color:var(--danger);">Nenhuma etiqueta.</p>'; else a.forEach(x=>h+=`<label style="display:block; padding:10px; background:white; border-radius:8px; margin-bottom:5px; border: 1px solid #cbd5e1;"><input type="checkbox" value="${x}"> 🎯 Enviar para <b>${x}</b></label>`); d.innerHTML=h; document.getElementById('modalCobranca').style.display='flex'; }
         window.fecharModalCobranca = () => document.getElementById('modalCobranca').style.display='none';
-        window.iniciarDisparoCobranca = async function() { const m=document.getElementById('textoCobranca').value, p=document.getElementById('pixCobranca').value, c=document.querySelectorAll('#listaTagsCobranca input:checked'); if(c.length===0)return alert("⚠️ Selecione o grupo!"); if(m==="")return alert("⚠️ Digite a mensagem."); let ts=Array.from(c).map(i=>i.value), n=window.listaContatos.filter(k=>k.tags&&k.tags.some(x=>ts.includes(x))).map(k=>k.telefone); if(n.length===0)return alert("⚠️ Ninguém encontrado."); if(window.planoClienteLogado==='basico'&&n.length>200)return alert(`⚠️ Máx 200 no Básico.`); let fm=p!==""?`${m}\n\n🏦 *CHAVE PIX:*\n${p}`:m; fecharModalCobranca(); document.getElementById('cardEnviado').classList.add('show'); try{await fetch('/api-oracle/api/saas/disparar',{method:'POST',headers:{'Content-Type':'application/json','x-senha':'123321'},body:JSON.stringify({idCliente:window.idClienteLogado,nomeEmpresa:window.nomeLojista,zapLojista:window.zapLojista,numeros:n,mensagem:fm,plano:window.planoClienteLogado})});}catch(e){} }
+        window.iniciarDisparoCobranca = async function() { const m=document.getElementById('textoCobranca').value, p=document.getElementById('pixCobranca').value, c=document.querySelectorAll('#listaTagsCobranca input:checked'); if(c.length===0)return alert("⚠️ Selecione o grupo!"); if(m==="")return alert("⚠️ Digite a mensagem."); let ts=Array.from(c).map(i=>i.value), n=window.listaContatos.filter(k=>k.tags&&k.tags.some(x=>ts.includes(x))).map(k=>k.telefone); if(n.length===0)return alert("⚠️ Ninguém encontrado."); if(window.planoClienteLogado==='basico'&&n.length>200)return alert(`⚠️ Máx 200 no Básico.`); let fm=p!==""?`${m}\n\n🏦 *CHAVE PIX:*\n${p}`:m; window.fecharModalCobranca(); document.getElementById('cardEnviado').classList.add('show'); try{await fetch('/api-oracle/api/saas/disparar',{method:'POST',headers:{'Content-Type':'application/json','x-senha':'123321'},body:JSON.stringify({idCliente:window.idClienteLogado,nomeEmpresa:window.nomeLojista,zapLojista:window.zapLojista,numeros:n,mensagem:fm,plano:window.planoClienteLogado})});}catch(e){} }
         
         window.atualizarListaTagsDisparo = () => { const d=document.getElementById('listaTagsDisparo');let h='<label style="display:block; padding:10px; background:white; border-radius:8px; margin-bottom:5px; border: 1px solid #cbd5e1; font-weight:bold;"><input type="checkbox" value="TODOS_OS_CONTATOS"> 📢 TODOS OS CONTATOS</label>';let t=new Set();window.listaContatos.forEach(c=>c.tags&&c.tags.forEach(x=>t.add(x)));Array.from(t).forEach(x=>h+=`<label style="display:block; padding:10px; background:white; border-radius:8px; margin-bottom:5px; border: 1px solid #cbd5e1;"><input type="checkbox" value="${x}"> 🏷️ ${x}</label>`);d.innerHTML=h; }
         window.abrirModalDisparo = () => { window.atualizarListaTagsDisparo();document.getElementById('modalDisparo').style.display='flex'; };
         window.fecharModalDisparo = () => document.getElementById('modalDisparo').style.display='none';
         
+        // CORREÇÃO FINAL: Variáveis de mídia casando perfeitamente com o central.js
         window.iniciarDisparo = async function() { 
             const m = document.getElementById('mensagemPromo').value;
             const ar = document.getElementById('arquivoMidia').files[0]; 
-            if(m === "" && !ar) return alert("⚠️ Preencha!"); 
+            if(m === "" && !ar) return alert("⚠️ Preencha a mensagem ou anexe uma foto/pdf!"); 
+            
             let b = null, no = "", mi = ""; 
             
             if(ar){
                 if((ar.size/1024/1024) > 5) return alert("⚠️ Limite 5MB."); 
                 const l = new FileReader(); 
-                b = await new Promise((r) => { l.onload = (e) => r(e.target.result.split(',')[1]); l.readAsDataURL(ar); }); 
-                no = ar.name; mi = ar.type;
+                b = await new Promise((r) => { 
+                    l.onload = (e) => r(e.target.result.split(',')[1]); 
+                    l.readAsDataURL(ar); 
+                }); 
+                no = ar.name; 
+                mi = ar.type;
             } 
             
             let contatosAlvo = []; 
@@ -793,10 +795,10 @@
                 contatosAlvo = document.getElementById('listaNumeros').value.split('\n').map(x => x.trim()).filter(x => x !== "").map(num => ({ numero: num, nome: 'Cliente' }));
             } 
             
-            if(contatosAlvo.length === 0) return alert("⚠️ Vazio."); 
-            if(window.planoClienteLogado === 'basico' && contatosAlvo.length > 200) return alert(`⚠️ Máx 200 no Básico.`); 
+            if(contatosAlvo.length === 0) return alert("⚠️ Nenhum contato na lista."); 
+            if(window.planoClienteLogado === 'basico' && contatosAlvo.length > 200) return alert(`⚠️ Máx 200 envios no plano Básico.`); 
             
-            fecharModalDisparo(); 
+            window.fecharModalDisparo(); 
             document.getElementById('cardEnviado').classList.add('show'); 
             
             try {
@@ -809,18 +811,18 @@
                         zapLojista: window.zapLojista,
                         contatos: contatosAlvo,
                         mensagem: m,
-                        midia: b,
-                        midiaNome: no,
-                        midiaMime: mi,
+                        midia: b,      // Enviando arquivo
+                        midiaNome: no, // Nome do arquivo
+                        midiaMime: mi, // Formato do arquivo (jpg, pdf)
                         plano: window.planoClienteLogado
                     })
                 });
-            } catch(e) {} 
+            } catch(e) { console.log(e); } 
         }
         
         window.abrirModalAniversario = async () => { document.getElementById('modalAniversario').style.display='flex';try{const s=await getDoc(doc(db,"configuracoes_loja",window.idClienteLogado));if(s.exists()&&s.data().msgAniversario)document.getElementById('textoAniversario').value=s.data().msgAniversario;}catch(e){} }
         window.fecharModalAniversario = () => document.getElementById('modalAniversario').style.display='none';
-        window.salvarConfigAniversario = async () => { const t=document.getElementById('textoAniversario').value;const im=document.getElementById('arquivoMidiaAniversario');const b=document.getElementById('btnSalvarAniversario');if(!t)return alert("⚠️ Digite.");b.innerText="Salvando...";b.disabled=true;let mi=null,mim=null,n=null;if(im.files[0]){if((im.files[0].size/1024/1024)>5){b.innerText="Salvar";b.disabled=false;return alert("⚠️ Max 5MB.");}mi=await new Promise(r=>{let l=new FileReader();l.onload=(e)=>r(e.target.result.split(',')[1]);l.readAsDataURL(im.files[0]);});mim=im.files[0].type;n=im.files[0].name;}try{let p={msgAniversario:t};if(mi){p.imgAniversario=mi;p.mimeAniversario=mim;p.nomeAniversario=n;}await setDoc(doc(db,"configuracoes_loja",window.idClienteLogado),p,{merge:true});alert("✅ Salvo.");fecharModalAniversario();}catch(e){}b.innerText="Salvar";b.disabled=false; }
+        window.salvarConfigAniversario = async () => { const t=document.getElementById('textoAniversario').value;const im=document.getElementById('arquivoMidiaAniversario');const b=document.getElementById('btnSalvarAniversario');if(!t)return alert("⚠️ Digite.");b.innerText="Salvando...";b.disabled=true;let mi=null,mim=null,n=null;if(im.files[0]){if((im.files[0].size/1024/1024)>5){b.innerText="Salvar";b.disabled=false;return alert("⚠️ Max 5MB.");}mi=await new Promise(r=>{let l=new FileReader();l.onload=(e)=>r(e.target.result.split(',')[1]);l.readAsDataURL(im.files[0]);});mim=im.files[0].type;n=im.files[0].name;}try{let p={msgAniversario:t};if(mi){p.imgAniversario=mi;p.mimeAniversario=mim;p.nomeAniversario=n;}await setDoc(doc(db,"configuracoes_loja",window.idClienteLogado),p,{merge:true});alert("✅ Salvo.");window.fecharModalAniversario();}catch(e){}b.innerText="Salvar";b.disabled=false; }
         
         window.fecharCardLateral = () => document.getElementById('cardEnviado').classList.remove('show');
     </script>
