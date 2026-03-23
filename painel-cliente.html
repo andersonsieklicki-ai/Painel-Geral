@@ -678,15 +678,19 @@
                                     document.getElementById('area-barra-progresso').style.display = 'block';
                                     document.getElementById('texto-aviso-envio').innerText = "Aguarde, enviando campanha...";
                                     document.getElementById('cardEnviado').classList.add('show');
+                                    
                                     let perc = Math.round((dataRobo.progressoDisparo.enviados / dataRobo.progressoDisparo.total) * 100);
+                                    if (isNaN(perc)) perc = 0;
+
                                     document.getElementById('progresso-texto').innerText = `${perc}% (${dataRobo.progressoDisparo.enviados}/${dataRobo.progressoDisparo.total})`;
                                     document.getElementById('progresso-barra').style.width = `${perc}%`;
                                     
                                     if(perc >= 100) {
-    document.getElementById('titulo-aviso-envio').innerHTML = `<i class="fa-solid fa-party-horn"></i> Campanha Finalizada!`;
-    document.getElementById('texto-aviso-envio').innerText = "Todos os clientes receberam a mensagem com sucesso.";
-    setDoc(doc(db, "clientes_premium", window.idClienteLogado), { progressoDisparo: { ativo: false } }, { merge: true });
-}
+                                        document.getElementById('titulo-aviso-envio').innerHTML = `<i class="fa-solid fa-check-double"></i> Campanha Finalizada!`;
+                                        document.getElementById('texto-aviso-envio').innerText = "Todos os clientes receberam a mensagem com sucesso.";
+                                        
+                                        // CORREÇÃO DO ERRO FIREBASE MODULAR (V9) APLICADA AQUI
+                                        setDoc(doc(db, "clientes_premium", window.idClienteLogado), { progressoDisparo: { ativo: false } }, { merge: true });
                                     }
                                 } else {
                                     document.getElementById('area-barra-progresso').style.display = 'none';
@@ -853,7 +857,7 @@
                     document.getElementById('tempoEntrega').value = d.tempoEntrega || ''; 
                     document.getElementById('taxaEntrega').value = d.taxaEntrega || '';
                     document.getElementById('metaFidelidade').value = d.metaFidelidade || ''; 
-                    renderCards();
+                    window.renderCards();
                 }
             } catch(e) {}
         }
@@ -872,7 +876,7 @@
                     if(j.sabores) window.menuData.sabores = j.sabores; 
                     if(j.porcoes) window.menuData.porcoes = j.porcoes; 
                     if(j.combos) window.menuData.combos = j.combos; 
-                    renderCards(); 
+                    window.renderCards(); 
                     alert("✅ JSON Importado!"); 
                 } catch(err) { 
                     alert("❌ Arquivo inválido."); 
@@ -927,12 +931,12 @@
                     document.getElementById('comboPreco').value='';
                 } 
             } 
-            renderCards(); 
+            window.renderCards(); 
         }
         
         window.removeObj = (tipo, idx) => { 
             window.menuData[tipo].splice(idx, 1); 
-            renderCards(); 
+            window.renderCards(); 
         }
         
         window.editObj = function(tipo, idx) { 
@@ -1032,7 +1036,7 @@
                 
                 await setDoc(doc(db,"cardapios_loja",window.idClienteLogado), payload, {merge:true}); 
                 alert("✅ Robô foi treinado!"); 
-                fecharModalCardapio(); 
+                window.fecharModalCardapio(); 
             } catch(e) {} 
             btn.innerHTML='<i class="fa-solid fa-cloud-arrow-up"></i> Treinar Robô com Cardápio'; 
             btn.disabled=false; 
@@ -1434,7 +1438,6 @@
             document.getElementById('dataAgendamento').value = ''; 
         };
 
-        // AGENDAMENTOS (LISTAR E CANCELAR)
         window.abrirModalAgendamentos = async function() {
             document.getElementById('modalAgendamentos').style.display = 'flex';
             await window.carregarAgendamentos();
