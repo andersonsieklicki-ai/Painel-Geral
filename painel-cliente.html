@@ -21,6 +21,7 @@
             --danger: #ef4444; 
             --warning: #f59e0b; 
             --whatsapp: #25D366;
+            --mp-blue: #009ee3;
         }
 
         body { 
@@ -33,30 +34,176 @@
             color: var(--text-main); 
         }
         
-        .sidebar { width: 260px; background-color: var(--sidebar-bg); color: white; display: flex; flex-direction: column; z-index: 100; }
-        .sidebar-header { padding: 20px; display: flex; align-items: center; gap: 10px; font-size: 1.2rem; font-weight: 700; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .sidebar-nav { flex: 1; padding: 20px 10px; overflow-y: auto; }
-        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 15px; color: #cbd5e1; text-decoration: none; border-radius: 8px; margin-bottom: 5px; cursor: pointer; transition: 0.2s; font-weight: 500; }
-        .nav-item:hover, .nav-item.active { background-color: var(--primary); color: white; }
-        .sidebar-footer { padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); }
-        .logout-btn { color: #fca5a5; cursor: pointer; display: flex; align-items: center; gap: 10px; font-weight: 600; padding: 10px; border-radius: 8px;}
+        /* SIDEBAR E NAVEGAÇÃO */
+        .sidebar { 
+            width: 260px; 
+            background-color: var(--sidebar-bg); 
+            color: white; 
+            display: flex; 
+            flex-direction: column; 
+            z-index: 100; 
+        }
         
-        .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
-        .topbar { background: var(--card-bg); padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; }
-        .empresa-info { display: flex; align-items: center; gap: 15px; } 
-        .empresa-info h2 { margin: 0; font-size: 1.2rem; color: #0f172a; }
-        .tag-plano { background: #dbeafe; color: var(--primary-dark); padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; display: flex; align-items: center; gap: 5px; }
-        .mobile-logout { display: none; color: var(--danger); font-size: 1.2rem; cursor: pointer; }
+        .sidebar-header { 
+            padding: 20px; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            font-size: 1.2rem; 
+            font-weight: 700; 
+            border-bottom: 1px solid rgba(255,255,255,0.1); 
+        }
         
-        .page-section { display: none; padding: 30px; overflow-y: auto; height: 100%; box-sizing: border-box; } 
-        .page-section.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .sidebar-nav { 
+            flex: 1; 
+            padding: 20px 10px; 
+            overflow-y: auto; 
+        }
         
-        .grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-        .card { background: var(--card-bg); border-radius: 12px; padding: 25px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0; }
-        .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; color: #0f172a; font-size: 1.1rem; font-weight: 600; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px;}
+        .nav-item { 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            padding: 12px 15px; 
+            color: #cbd5e1; 
+            text-decoration: none; 
+            border-radius: 8px; 
+            margin-bottom: 5px; 
+            cursor: pointer; 
+            transition: 0.2s; 
+            font-weight: 500; 
+        }
         
-        .btn { border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+        .nav-item:hover, .nav-item.active { 
+            background-color: var(--primary); 
+            color: white; 
+        }
+        
+        .sidebar-footer { 
+            padding: 20px; 
+            border-top: 1px solid rgba(255,255,255,0.1); 
+        }
+        
+        .logout-btn { 
+            color: #fca5a5; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            font-weight: 600; 
+            padding: 10px; 
+            border-radius: 8px;
+        }
+
+        /* CONTEÚDO PRINCIPAL E TOPBAR */
+        .main-content { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden; 
+            position: relative; 
+        }
+        
+        .topbar { 
+            background: var(--card-bg); 
+            padding: 15px 30px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 1px solid #e2e8f0; 
+        }
+        
+        .empresa-info { 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+        } 
+        
+        .empresa-info h2 { 
+            margin: 0; 
+            font-size: 1.2rem; 
+            color: #0f172a; 
+        }
+        
+        .tag-plano { 
+            background: #dbeafe; 
+            color: var(--primary-dark); 
+            padding: 5px 12px; 
+            border-radius: 20px; 
+            font-size: 0.75rem; 
+            font-weight: 700; 
+            display: flex; 
+            align-items: center; 
+            gap: 5px; 
+        }
+        
+        .mobile-logout { 
+            display: none; 
+            color: var(--danger); 
+            font-size: 1.2rem; 
+            cursor: pointer; 
+        }
+        
+        .page-section { 
+            display: none; 
+            padding: 30px; 
+            overflow-y: auto; 
+            height: 100%; 
+            box-sizing: border-box; 
+        } 
+        
+        .page-section.active { 
+            display: block; 
+            animation: fadeIn 0.3s ease; 
+        }
+        
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(5px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+        
+        /* CARDS */
+        .grid-cards { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+            gap: 20px; 
+        }
+        
+        .card { 
+            background: var(--card-bg); 
+            border-radius: 12px; 
+            padding: 25px; 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); 
+            border: 1px solid #e2e8f0; 
+        }
+        
+        .card-header { 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            margin-bottom: 15px; 
+            color: #0f172a; 
+            font-size: 1.1rem; 
+            font-weight: 600; 
+            border-bottom: 1px solid #f1f5f9; 
+            padding-bottom: 10px;
+        }
+
+        /* BOTÕES E FORMS */
+        .btn { 
+            border: none; 
+            padding: 10px 20px; 
+            border-radius: 8px; 
+            font-weight: 600; 
+            font-size: 0.9rem; 
+            cursor: pointer; 
+            transition: 0.2s; 
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 8px; 
+        }
+        
         .btn-primary { background-color: var(--primary); color: white; } 
         .btn-success { background-color: var(--success); color: white; } 
         .btn-danger { background-color: var(--danger); color: white; } 
@@ -65,88 +212,472 @@
         .btn-outline { background-color: transparent; border: 1px solid #cbd5e1; color: var(--text-main); }
         .btn-block { width: 100%; margin-bottom: 10px; padding: 12px; }
         
-        input[type="text"], input[type="number"], input[type="datetime-local"], textarea, select { width: 100%; padding: 12px; margin: 8px 0 15px 0; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; font-family: inherit; outline: none; }
-        
-        .status-box { display: flex; align-items: center; background-color: #f1f5f9; padding: 15px; border-radius: 10px; font-weight: 600; font-size: 0.95rem; margin-bottom: 15px;}
-        .status-indicator { width: 12px; height: 12px; background-color: #94a3b8; border-radius: 50%; margin-right: 10px;}
-        .status-indicator.online { background-color: var(--success); box-shadow: 0 0 8px var(--success); }
-        .qr-container { text-align: center; margin-top: 15px; padding: 15px; border: 2px dashed #cbd5e1; border-radius: 10px; display: none; background: white;}
+        input[type="text"], input[type="number"], input[type="datetime-local"], textarea, select { 
+            width: 100%; 
+            padding: 12px; 
+            margin: 8px 0 15px 0; 
+            border: 1px solid #cbd5e1; 
+            border-radius: 8px; 
+            box-sizing: border-box; 
+            font-family: inherit; 
+            outline: none; 
+        }
 
-        .table-container { background: white; border-radius: 12px; border: 1px solid #e2e8f0; overflow-x: auto; padding: 20px;}
-        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; white-space: nowrap;}
-        th { background-color: #f8fafc; padding: 15px; text-align: left; border-bottom: 1px solid #e2e8f0; font-weight: 600; cursor: pointer; color: var(--primary);}
-        td { padding: 15px; border-bottom: 1px solid #f1f5f9; }
-        .tag-pill { background: #e2e8f0; color: #475569; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; margin: 2px; }
+        /* STATUS E QR CODE */
+        .status-box { 
+            display: flex; 
+            align-items: center; 
+            background-color: #f1f5f9; 
+            padding: 15px; 
+            border-radius: 10px; 
+            font-weight: 600; 
+            font-size: 0.95rem; 
+            margin-bottom: 15px;
+        }
         
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 10000; padding: 20px; }
-        .modal-content { background: white; padding: 30px; border-radius: 15px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
-        .kiosk-modal { max-width: 900px !important; display: flex; flex-direction: column; padding: 0; overflow: hidden;}
-        .kiosk-header { background: #ea580c; color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
-        .kiosk-body { display: flex; flex: 1; overflow: hidden; height: 75vh; }
-        .kiosk-sidebar { width: 200px; background: #fff; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; overflow-y: auto; }
-        .kiosk-nav-btn { padding: 15px; border: none; background: none; text-align: left; font-weight: 600; color: #475569; cursor: pointer; border-bottom: 1px solid #f1f5f9; }
-        .kiosk-nav-btn.active { background: #fff7ed; color: #ea580c; border-left: 4px solid #ea580c; }
-        .kiosk-content { flex: 1; padding: 20px; overflow-y: auto; background: #f8fafc; }
-        .kiosk-form { background: white; padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #e2e8f0; display: flex; flex-wrap: wrap; gap: 8px; align-items: center;}
+        .status-indicator { 
+            width: 12px; 
+            height: 12px; 
+            background-color: #94a3b8; 
+            border-radius: 50%; 
+            margin-right: 10px;
+        }
         
-        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
-        .product-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; text-align: left; position: relative; display: flex; flex-direction: column;}
-        .product-card .badge-cat { display: inline-flex; background: #f1f5f9; color: #475569; font-size: 0.65rem; padding: 3px 8px; border-radius: 20px; font-weight: 600; margin-bottom: 6px; width: fit-content;}
-        .product-card h4 { margin: 0 0 4px 0; color: #0f172a; font-size: 0.9rem; line-height: 1.2;}
-        .product-card p.price { margin: 0; color: var(--success); font-weight: 700; font-size: 0.85rem; }
-        .product-card .actions { position: absolute; top: 6px; right: 6px; display: flex; gap: 4px; }
-        .btn-action { background: #f1f5f9; border: none; border-radius: 6px; width: 24px; height: 24px; cursor: pointer; font-size: 0.7rem; color: #64748b;}
+        .status-indicator.online { 
+            background-color: var(--success); 
+            box-shadow: 0 0 8px var(--success); 
+        }
         
-        .tabs { display: flex; border-bottom: 2px solid #e2e8f0; margin-bottom: 20px; overflow-x: auto; }
-        .tab-btn { flex: 1; background: none; border: none; padding: 12px; font-weight: 600; color: #64748b; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; white-space: nowrap;}
-        .tab-btn.active { color: var(--primary); border-color: var(--primary); }
-        .tab-content { display: none; } 
-        .tab-content.active { display: block; }
-        .lista-selecao { border: 1px solid #cbd5e1; border-radius: 8px; padding: 15px; max-height: 150px; overflow-y: auto; margin-bottom: 15px; background: #f8fafc; }
-        
-        .card-enviado-lateral { position: fixed; bottom: 20px; right: 20px; width: 320px; background: white; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); border-left: 5px solid var(--success); padding: 20px; z-index: 1500; display: none; }
-        .card-enviado-lateral.show { display: block; animation: slideInRight 0.3s ease-out; } 
-        @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
+        .qr-container { 
+            text-align: center; 
+            margin-top: 15px; 
+            padding: 15px; 
+            border: 2px dashed #cbd5e1; 
+            border-radius: 10px; 
+            display: none; 
+            background: white;
+        }
 
-        .dash-metric { background: #f8fafc; padding: 15px; border-radius: 10px; text-align: center; border: 1px solid #e2e8f0; }
-        .dash-metric h3 { margin: 0; font-size: 2rem; color: var(--primary); }
-        .dash-metric p { margin: 5px 0 0 0; font-size: 0.8rem; color: #64748b; font-weight: 600; text-transform: uppercase;}
-
-        .progress-container { width: 100%; background-color: #e2e8f0; border-radius: 8px; overflow: hidden; margin-top: 10px; height: 10px;}
-        .progress-bar { height: 100%; background-color: var(--success); width: 0%; transition: width 0.5s ease; }
+        /* TABELA CRM */
+        .table-container { 
+            background: white; 
+            border-radius: 12px; 
+            border: 1px solid #e2e8f0; 
+            overflow-x: auto; 
+            padding: 20px;
+        }
         
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            font-size: 0.9rem; 
+            white-space: nowrap;
+        }
+        
+        th { 
+            background-color: #f8fafc; 
+            padding: 15px; 
+            text-align: left; 
+            border-bottom: 1px solid #e2e8f0; 
+            font-weight: 600; 
+            cursor: pointer; 
+            color: var(--primary);
+        }
+        
+        td { 
+            padding: 15px; 
+            border-bottom: 1px solid #f1f5f9; 
+        }
+        
+        .tag-pill { 
+            background: #e2e8f0; 
+            color: #475569; 
+            padding: 4px 10px; 
+            border-radius: 20px; 
+            font-size: 0.75rem; 
+            font-weight: 600; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 5px; 
+            margin: 2px; 
+        }
+
+        /* MODAIS E KIOSK */
+        .modal { 
+            display: none; 
+            position: fixed; 
+            top: 0; left: 0; 
+            width: 100%; height: 100%; 
+            background: rgba(15, 23, 42, 0.6); 
+            backdrop-filter: blur(4px); 
+            justify-content: center; 
+            align-items: center; 
+            z-index: 10000; 
+            padding: 20px; 
+        }
+        
+        .modal-content { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 15px; 
+            width: 100%; 
+            max-width: 500px; 
+            max-height: 90vh; 
+            overflow-y: auto; 
+        }
+        
+        .kiosk-modal { 
+            max-width: 900px !important; 
+            display: flex; 
+            flex-direction: column; 
+            padding: 0; 
+            overflow: hidden;
+        }
+        
+        .kiosk-header { 
+            background: #ea580c; 
+            color: white; 
+            padding: 20px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
+        
+        .kiosk-body { 
+            display: flex; 
+            flex: 1; 
+            overflow: hidden; 
+            height: 75vh; 
+        }
+        
+        .kiosk-sidebar { 
+            width: 200px; 
+            background: #fff; 
+            border-right: 1px solid #e2e8f0; 
+            display: flex; 
+            flex-direction: column; 
+            overflow-y: auto; 
+        }
+        
+        .kiosk-nav-btn { 
+            padding: 15px; 
+            border: none; 
+            background: none; 
+            text-align: left; 
+            font-weight: 600; 
+            color: #475569; 
+            cursor: pointer; 
+            border-bottom: 1px solid #f1f5f9; 
+        }
+        
+        .kiosk-nav-btn.active { 
+            background: #fff7ed; 
+            color: #ea580c; 
+            border-left: 4px solid #ea580c; 
+        }
+        
+        .kiosk-content { 
+            flex: 1; 
+            padding: 20px; 
+            overflow-y: auto; 
+            background: #f8fafc; 
+        }
+        
+        .kiosk-form { 
+            background: white; 
+            padding: 15px; 
+            border-radius: 12px; 
+            margin-bottom: 20px; 
+            border: 1px solid #e2e8f0; 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 8px; 
+            align-items: center;
+        }
+
+        .product-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); 
+            gap: 10px; 
+        }
+        
+        .product-card { 
+            background: #fff; 
+            border: 1px solid #e2e8f0; 
+            border-radius: 10px; 
+            padding: 12px; 
+            text-align: left; 
+            position: relative; 
+            display: flex; 
+            flex-direction: column;
+        }
+        
+        .product-card .badge-cat { 
+            display: inline-flex; 
+            background: #f1f5f9; 
+            color: #475569; 
+            font-size: 0.65rem; 
+            padding: 3px 8px; 
+            border-radius: 20px; 
+            font-weight: 600; 
+            margin-bottom: 6px; 
+            width: fit-content;
+        }
+        
+        .product-card h4 { 
+            margin: 0 0 4px 0; 
+            color: #0f172a; 
+            font-size: 0.9rem; 
+            line-height: 1.2;
+        }
+        
+        .product-card p.price { 
+            margin: 0; 
+            color: var(--success); 
+            font-weight: 700; 
+            font-size: 0.85rem; 
+        }
+        
+        .product-card .actions { 
+            position: absolute; 
+            top: 6px; 
+            right: 6px; 
+            display: flex; 
+            gap: 4px; 
+        }
+        
+        .btn-action { 
+            background: #f1f5f9; 
+            border: none; 
+            border-radius: 6px; 
+            width: 24px; 
+            height: 24px; 
+            cursor: pointer; 
+            font-size: 0.7rem; 
+            color: #64748b;
+        }
+
+        /* TABS (ABAS DE NAVEGAÇÃO) */
+        .tabs { 
+            display: flex; 
+            border-bottom: 2px solid #e2e8f0; 
+            margin-bottom: 20px; 
+            overflow-x: auto; 
+        }
+        
+        .tab-btn { 
+            flex: 1; 
+            background: none; 
+            border: none; 
+            padding: 12px; 
+            font-weight: 600; 
+            color: #64748b; 
+            cursor: pointer; 
+            border-bottom: 2px solid transparent; 
+            margin-bottom: -2px; 
+            white-space: nowrap;
+        }
+        
+        .tab-btn.active { 
+            color: var(--primary); 
+            border-color: var(--primary); 
+        }
+        
+        .tab-content { 
+            display: none; 
+        } 
+        
+        .tab-content.active { 
+            display: block; 
+        }
+        
+        .lista-selecao { 
+            border: 1px solid #cbd5e1; 
+            border-radius: 8px; 
+            padding: 15px; 
+            max-height: 150px; 
+            overflow-y: auto; 
+            margin-bottom: 15px; 
+            background: #f8fafc; 
+        }
+
+        /* CARD LATERAL E PROGRESSO */
+        .card-enviado-lateral { 
+            position: fixed; 
+            bottom: 20px; 
+            right: 20px; 
+            width: 320px; 
+            background: white; 
+            border-radius: 12px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15); 
+            border-left: 5px solid var(--success); 
+            padding: 20px; 
+            z-index: 1500; 
+            display: none; 
+        }
+        
+        .card-enviado-lateral.show { 
+            display: block; 
+            animation: slideInRight 0.3s ease-out; 
+        } 
+        
+        @keyframes slideInRight { 
+            from { transform: translateX(100%); } 
+            to { transform: translateX(0); } 
+        }
+
+        .dash-metric { 
+            background: #f8fafc; 
+            padding: 15px; 
+            border-radius: 10px; 
+            text-align: center; 
+            border: 1px solid #e2e8f0; 
+        }
+        
+        .dash-metric h3 { 
+            margin: 0; 
+            font-size: 2rem; 
+            color: var(--primary); 
+        }
+        
+        .dash-metric p { 
+            margin: 5px 0 0 0; 
+            font-size: 0.8rem; 
+            color: #64748b; 
+            font-weight: 600; 
+            text-transform: uppercase;
+        }
+
+        .progress-container { 
+            width: 100%; 
+            background-color: #e2e8f0; 
+            border-radius: 8px; 
+            overflow: hidden; 
+            margin-top: 10px; 
+            height: 10px;
+        }
+        
+        .progress-bar { 
+            height: 100%; 
+            background-color: var(--success); 
+            width: 0%; 
+            transition: width 0.5s ease; 
+        }
+
+        /* RESPONSIVIDADE MOBILE */
         @media (max-width: 768px) {
             body { flex-direction: column; }
-            .sidebar { position: fixed; bottom: 0; left: 0; width: 100%; height: 70px; flex-direction: row; padding: 0; box-shadow: 0 -4px 15px rgba(0,0,0,0.1); justify-content: space-around; align-items: center; z-index: 9999; }
+            .sidebar { 
+                position: fixed; 
+                bottom: 0; 
+                left: 0; 
+                width: 100%; 
+                height: 70px; 
+                flex-direction: row; 
+                padding: 0; 
+                box-shadow: 0 -4px 15px rgba(0,0,0,0.1); 
+                justify-content: space-around; 
+                align-items: center; 
+                z-index: 9999; 
+            }
             .sidebar-header, .sidebar-footer { display: none; }
-            .sidebar-nav { display: flex; flex-direction: row; width: 100%; justify-content: space-around; padding: 0; }
-            .nav-item { flex-direction: column; gap: 4px; padding: 10px; font-size: 0.65rem; border-radius: 0; margin: 0; flex: 1; text-align: center; color: #cbd5e1; }
-            .nav-item.active { background: transparent; color: #38bdf8; border-top: 3px solid #38bdf8; }
-            .topbar { padding: 15px; position: sticky; top: 0; z-index: 1000;}
+            .sidebar-nav { 
+                display: flex; 
+                flex-direction: row; 
+                width: 100%; 
+                justify-content: space-around; 
+                padding: 0; 
+            }
+            .nav-item { 
+                flex-direction: column; 
+                gap: 4px; 
+                padding: 10px; 
+                font-size: 0.65rem; 
+                border-radius: 0; 
+                margin: 0; 
+                flex: 1; 
+                text-align: center; 
+                color: #cbd5e1; 
+            }
+            .nav-item.active { 
+                background: transparent; 
+                color: #38bdf8; 
+                border-top: 3px solid #38bdf8; 
+            }
+            .topbar { 
+                padding: 15px; 
+                position: sticky; 
+                top: 0; 
+                z-index: 1000;
+            }
             .mobile-logout { display: block; }
-            .main-content { overflow-y: auto; height: calc(100vh - 70px); }
-            .page-section { padding: 15px; padding-bottom: 90px; } 
-            .kiosk-modal { height: 95vh; max-height: 95vh; border-radius: 15px 15px 0 0; top: auto; bottom: 0; padding: 0;}
+            .main-content { 
+                overflow-y: auto; 
+                height: calc(100vh - 70px); 
+            }
+            .page-section { 
+                padding: 15px; 
+                padding-bottom: 90px; 
+            } 
+            .kiosk-modal { 
+                height: 95vh; 
+                max-height: 95vh; 
+                border-radius: 15px 15px 0 0; 
+                top: auto; 
+                bottom: 0; 
+                padding: 0;
+            }
             .kiosk-body { flex-direction: column; }
-            .kiosk-sidebar { width: 100%; flex-direction: row; border-right: none; border-bottom: 1px solid #e2e8f0; overflow-x: auto; flex-shrink: 0; }
-            .kiosk-nav-btn { white-space: nowrap; padding: 10px; font-size: 0.8rem; border-bottom: none; border-left: none; }
-            .kiosk-nav-btn.active { border-bottom: 3px solid #ea580c; border-left: none; }
-            .product-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px;}
+            .kiosk-sidebar { 
+                width: 100%; 
+                flex-direction: row; 
+                border-right: none; 
+                border-bottom: 1px solid #e2e8f0; 
+                overflow-x: auto; 
+                flex-shrink: 0; 
+            }
+            .kiosk-nav-btn { 
+                white-space: nowrap; 
+                padding: 10px; 
+                font-size: 0.8rem; 
+                border-bottom: none; 
+                border-left: none; 
+            }
+            .kiosk-nav-btn.active { 
+                border-bottom: 3px solid #ea580c; 
+                border-left: none; 
+            }
+            .product-grid { 
+                grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); 
+                gap: 8px;
+            }
         }
     </style>
 </head>
 <body>
 
     <aside class="sidebar">
-        <div class="sidebar-header"><i class="fa-solid fa-rocket" style="color: #60a5fa;"></i> Omnichannel</div>
+        <div class="sidebar-header">
+            <i class="fa-solid fa-rocket" style="color: #60a5fa;"></i> Omnichannel
+        </div>
         <nav class="sidebar-nav">
-            <div class="nav-item active" onclick="trocarPagina('inicio', this)"><i class="fa-solid fa-house"></i> Início</div>
-            <div class="nav-item" onclick="trocarPagina('marketing', this)"><i class="fa-solid fa-bullhorn"></i> Marketing</div>
-            <div class="nav-item" onclick="trocarPagina('crm', this)"><i class="fa-solid fa-users"></i> CRM & Relatórios</div>
-            <div class="nav-item" onclick="trocarPagina('config', this)"><i class="fa-solid fa-gear"></i> Ajustes</div>
+            <div class="nav-item active" onclick="trocarPagina('inicio', this)">
+                <i class="fa-solid fa-house"></i> Início
+            </div>
+            <div class="nav-item" onclick="trocarPagina('marketing', this)">
+                <i class="fa-solid fa-bullhorn"></i> Marketing
+            </div>
+            <div class="nav-item" onclick="trocarPagina('crm', this)">
+                <i class="fa-solid fa-users"></i> CRM & Relatórios
+            </div>
+            <div class="nav-item" onclick="trocarPagina('config', this)">
+                <i class="fa-solid fa-gear"></i> Ajustes
+            </div>
         </nav>
         <div class="sidebar-footer">
-            <div class="logout-btn" onclick="fazerLogout()"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sair do Painel</div>
+            <div class="logout-btn" onclick="fazerLogout()">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Sair do Painel
+            </div>
         </div>
     </aside>
 
@@ -154,18 +685,24 @@
         <header class="topbar">
             <div class="empresa-info">
                 <h2 id="nomeCliente">Carregando...</h2>
-                <div class="tag-plano" id="tagPlano"><i class="fa-solid fa-medal"></i> PRO</div>
+                <div class="tag-plano" id="tagPlano">
+                    <i class="fa-solid fa-medal"></i> PRO
+                </div>
             </div>
-            <div class="mobile-logout" onclick="fazerLogout()"><i class="fa-solid fa-arrow-right-from-bracket"></i></div>
+            <div class="mobile-logout" onclick="fazerLogout()">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+            </div>
         </header>
 
         <section id="page-inicio" class="page-section active">
             <h2 style="margin-top: 0; color: #0f172a;">Visão Geral</h2>
+            
             <div class="grid-cards">
                 <div class="card">
                     <div class="card-header">
                         <div><i class="fa-solid fa-robot"></i> Status do Motor</div>
                     </div>
+                    
                     <div class="status-box" id="area-conexao-status">
                         <span class="status-indicator" id="bolinha-status"></span>
                         <span id="texto-status">Verificando Servidor...</span>
@@ -174,14 +711,19 @@
                             <i class="fa-solid fa-clock"></i> <span id="contador-tempo">00:00:00</span>
                         </span>
                     </div>
+                    
                     <div id="area-botao-conectar" style="display: flex; flex-direction: column; gap: 8px;"></div>
+                    
                     <div class="qr-container" id="area-qr-code">
                         <h4 id="status-texto-qr" style="color: var(--primary); margin-top: 0;">Gerando QR...</h4>
                         <img id="qrcode-imagem" style="max-width: 100%; border-radius: 8px; display: none; margin: 0 auto;">
                     </div>
                 </div>
+
                 <div class="card">
-                    <div class="card-header"><div><i class="fa-solid fa-chart-simple"></i> Base de Contatos</div></div>
+                    <div class="card-header">
+                        <div><i class="fa-solid fa-chart-simple"></i> Base de Contatos</div>
+                    </div>
                     <div style="background: #f1f5f9; padding: 20px; border-radius: 10px; text-align: center;">
                         <h1 style="margin: 0; color: var(--primary); font-size: 3rem;" id="totalContatosCard">0</h1>
                         <p style="margin: 5px 0 0 0; color: #64748b; font-weight: 500;">Clientes no CRM</p>
@@ -193,19 +735,37 @@
         <section id="page-marketing" class="page-section">
             <h2 style="margin-top: 0; color: #0f172a;">Central de Marketing</h2>
             <div class="grid-cards">
+                
                 <div class="card">
-                    <div class="card-header"><div><i class="fa-solid fa-paper-plane"></i> Campanhas</div></div>
-                    <button class="btn btn-primary btn-block" onclick="abrirModalDisparo()"><i class="fa-solid fa-rocket"></i> Criar Campanha</button>
-                    <button class="btn btn-outline btn-block" style="margin-top: 5px;" onclick="abrirModalAgendamentos()"><i class="fa-solid fa-calendar-check"></i> Ver Agendados</button>
+                    <div class="card-header">
+                        <div><i class="fa-solid fa-paper-plane"></i> Campanhas</div>
+                    </div>
+                    <button class="btn btn-primary btn-block" onclick="abrirModalDisparo()">
+                        <i class="fa-solid fa-rocket"></i> Criar Campanha
+                    </button>
+                    <button class="btn btn-outline btn-block" style="margin-top: 5px;" onclick="abrirModalAgendamentos()">
+                        <i class="fa-solid fa-calendar-check"></i> Ver Agendados
+                    </button>
                 </div>
+                
                 <div class="card">
-                    <div class="card-header" style="color: var(--danger);"><div><i class="fa-solid fa-file-invoice-dollar"></i> Cobranças</div></div>
-                    <button class="btn btn-danger btn-block" onclick="abrirModalCobranca()"><i class="fa-solid fa-comments-dollar"></i> Enviar Cobranças</button>
+                    <div class="card-header" style="color: var(--danger);">
+                        <div><i class="fa-solid fa-file-invoice-dollar"></i> Cobranças</div>
+                    </div>
+                    <button class="btn btn-danger btn-block" onclick="abrirModalCobranca()">
+                        <i class="fa-solid fa-comments-dollar"></i> Enviar Cobranças
+                    </button>
                 </div>
+                
                 <div class="card">
-                    <div class="card-header" style="color: var(--warning);"><div><i class="fa-solid fa-cake-candles"></i> Aniversários</div></div>
-                    <button class="btn btn-warning btn-block" onclick="abrirModalAniversario()"><i class="fa-solid fa-gift"></i> Configurar</button>
+                    <div class="card-header" style="color: var(--warning);">
+                        <div><i class="fa-solid fa-cake-candles"></i> Aniversários</div>
+                    </div>
+                    <button class="btn btn-warning btn-block" onclick="abrirModalAniversario()">
+                        <i class="fa-solid fa-gift"></i> Configurar
+                    </button>
                 </div>
+                
             </div>
         </section>
         
@@ -213,11 +773,13 @@
             <div class="card-header" style="margin-bottom: 20px; border: none; padding: 0;">
                 <div>
                     <h2 style="margin: 0; font-size: 1.5rem;">Gestão CRM e Vendas</h2>
-                    <p style="color: var(--text-muted); margin: 5px 0 0 0; font-size: 0.9rem;">Gerencie seus clientes e veja relatórios de consumo.</p>
+                    <p style="color: var(--text-muted); margin: 5px 0 0 0; font-size: 0.9rem;">
+                        Gerencie seus clientes e atualize CPF/CNPJ ou endereço.
+                    </p>
                 </div>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                     <button class="btn btn-success" onclick="abrirModalNovoContato()"><i class="fa-solid fa-plus"></i> Novo Contato</button>
-                    <button class="btn btn-warning" onclick="gerarRelatorioVendas()"><i class="fa-solid fa-chart-pie"></i> Relatório de Vendas</button>
+                    <button class="btn btn-warning" onclick="gerarRelatorioVendas()"><i class="fa-solid fa-chart-pie"></i> Relatório</button>
                     <button class="btn btn-primary" onclick="abrirModalImportar()"><i class="fa-solid fa-upload"></i> Importar</button>
                     <button class="btn btn-outline" onclick="exportarVCF()"><i class="fa-solid fa-download"></i></button>
                 </div>
@@ -241,7 +803,7 @@
                                 <th><input type="checkbox" id="checkTodos" onclick="alternarTodosChecks()"></th>
                                 <th onclick="ordenarTabela('nome')">Nome ↕</th>
                                 <th>WhatsApp</th>
-                                <th onclick="ordenarTabela('nascimento')">Nasc. ↕</th>
+                                <th>CPF/Endereço</th>
                                 <th onclick="ordenarTabela('ultimaCompra')">Última Compra ↕</th>
                                 <th onclick="ordenarTabela('qtdPedidos')">Pedidos ↕</th>
                                 <th onclick="ordenarTabela('tags')">Etiquetas ↕</th>
@@ -249,7 +811,7 @@
                             </tr>
                         </thead>
                         <tbody id="tabelaContatos">
-                            </tbody>
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -258,6 +820,7 @@
         <section id="page-config" class="page-section">
             <h2 style="margin-top: 0; color: #0f172a;">Ajustes do Negócio</h2>
             <div class="grid-cards">
+                
                 <div class="card">
                     <div class="card-header"><div><i class="fa-solid fa-store"></i> Perfil do Ramo</div></div>
                     <select id="selectRamo" class="select-ramo" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; margin-bottom: 15px;">
@@ -272,11 +835,32 @@
                     </select>
                     <button class="btn btn-primary" onclick="salvarConfigRamo()"><i class="fa-solid fa-save"></i> Atualizar Perfil</button>
                 </div>
-                <div class="card" id="cardFidelidade" style="display: none; border-color: #fdba74;">
-                    <div class="card-header" style="color: #ea580c;"><div><i class="fa-solid fa-pizza-slice"></i> Cardápio App</div></div>
-                    <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 20px;">Gerencie produtos e treine o Robô para vender automaticamente.</p>
-                    <button class="btn btn-block" style="background-color: #ea580c; color: white;" onclick="abrirModalCardapio()"><i class="fa-solid fa-desktop"></i> Abrir Menu Kiosk</button>
+
+                <div class="card" style="border-color: var(--mp-blue);">
+                    <div class="card-header" style="color: var(--mp-blue);">
+                        <div><i class="fa-solid fa-hand-holding-dollar"></i> Mercado Pago (Integração)</div>
+                    </div>
+                    <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 15px;">
+                        Cole seu Access Token para permitir a geração automática de boletos e PIX no futuro.
+                    </p>
+                    <input type="text" id="mercadoPagoToken" placeholder="APP_USR-123456789...">
+                    <button class="btn btn-block" style="background-color: var(--mp-blue); color: white;" onclick="salvarMercadoPago()">
+                        <i class="fa-solid fa-link"></i> Salvar Chave API
+                    </button>
                 </div>
+
+                <div class="card" id="cardFidelidade" style="display: none; border-color: #fdba74;">
+                    <div class="card-header" style="color: #ea580c;">
+                        <div><i class="fa-solid fa-pizza-slice"></i> Cardápio App</div>
+                    </div>
+                    <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 20px;">
+                        Gerencie produtos e treine o Robô para vender automaticamente.
+                    </p>
+                    <button class="btn btn-block" style="background-color: #ea580c; color: white;" onclick="abrirModalCardapio()">
+                        <i class="fa-solid fa-desktop"></i> Abrir Menu Kiosk
+                    </button>
+                </div>
+                
             </div>
         </section>
     </main>
@@ -285,7 +869,9 @@
         <div class="modal-content" style="max-width: 700px;">
             <h2 style="margin-top: 0; color: var(--primary); display: flex; justify-content: space-between; align-items: center;">
                 <span><i class="fa-solid fa-chart-pie"></i> Relatório de Vendas Delivery</span>
-                <button class="btn-outline" style="border:none;" onclick="document.getElementById('modalRelatorio').style.display='none'"><i class="fa-solid fa-xmark"></i></button>
+                <button class="btn-outline" style="border:none;" onclick="document.getElementById('modalRelatorio').style.display='none'">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
             </h2>
             
             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px;">
@@ -321,9 +907,13 @@
             <div class="kiosk-header">
                 <div><h2 style="font-size: 1.2rem;"><i class="fa-solid fa-store"></i> Menu Kiosk</h2></div>
                 <div style="display: flex; gap: 10px;">
-                    <button class="btn" style="background: rgba(255,255,255,0.2); color: white; font-size: 0.8rem;" onclick="document.getElementById('importarJsonCardapio').click()"><i class="fa-solid fa-file-import"></i> Importar JSON</button>
+                    <button class="btn" style="background: rgba(255,255,255,0.2); color: white; font-size: 0.8rem;" onclick="document.getElementById('importarJsonCardapio').click()">
+                        <i class="fa-solid fa-file-import"></i> Importar JSON
+                    </button>
                     <input type="file" id="importarJsonCardapio" accept=".json" style="display:none;" onchange="importarCardapioJson(event)">
-                    <button class="btn" style="background: rgba(0,0,0,0.3); color: white; border-radius: 50%; width: 40px; height: 40px; padding: 0;" onclick="fecharModalCardapio()"><i class="fa-solid fa-xmark"></i></button>
+                    <button class="btn" style="background: rgba(0,0,0,0.3); color: white; border-radius: 50%; width: 40px; height: 40px; padding: 0;" onclick="fecharModalCardapio()">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
                 </div>
             </div>
 
@@ -402,39 +992,83 @@
                 </div>
             </div>
             <div style="padding: 15px; background: white; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end;">
-                <button class="btn" style="background-color: #ea580c; color: white; width: 100%; font-size: 1rem; padding: 12px;" onclick="salvarCardapioNuvem()" id="btnSalvarCardapio"><i class="fa-solid fa-cloud-arrow-up"></i> Treinar Robô com Cardápio</button>
+                <button class="btn" style="background-color: #ea580c; color: white; width: 100%; font-size: 1rem; padding: 12px;" onclick="salvarCardapioNuvem()" id="btnSalvarCardapio">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Treinar Robô com Cardápio
+                </button>
             </div>
         </div>
     </div>
 
     <div class="modal" id="modalNovoContato">
-        <div class="modal-content" style="max-width: 400px;">
-            <h2 style="margin-top: 0; color: var(--success);"><i class="fa-solid fa-user-plus"></i> Adicionar Contato</h2>
-            <label style="font-size: 0.85rem; font-weight: bold;">Nome do Cliente:</label>
-            <input type="text" id="novoContatoNome" placeholder="Ex: João Silva">
-            <label style="font-size: 0.85rem; font-weight: bold;">WhatsApp (com DDD):</label>
-            <input type="number" id="novoContatoZap" placeholder="Ex: 45999999999">
-            <label style="font-size: 0.85rem; font-weight: bold;">Aniversário (Opcional):</label>
-            <input type="text" id="novoContatoNasc" placeholder="DD/MM">
+        <div class="modal-content" style="max-width: 450px;">
+            <h2 style="margin-top: 0; color: var(--success);" id="tituloModalContato">
+                <i class="fa-solid fa-user-plus"></i> Adicionar Contato
+            </h2>
+            <input type="hidden" id="idContatoEdit">
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div>
+                    <label>Nome Completo:</label>
+                    <input type="text" id="novoContatoNome" placeholder="Ex: João Silva">
+                </div>
+                <div>
+                    <label>WhatsApp (com DDD):</label>
+                    <input type="number" id="novoContatoZap" placeholder="Ex: 45999999999">
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div>
+                    <label>CPF / CNPJ:</label>
+                    <input type="text" id="novoContatoDoc" placeholder="Opcional">
+                </div>
+                <div>
+                    <label>Nascimento:</label>
+                    <input type="text" id="novoContatoNasc" placeholder="DD/MM">
+                </div>
+            </div>
+
+            <label>Endereço Completo:</label>
+            <input type="text" id="novoContatoEnd" placeholder="Rua, Número, Bairro">
+
             <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px;">
                 <button class="btn btn-outline" onclick="fecharModalNovoContato()">Cancelar</button>
-                <button class="btn btn-success" onclick="salvarNovoContato()"><i class="fa-solid fa-save"></i> Salvar</button>
+                <button class="btn btn-success" id="btnSalvarContato" onclick="salvarNovoContato()">
+                    <i class="fa-solid fa-save"></i> Salvar
+                </button>
             </div>
         </div>
     </div>
 
     <div class="modal" id="modalCobranca">
-        <div class="modal-content">
-            <h2 style="margin-top: 0; color: #dc3545;"><i class="fa-solid fa-file-invoice-dollar"></i> Cobranças</h2>
-            <label style="font-size: 0.9rem; font-weight: 600;">Selecione o Grupo Alvo:</label>
+        <div class="modal-content" style="max-width: 600px;">
+            <h2 style="margin-top: 0; color: #dc3545;"><i class="fa-solid fa-file-invoice-dollar"></i> Enviar Cobrança</h2>
+            
+            <label>1. Selecione a Etiqueta dos Devedores:</label>
             <div class="lista-selecao" id="listaTagsCobranca" style="max-height: 100px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; border-radius: 8px;"></div>
-            <label style="font-size: 0.9rem; font-weight: 600;">Sua Chave PIX:</label>
-            <input type="text" id="pixCobranca" placeholder="Ex: 12.345.678/0001-90">
-            <label style="font-size: 0.9rem; font-weight: 600;">Mensagem:</label>
-            <textarea id="textoCobranca" rows="4">Olá {nome}! Tudo bem? Passando para lembrar que sua fatura vence nos próximos dias. Segue a chave PIX:</textarea>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+                <div>
+                    <label>2. Sua Chave PIX:</label>
+                    <input type="text" id="pixCobranca" placeholder="Ex: 12.345.678/0001-90">
+                </div>
+                <div>
+                    <label>3. Agendar Cobrança:</label>
+                    <input type="datetime-local" id="dataAgendamentoCobranca">
+                </div>
+            </div>
+
+            <label>4. Anexar Boleto / QR Code (PDF ou Imagem):</label>
+            <input type="file" id="arquivoMidiaCobranca" accept="image/*, application/pdf">
+
+            <label>5. Mensagem de Cobrança:</label>
+            <textarea id="textoCobranca" rows="4">Olá {nome}! Tudo bem? Passando para lembrar que sua fatura vence nos próximos dias. Segue o boleto em anexo e a chave PIX abaixo:</textarea>
+            
             <div style="display: flex; gap: 10px; justify-content: flex-end;">
                 <button class="btn btn-outline" onclick="fecharModalCobranca()">Cancelar</button>
-                <button class="btn btn-danger" onclick="iniciarDisparoCobranca()"><i class="fa-solid fa-paper-plane"></i> Enviar</button>
+                <button class="btn btn-danger" onclick="iniciarDisparoCobranca()">
+                    <i class="fa-solid fa-paper-plane"></i> Enviar / Agendar
+                </button>
             </div>
         </div>
     </div>
@@ -482,6 +1116,7 @@
     <div class="modal" id="modalDisparo">
         <div class="modal-content">
             <h2 style="margin-top: 0; color: var(--primary);"><i class="fa-solid fa-rocket"></i> Disparo em Massa</h2>
+            
             <div class="tabs">
                 <button class="tab-btn active" onclick="trocarAba('tags')" id="btn-tags">🏷️ Por Tag</button>
                 <button class="tab-btn" onclick="trocarAba('avulso')" id="btn-avulso">✏️ Números</button>
@@ -490,6 +1125,7 @@
             <div id="aba-tags" class="tab-content active">
                 <div class="lista-selecao" id="listaTagsDisparo" style="max-height: 100px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; border-radius: 8px;"></div>
             </div>
+            
             <div id="aba-avulso" class="tab-content">
                 <textarea id="listaNumeros" rows="3" placeholder="Cole números (um por linha)"></textarea>
             </div>
@@ -497,7 +1133,7 @@
             <label style="font-size: 0.9rem; font-weight: 600; display: block; margin-top: 15px;">Agendar Envio (Opcional):</label>
             <input type="datetime-local" id="dataAgendamento" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1;">
 
-            <label style="font-size: 0.9rem; font-weight: 600; display: block; margin-top: 15px;">Foto (Máx 5MB):</label>
+            <label style="font-size: 0.9rem; font-weight: 600; display: block; margin-top: 15px;">Foto / PDF (Máx 5MB):</label>
             <input type="file" id="arquivoMidia" accept="image/*, application/pdf">
             
             <label style="font-size: 0.9rem; font-weight: 600; display: block; margin-top: 10px;">Texto da Campanha:</label>
@@ -505,22 +1141,23 @@
             
             <div style="display: flex; gap: 10px; justify-content: flex-end;">
                 <button class="btn btn-outline" onclick="fecharModalDisparo()">Cancelar</button>
-                <button class="btn btn-primary" onclick="iniciarDisparo()"><i class="fa-solid fa-paper-plane"></i> Disparar</button>
+                <button class="btn btn-primary" onclick="iniciarDisparo()">
+                    <i class="fa-solid fa-paper-plane"></i> Disparar
+                </button>
             </div>
         </div>
     </div>
 
     <div class="modal" id="modalAgendamentos">
-        <div class="modal-content" style="max-width: 700px;">
+        <div class="modal-content" style="max-width: 800px;">
             <h2 style="margin-top: 0; color: var(--primary);"><i class="fa-solid fa-calendar-check"></i> Campanhas Agendadas</h2>
-            <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 15px;">Se você errar alguma configuração de imagem ou texto, apenas cancele o agendamento abaixo e crie um novo na aba de disparos.</p>
             <div class="table-container" style="max-height: 300px; overflow-y: auto;">
                 <table style="width: 100%; border-collapse: collapse;">
                     <thead>
                         <tr>
                             <th>Data e Hora</th>
+                            <th>Tipo</th>
                             <th>Mensagem</th>
-                            <th>Contatos</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
@@ -560,6 +1197,9 @@
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
+        // ==========================================
+        // 1. CONFIGURAÇÃO DO FIREBASE
+        // ==========================================
         const firebaseConfig = { 
             apiKey: "AIzaSyC4-2LavZt7iWPt2u71u-yRUYbIJu-Vzf0", 
             authDomain: "central-omnichannel-saas.firebaseapp.com", 
@@ -573,6 +1213,9 @@
         const auth = getAuth(app); 
         const db = getFirestore(app);
 
+        // ==========================================
+        // 2. VARIÁVEIS GLOBAIS E ESTADO
+        // ==========================================
         window.listaContatos = []; 
         window.idClienteLogado = ""; 
         window.planoClienteLogado = "basico"; 
@@ -580,9 +1223,12 @@
         window.zapLojista = "";
         window.ordemAtual = { coluna: '', direcao: 'asc' }; 
         window.menuData = { tamanhos: [], bordas: [], sabores: [], porcoes: [], combos: [] };
-        
-        // VARIÁVEIS E FUNÇÃO DO RELÓGIO ONLINE
+        window.agendamentosMemoria = []; 
         window.intervaloTempoOnline = null;
+        
+        // ==========================================
+        // 3. RELÓGIO ONLINE
+        // ==========================================
         window.atualizarTempoOnline = function() {
             const desde = localStorage.getItem('online_since_' + window.idClienteLogado);
             if(desde) {
@@ -595,7 +1241,9 @@
             }
         };
 
-        // NAVEGAÇÃO ENTRE ABAS
+        // ==========================================
+        // 4. FUNÇÕES DE NAVEGAÇÃO
+        // ==========================================
         window.trocarPagina = function(idAba, el) { 
             document.querySelectorAll('.page-section').forEach(e => e.classList.remove('active')); 
             document.querySelectorAll('.nav-item').forEach(e => e.classList.remove('active')); 
@@ -616,7 +1264,9 @@
             document.getElementById('k-aba-'+aba).style.display = 'block'; 
         }
 
-        // CONEXÃO DO WHATSAPP PREMIUM
+        // ==========================================
+        // 5. MOTOR DO WHATSAPP (BOTÕES)
+        // ==========================================
         window.conectarRoboPremium = async function() {
             const btn = document.getElementById('btnConectarZapBase'); 
             if(btn) { 
@@ -653,7 +1303,9 @@
             } catch(e) {}
         }
 
-        // AUTENTICAÇÃO E ESCUTA DO FIREBASE
+        // ==========================================
+        // 6. AUTENTICAÇÃO E ESCUTA DE STATUS
+        // ==========================================
         onAuthStateChanged(auth, async function(user) {
             if (user) {
                 window.idClienteLogado = user.uid;
@@ -699,7 +1351,7 @@
                                     document.getElementById('area-barra-progresso').style.display = 'none';
                                 }
 
-                                // STATUS DE CONEXÃO
+                                // LÓGICA DE STATUS DO WHATSAPP (QR CODE, ONLINE, OFFLINE)
                                 if(dataRobo.status === 'online') {
                                     document.getElementById('area-qr-code').style.display = 'none'; 
                                     document.getElementById('bolinha-status').className = 'status-indicator online'; 
@@ -774,17 +1426,51 @@
                 }
                 try { 
                     const sC = await getDoc(doc(db, "configuracoes_loja", window.idClienteLogado)); 
-                    if(sC.exists() && sC.data().ramo) { 
-                        document.getElementById('selectRamo').value = sC.data().ramo; 
-                        window.verificarRamoAtivo(sC.data().ramo); 
-                    } 
+                    if(sC.exists()) {
+                        if(sC.data().ramo) {
+                            document.getElementById('selectRamo').value = sC.data().ramo; 
+                            window.verificarRamoAtivo(sC.data().ramo); 
+                        }
+                        if(sC.data().mercadoPagoToken) {
+                            document.getElementById('mercadoPagoToken').value = sC.data().mercadoPagoToken;
+                        }
+                    }
                 } catch(e) {}
             } else {
                 window.location.href = "index.html";
             }
         });
 
-        // RELATÓRIOS
+        // ==========================================
+        // 7. AJUSTES DA LOJA E MERCADO PAGO
+        // ==========================================
+        window.salvarConfigRamo = async function() { 
+            const r = document.getElementById('selectRamo').value; 
+            if(!r) return; 
+            await setDoc(doc(db, "configuracoes_loja", window.idClienteLogado), { ramo: r }, { merge: true }); 
+            window.verificarRamoAtivo(r); 
+            alert('Perfil atualizado!'); 
+        }
+
+        window.salvarMercadoPago = async function() {
+            const token = document.getElementById('mercadoPagoToken').value.trim();
+            if(!token) return alert('Insira a chave da API do Mercado Pago.');
+            await setDoc(doc(db, "configuracoes_loja", window.idClienteLogado), { mercadoPagoToken: token }, { merge: true }); 
+            alert('✅ Chave do Mercado Pago salva! O módulo de boletos será ativado na próxima atualização.');
+        }
+        
+        window.verificarRamoAtivo = function(r) { 
+            const c = document.getElementById('cardFidelidade'); 
+            if (['pizzaria', 'hamburgueria', 'restaurante'].includes(r)) {
+                c.style.display = 'block'; 
+            } else {
+                c.style.display = 'none'; 
+            }
+        }
+
+        // ==========================================
+        // 8. RELATÓRIOS
+        // ==========================================
         window.gerarRelatorioVendas = function() {
             let totalPed = 0; 
             let clientesUnicos = 0; 
@@ -830,24 +1516,9 @@
             document.getElementById('modalRelatorio').style.display = 'flex';
         }
 
-        // CONFIGURAÇÕES E CARDÁPIO (KIOSK)
-        window.salvarConfigRamo = async function() { 
-            const r = document.getElementById('selectRamo').value; 
-            if(!r) return; 
-            await setDoc(doc(db, "configuracoes_loja", window.idClienteLogado), { ramo: r }, { merge: true }); 
-            window.verificarRamoAtivo(r); 
-            alert('Salvo!'); 
-        }
-        
-        window.verificarRamoAtivo = function(r) { 
-            const c = document.getElementById('cardFidelidade'); 
-            if (['pizzaria', 'hamburgueria', 'restaurante'].includes(r)) {
-                c.style.display = 'block'; 
-            } else {
-                c.style.display = 'none'; 
-            }
-        }
-
+        // ==========================================
+        // 9. KIOSK E CARDÁPIO
+        // ==========================================
         window.abrirModalCardapio = async function() {
             if (window.planoClienteLogado === 'basico') return alert("⚠️ Recurso Premium!");
             document.getElementById('modalCardapio').style.display = 'flex';
@@ -861,14 +1532,16 @@
                     window.menuData.porcoes = d.porcoes || []; 
                     window.menuData.combos = d.combos || [];
                     document.getElementById('tempoEntrega').value = d.tempoEntrega || ''; 
-                    document.getElementById('taxaEntrega').value = d.taxaEntrega || '';
+                    document.getElementById('taxaEntrega').value = d.taxaEntrega || ''; 
                     document.getElementById('metaFidelidade').value = d.metaFidelidade || ''; 
-                    window.renderCards();
+                    renderCards();
                 }
             } catch(e) {}
         }
         
-        window.fecharModalCardapio = () => document.getElementById('modalCardapio').style.display = 'none';
+        window.fecharModalCardapio = () => {
+            document.getElementById('modalCardapio').style.display = 'none';
+        }
         
         window.importarCardapioJson = function(event) { 
             const file = event.target.files[0]; 
@@ -882,7 +1555,7 @@
                     if(j.sabores) window.menuData.sabores = j.sabores; 
                     if(j.porcoes) window.menuData.porcoes = j.porcoes; 
                     if(j.combos) window.menuData.combos = j.combos; 
-                    window.renderCards(); 
+                    renderCards(); 
                     alert("✅ JSON Importado!"); 
                 } catch(err) { 
                     alert("❌ Arquivo inválido."); 
@@ -937,12 +1610,12 @@
                     document.getElementById('comboPreco').value='';
                 } 
             } 
-            window.renderCards(); 
+            renderCards(); 
         }
         
         window.removeObj = (tipo, idx) => { 
             window.menuData[tipo].splice(idx, 1); 
-            window.renderCards(); 
+            renderCards(); 
         }
         
         window.editObj = function(tipo, idx) { 
@@ -1042,13 +1715,15 @@
                 
                 await setDoc(doc(db,"cardapios_loja",window.idClienteLogado), payload, {merge:true}); 
                 alert("✅ Robô foi treinado!"); 
-                window.fecharModalCardapio(); 
+                fecharModalCardapio(); 
             } catch(e) {} 
             btn.innerHTML='<i class="fa-solid fa-cloud-arrow-up"></i> Treinar Robô com Cardápio'; 
             btn.disabled=false; 
         }
 
-        // CRM E CONTATOS
+        // ==========================================
+        // 10. CRM: TABELA E LOCAL STORAGE
+        // ==========================================
         window.salvarContatosLocal = async function() { 
             if (window.idClienteLogado) { 
                 localStorage.setItem('crm_'+window.idClienteLogado, JSON.stringify(window.listaContatos)); 
@@ -1086,7 +1761,7 @@
                 else if(c==='qtdPedidos'){vA=a.qtdPedidos||0;vB=b.qtdPedidos||0;} 
                 else if(c==='tags'){vA=(a.tags&&a.tags.length>0)?a.tags[0].toLowerCase():'z';vB=(b.tags&&b.tags.length>0)?b.tags[0].toLowerCase():'z';} 
                 
-                if (c === 'qtdPedidos') { 
+                if (c === 'qtdPedidos') {
                     return window.ordemAtual.direcao==='asc' ? vA - vB : vB - vA; 
                 } else { 
                     if(vA<vB) return window.ordemAtual.direcao==='asc'?-1:1; 
@@ -1100,7 +1775,12 @@
         window.renderizarTabela = function() { 
             const co=document.getElementById('tabelaContatos'); 
             const bu=document.getElementById('buscaContato').value.toLowerCase(); 
-            let lf=window.listaContatos.filter(c=>(c.nome||'').toLowerCase().includes(bu)||c.telefone.includes(bu)); 
+            
+            let lf=window.listaContatos.filter(c => 
+                (c.nome||'').toLowerCase().includes(bu) || 
+                c.telefone.includes(bu) || 
+                (c.documento||'').toLowerCase().includes(bu)
+            ); 
             
             if(lf.length===0){ 
                 co.innerHTML='<tr><td colspan="8" style="text-align: center; padding: 40px; color: #94a3b8;">Nenhum contato encontrado.</td></tr>'; 
@@ -1114,15 +1794,22 @@
                 if(c.tags){ 
                     c.tags.forEach(t=>ht+=`<span class="tag-pill"><i class="fa-solid fa-tag" style="font-size:0.6rem;"></i> ${t} <button class="tag-remove" onclick="removerTagDoContato('${c.id}', '${t}')">×</button></span>`); 
                 } 
+                
+                let detalhesDoc = c.documento ? `<div><i class="fa-solid fa-id-card"></i> ${c.documento}</div>` : '';
+                let detalhesEnd = c.endereco ? `<div style="font-size: 0.75rem; color: #64748b; margin-top:3px;"><i class="fa-solid fa-location-dot"></i> ${c.endereco}</div>` : '';
+                
                 h+=`<tr>
                     <td><input type="checkbox" class="check-contato" value="${c.id}"></td>
                     <td><strong>${c.nome||'Cliente'}</strong></td>
                     <td>${c.telefone}</td>
-                    <td><input type="text" style="width:70px; padding:6px; font-size:0.8rem;" placeholder="DD/MM" value="${c.aniversario||''}" onchange="atualizarNascimento('${c.id}', this.value)"></td>
+                    <td>${detalhesDoc} ${detalhesEnd}</td>
                     <td style="color:#64748b; font-size:0.85rem;">${c.ultimaCompra || 'Nunca'}</td>
                     <td style="font-weight:bold; color:var(--primary);">${c.qtdPedidos || 0}</td>
                     <td>${ht}</td>
-                    <td><button class="btn btn-outline" style="padding: 5px 10px; color: var(--danger); border-color: #fca5a5;" onclick="apagarContato('${c.id}')"><i class="fa-solid fa-trash"></i></button></td>
+                    <td>
+                        <button class="btn btn-outline" style="padding: 5px; color: #f59e0b; border-color: #fcd34d; margin-right: 5px;" onclick="editarContatoExistente('${c.id}')"><i class="fa-solid fa-pen"></i></button>
+                        <button class="btn btn-outline" style="padding: 5px; color: var(--danger); border-color: #fca5a5;" onclick="apagarContato('${c.id}')"><i class="fa-solid fa-trash"></i></button>
+                    </td>
                 </tr>`; 
             } 
             co.innerHTML=h; 
@@ -1137,20 +1824,8 @@
             window.salvarContatosLocal(); 
         }
         
-        window.atualizarNascimento = (id, nova) => { 
-            let d = nova.replace(/\D/g, '');
-            if(d.length>=4) d=d.substring(0,2)+'/'+d.substring(2,4);
-            for(let i=0; i<window.listaContatos.length; i++){
-                if(window.listaContatos[i].id===id){
-                    window.listaContatos[i].aniversario=d;
-                    break;
-                }
-            }
-            window.salvarContatosLocal(); 
-        }
-        
         window.apagarContato = (id) => { 
-            if(confirm("Apagar?")){
+            if(confirm("Apagar Contato?")){
                 window.listaContatos=window.listaContatos.filter(c=>c.id!==id);
                 window.renderizarTabela();
                 window.salvarContatosLocal();
@@ -1159,8 +1834,8 @@
         
         window.apagarSelecionados = () => { 
             const c=document.querySelectorAll('.check-contato:checked');
-            if(c.length===0) return alert("⚠️ Selecione!");
-            if(confirm(`Excluir ${c.length} contatos?`)){
+            if(c.length===0) return alert("⚠️ Selecione contatos na tabela primeiro!");
+            if(confirm(`Excluir os ${c.length} contatos selecionados?`)){
                 let i=Array.from(c).map(x=>x.value);
                 window.listaContatos=window.listaContatos.filter(x=>!i.includes(x.id));
                 window.renderizarTabela();
@@ -1172,17 +1847,23 @@
         window.alternarTodosChecks = () => {
             document.querySelectorAll('.check-contato').forEach(c=>c.checked=document.getElementById('checkTodos').checked);
         }
-        
+
+        // ==========================================
+        // 11. CRM: FUNÇÕES DE TAGS E IMPORTAÇÃO
+        // ==========================================
         window.abrirModalTag = () => { 
             const l=document.querySelectorAll('.check-contato:checked');
-            if(l.length===0) return alert("⚠️ Marque clientes!");
+            if(l.length===0) return alert("⚠️ Marque clientes na tabela primeiro!");
             document.getElementById('modalTag').style.display='flex';
+            
             let t=new Set();
             window.listaContatos.forEach(c=>c.tags&&c.tags.forEach(x=>t.add(x)));
             let a=Array.from(t);
+            
             const c=document.getElementById('botoesTagsSalvas');
             const ar=document.getElementById('areaTagsExistentes');
             c.innerHTML='';
+            
             if(a.length>0){
                 ar.style.display='block';
                 a.forEach(x=>{
@@ -1205,7 +1886,8 @@
         
         window.salvarTagMassa = () => { 
             const t=document.getElementById('nomeNovaTag').value.trim();
-            if(t==="") return alert("⚠️ Escreva a Tag.");
+            if(t==="") return alert("⚠️ Escreva o nome da Tag.");
+            
             const m=document.querySelectorAll('.check-contato:checked');
             m.forEach(c=>{
                 let k=window.listaContatos.find(x=>x.id===c.value);
@@ -1219,7 +1901,7 @@
             window.fecharModalTag();
             document.getElementById('checkTodos').checked=false;
             window.alternarTodosChecks();
-            alert(`✅ Tag "${t}" aplicada.`); 
+            alert(`✅ Tag "${t}" aplicada com sucesso.`); 
         }
         
         window.abrirModalImportar = () => {
@@ -1257,7 +1939,7 @@
         window.iniciarImportacao = () => { 
             const c=document.getElementById('arquivoCsv');
             const a=c.files[0];
-            if(!a) return alert("⚠️ Selecione um arquivo!");
+            if(!a) return alert("⚠️ Selecione um arquivo CSV ou VCF!");
             
             if (window.planoClienteLogado === 'basico' && window.listaContatos.length >= 50) {
                 return alert("⚠️ Limite de 50 contatos do plano Básico atingido. Faça upgrade para Premium!");
@@ -1270,6 +1952,7 @@
                 const t=e.target.result;
                 let li=0;
                 let d=0;
+                
                 if(ex==='csv'){
                     t.split('\n').forEach((x,i)=>{
                         if(i===0) return;
@@ -1281,7 +1964,9 @@
                                 if(!window.listaContatos.some(k=>k.telefone===te)){ 
                                     window.listaContatos.push({id:'ctt_'+Math.random().toString(36).substr(2,9),nome:p[0].trim(),telefone:te,tags:['CSV']});
                                     li++; 
-                                } else d++;
+                                } else {
+                                    d++;
+                                }
                             }
                         }
                     });
@@ -1298,12 +1983,14 @@
                                 if(!window.listaContatos.some(k=>k.telefone===te)){ 
                                     window.listaContatos.push({id:'ctt_'+Math.random().toString(36).substr(2,9),nome:n,telefone:te,tags:['Celular']});
                                     li++; 
-                                } else d++;
+                                } else {
+                                    d++;
+                                }
                             }
                         }
                     });
                 }
-                alert(`✅ ${li} novos importados. ${d} duplicados ignorados.`);
+                alert(`✅ ${li} novos clientes importados com sucesso.\n⚠️ ${d} números ignorados por estarem duplicados.`);
                 window.fecharModalImportar();
                 c.value='';
                 window.renderizarTabela();
@@ -1324,117 +2011,205 @@
             l.click(); 
         }
         
-        window.etiquetarSelecionados = () => { 
-            if(document.querySelectorAll('.check-contato:checked').length===0) return alert("⚠️ Selecione contatos primeiro!");
-            document.getElementById('checkTodos').checked=false;
-            window.abrirModalTag(); 
-        }
-        
         window.fazerLogout = () => {
             signOut(auth).then(()=>window.location.href="index.html");
         }
-        
-        // NOVO CONTATO MANUAL
-        window.abrirModalNovoContato = () => document.getElementById('modalNovoContato').style.display = 'flex';
-        
-        window.fecharModalNovoContato = () => { 
-            document.getElementById('modalNovoContato').style.display = 'none'; 
+
+        // ==========================================
+        // 12. CRM: NOVO CONTATO E EDIÇÃO (CPF/ENDEREÇO)
+        // ==========================================
+        window.abrirModalNovoContato = () => {
+            document.getElementById('tituloModalContato').innerHTML = `<i class="fa-solid fa-user-plus"></i> Adicionar Contato`;
+            document.getElementById('idContatoEdit').value = '';
             document.getElementById('novoContatoNome').value = ''; 
             document.getElementById('novoContatoZap').value = ''; 
             document.getElementById('novoContatoNasc').value = ''; 
+            document.getElementById('novoContatoDoc').value = ''; 
+            document.getElementById('novoContatoEnd').value = ''; 
+            document.getElementById('modalNovoContato').style.display = 'flex';
+        }
+
+        window.editarContatoExistente = (id) => {
+            const c = window.listaContatos.find(x => x.id === id);
+            if(!c) return;
+            
+            document.getElementById('tituloModalContato').innerHTML = `<i class="fa-solid fa-pen"></i> Editar Contato`;
+            document.getElementById('idContatoEdit').value = c.id;
+            
+            document.getElementById('novoContatoNome').value = c.nome || '';
+            document.getElementById('novoContatoZap').value = c.telefone || '';
+            document.getElementById('novoContatoNasc').value = c.aniversario || '';
+            document.getElementById('novoContatoDoc').value = c.documento || '';
+            document.getElementById('novoContatoEnd').value = c.endereco || '';
+            
+            document.getElementById('modalNovoContato').style.display = 'flex';
+        }
+        
+        window.fecharModalNovoContato = () => { 
+            document.getElementById('modalNovoContato').style.display = 'none'; 
         };
         
         window.salvarNovoContato = () => {
-            if (window.planoClienteLogado === 'basico' && window.listaContatos.length >= 50) { 
-                return alert("⚠️ Limite de 50 contatos do plano Básico atingido. Faça o upgrade para a versão Premium!"); 
-            }
-
+            let idEdit = document.getElementById('idContatoEdit').value;
             let nome = document.getElementById('novoContatoNome').value.trim();
             let zap = document.getElementById('novoContatoZap').value.trim();
             let nasc = document.getElementById('novoContatoNasc').value.trim();
+            let doc = document.getElementById('novoContatoDoc').value.trim();
+            let end = document.getElementById('novoContatoEnd').value.trim();
             
-            if(!nome || !zap) return alert("⚠️ Nome e WhatsApp são obrigatórios!");
+            if(!nome || !zap) return alert("⚠️ Nome e WhatsApp são campos obrigatórios!");
             let numLimpo = zap.replace(/\D/g, '');
-            if(window.listaContatos.some(c => c.telefone === numLimpo)) return alert("⚠️ Este número já existe no CRM!");
             
-            window.listaContatos.push({ 
-                id: 'ctt_' + Math.random().toString(36).substr(2, 9), 
-                nome: nome, 
-                telefone: numLimpo, 
-                aniversario: nasc, 
-                qtdPedidos: 0, 
-                tags: ['Manual'] 
-            });
+            if (idEdit) {
+                let c = window.listaContatos.find(x => x.id === idEdit);
+                if(c) {
+                    if(c.telefone !== numLimpo && window.listaContatos.some(k => k.telefone === numLimpo)) {
+                        return alert("⚠️ O número de WhatsApp atualizado já pertence a outro cliente no seu CRM!");
+                    }
+                    c.nome = nome; 
+                    c.telefone = numLimpo; 
+                    c.aniversario = nasc; 
+                    c.documento = doc; 
+                    c.endereco = end;
+                    alert("✅ Dados do contato atualizados com sucesso!");
+                }
+            } else {
+                if (window.planoClienteLogado === 'basico' && window.listaContatos.length >= 50) { 
+                    return alert("⚠️ Limite de 50 contatos do plano Básico atingido. Faça o upgrade para a versão Premium!"); 
+                }
+                if(window.listaContatos.some(c => c.telefone === numLimpo)) return alert("⚠️ Este número já existe no seu CRM!");
+                
+                window.listaContatos.push({ 
+                    id: 'ctt_' + Math.random().toString(36).substr(2, 9), 
+                    nome: nome, 
+                    telefone: numLimpo, 
+                    aniversario: nasc, 
+                    documento: doc, 
+                    endereco: end, 
+                    qtdPedidos: 0, 
+                    tags: ['Manual'] 
+                });
+                alert("✅ Novo cliente adicionado com sucesso!");
+            }
+
             window.renderizarTabela(); 
             window.salvarContatosLocal(); 
             window.fecharModalNovoContato(); 
-            alert("✅ Contato adicionado com sucesso!");
         };
 
-        // MARKETING E DISPAROS (COM AGENDAMENTO FUSO HORÁRIO CORRIGIDO)
+        // ==========================================
+        // 13. COBRANÇAS (AGENDAMENTO E ANEXOS)
+        // ==========================================
         window.abrirModalCobranca = function() { 
-            const d=document.getElementById('listaTagsCobranca');
-            let h='';
-            let t=new Set(); 
-            window.listaContatos.forEach(c=>c.tags&&c.tags.forEach(x=>t.add(x))); 
-            let a=Array.from(t); 
-            if(a.length===0) {
-                h='<p style="color:var(--danger);">Nenhuma etiqueta cadastrada.</p>'; 
+            const d = document.getElementById('listaTagsCobranca');
+            let h = '';
+            let t = new Set(); 
+            window.listaContatos.forEach(c => c.tags && c.tags.forEach(x => t.add(x))); 
+            let a = Array.from(t); 
+            
+            if(a.length === 0) {
+                h = '<p style="color:var(--danger);">Nenhuma etiqueta de cliente cadastrada.</p>'; 
             } else {
-                a.forEach(x=>h+=`<label style="display:block; padding:10px; background:white; border-radius:8px; margin-bottom:5px; border: 1px solid #cbd5e1;"><input type="checkbox" value="${x}"> 🎯 Enviar para <b>${x}</b></label>`); 
+                a.forEach(x => h+=`<label style="display:block; padding:10px; background:white; border-radius:8px; margin-bottom:5px; border: 1px solid #cbd5e1;"><input type="checkbox" value="${x}"> 🎯 Enviar para <b>${x}</b></label>`); 
             }
-            d.innerHTML=h; 
+            d.innerHTML = h; 
             document.getElementById('modalCobranca').style.display='flex'; 
         }
         
         window.fecharModalCobranca = () => {
             document.getElementById('modalCobranca').style.display='none';
+            document.getElementById('dataAgendamentoCobranca').value = ''; 
+            document.getElementById('arquivoMidiaCobranca').value = ''; 
         }
         
         window.iniciarDisparoCobranca = async function() { 
             const m = document.getElementById('textoCobranca').value;
             const p = document.getElementById('pixCobranca').value;
             const c = document.querySelectorAll('#listaTagsCobranca input:checked'); 
-            if(c.length===0) return alert("⚠️ Selecione o grupo!"); 
-            if(m==="") return alert("⚠️ Digite a mensagem."); 
+            const ar = document.getElementById('arquivoMidiaCobranca').files[0]; 
+            const agendamentoInput = document.getElementById('dataAgendamentoCobranca').value;
+
+            if(c.length === 0) return alert("⚠️ Selecione a etiqueta dos devedores!"); 
+            if(m === "") return alert("⚠️ Digite a mensagem de cobrança."); 
+
+            if(window.planoClienteLogado === 'basico' && ar) {
+                return alert("⚠️ O plano Básico não suporta envio de boletos em PDF ou arquivos de foto. Faça o upgrade.");
+            }
+            
+            let agendamentoTimestamp = null;
+            if (agendamentoInput) {
+                agendamentoTimestamp = new Date(agendamentoInput).getTime();
+                if (window.planoClienteLogado === 'basico' && agendamentoTimestamp > (Date.now() + (24 * 60 * 60 * 1000))) {
+                    return alert("⚠️ O plano Básico só permite agendar cobranças para no máximo 24 horas à frente.");
+                }
+            }
+
+            let b = null, no = "", mi = ""; 
+            if(ar) {
+                if((ar.size/1024/1024) > 5) return alert("⚠️ O tamanho máximo do boleto/foto é de 5MB."); 
+                const l = new FileReader(); 
+                b = await new Promise((r) => { 
+                    l.onload = (e) => r(e.target.result.split(',')[1]); 
+                    l.readAsDataURL(ar); 
+                }); 
+                no = ar.name; 
+                mi = ar.type;
+            }
             
             let ts = Array.from(c).map(i=>i.value);
             let n = window.listaContatos.filter(k=>k.tags&&k.tags.some(x=>ts.includes(x))).map(k=>({ numero: k.telefone, nome: k.nome.split(' ')[0] })); 
             
-            if(n.length===0) return alert("⚠️ Ninguém encontrado para esta etiqueta."); 
-            if(window.planoClienteLogado==='basico' && n.length>20) return alert(`⚠️ Limite do Básico: Máx 20 disparos por vez.`); 
+            if(n.length === 0) return alert("⚠️ Ninguém encontrado no CRM para esta etiqueta."); 
+            if(window.planoClienteLogado === 'basico' && n.length > 20) return alert(`⚠️ Limite do Básico atingido: Você pode cobrar no máximo 20 pessoas por vez.`); 
             
             let fm = p !== "" ? `${m}\n\n🏦 *CHAVE PIX:*\n${p}` : m; 
             
             window.fecharModalCobranca(); 
             document.getElementById('cardEnviado').classList.add('show'); 
-            document.getElementById('titulo-aviso-envio').innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Preparando...`; 
-            document.getElementById('texto-aviso-envio').innerText = "Iniciando fila no servidor."; 
+            
+            if (agendamentoTimestamp) {
+                document.getElementById('titulo-aviso-envio').innerHTML = `<i class="fa-solid fa-clock"></i> Cobrança Agendada!`;
+                document.getElementById('texto-aviso-envio').innerText = `O envio do boleto automático está pronto.`;
+            } else {
+                document.getElementById('titulo-aviso-envio').innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Preparando Cobrança...`; 
+                document.getElementById('texto-aviso-envio').innerText = "Iniciando a fila de cobrança no servidor."; 
+            }
             
             try {
                 await fetch('/api-oracle/api/saas/disparar', {
-                    method: 'POST',
+                    method: 'POST', 
                     headers: {'Content-Type':'application/json','x-senha':'123321'},
                     body: JSON.stringify({
-                        idCliente: window.idClienteLogado,
-                        nomeEmpresa: window.nomeLojista,
+                        idCliente: window.idClienteLogado, 
+                        nomeEmpresa: window.nomeLojista, 
                         zapLojista: window.zapLojista,
-                        contatos: n,
-                        mensagem: fm,
-                        plano: window.planoClienteLogado,
-                        isCobranca: true
+                        contatos: n, 
+                        mensagem: fm, 
+                        midia: b, 
+                        midiaNome: no, 
+                        midiaMime: mi,
+                        plano: window.planoClienteLogado, 
+                        isCobranca: true, 
+                        agendamento: agendamentoTimestamp
                     })
                 });
             } catch(e) {} 
         }
-        
+
+        // ==========================================
+        // 14. DISPAROS EM MASSA DE MARKETING
+        // ==========================================
         window.atualizarListaTagsDisparo = () => { 
-            const d=document.getElementById('listaTagsDisparo');
-            let h='<label style="display:block; padding:10px; background:white; border-radius:8px; margin-bottom:5px; border: 1px solid #cbd5e1; font-weight:bold;"><input type="checkbox" value="TODOS_OS_CONTATOS"> 📢 TODOS OS CONTATOS</label>';
-            let t=new Set();
+            const d = document.getElementById('listaTagsDisparo');
+            let h = '<label style="display:block; padding:10px; background:white; border-radius:8px; margin-bottom:5px; border: 1px solid #cbd5e1; font-weight:bold;"><input type="checkbox" value="TODOS_OS_CONTATOS"> 📢 TODOS OS CONTATOS</label>';
+            
+            let t = new Set();
             window.listaContatos.forEach(c=>c.tags&&c.tags.forEach(x=>t.add(x)));
-            Array.from(t).forEach(x=>h+=`<label style="display:block; padding:10px; background:white; border-radius:8px; margin-bottom:5px; border: 1px solid #cbd5e1;"><input type="checkbox" value="${x}"> 🏷️ ${x}</label>`);
-            d.innerHTML=h; 
+            
+            Array.from(t).forEach(x => {
+                h += `<label style="display:block; padding:10px; background:white; border-radius:8px; margin-bottom:5px; border: 1px solid #cbd5e1;"><input type="checkbox" value="${x}"> 🏷️ ${x}</label>`
+            });
+            d.innerHTML = h; 
         }
         
         window.abrirModalDisparo = () => { 
@@ -1445,90 +2220,33 @@
         window.fecharModalDisparo = () => {
             document.getElementById('modalDisparo').style.display='none';
             document.getElementById('dataAgendamento').value = ''; 
+            document.getElementById('arquivoMidia').value = ''; 
         };
 
-        window.abrirModalAgendamentos = async function() {
-            document.getElementById('modalAgendamentos').style.display = 'flex';
-            await window.carregarAgendamentos();
-        };
-
-        window.fecharModalAgendamentos = () => {
-            document.getElementById('modalAgendamentos').style.display = 'none';
-        };
-
-        window.carregarAgendamentos = async function() {
-            const tb = document.getElementById('lista-agendamentos-body');
-            tb.innerHTML = '<tr><td colspan="4" style="text-align: center;">Carregando...</td></tr>';
-            try {
-                const res = await fetch('/api-oracle/api/saas/agendamentos/listar', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'x-senha': '123321' },
-                    body: JSON.stringify({ idCliente: window.idClienteLogado })
-                });
-                const data = await res.json();
-                if (data.agendamentos && data.agendamentos.length > 0) {
-                    let h = '';
-                    data.agendamentos.forEach(a => {
-                        const dataFormatada = new Date(a.tempoDisparo).toLocaleString('pt-BR');
-                        const msgCurta = a.mensagem.length > 30 ? a.mensagem.substring(0, 30) + '...' : a.mensagem;
-                        h += `<tr>
-                                <td>${dataFormatada}</td>
-                                <td>${msgCurta}</td>
-                                <td>${a.qtdAlvos}</td>
-                                <td>
-                                    <button class="btn btn-danger" style="padding: 5px 10px; font-size: 0.8rem;" onclick="cancelarAgendamento('${a.id}')"><i class="fa-solid fa-trash"></i> Cancelar</button>
-                                </td>
-                              </tr>`;
-                    });
-                    tb.innerHTML = h;
-                } else {
-                    tb.innerHTML = '<tr><td colspan="4" style="text-align: center;">Nenhum agendamento encontrado.</td></tr>';
-                }
-            } catch (e) {
-                tb.innerHTML = '<tr><td colspan="4" style="text-align: center; color: red;">Erro ao carregar agendamentos.</td></tr>';
-            }
-        };
-
-        window.cancelarAgendamento = async function(idAgendamento) {
-            if(!confirm("Tem certeza que deseja cancelar este agendamento?")) return;
-            try {
-                await fetch('/api-oracle/api/saas/agendamentos/cancelar', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'x-senha': '123321' },
-                    body: JSON.stringify({ idCliente: window.idClienteLogado, idAgendamento: idAgendamento })
-                });
-                alert("✅ Agendamento cancelado!");
-                window.carregarAgendamentos();
-            } catch (e) {
-                alert("Erro ao cancelar.");
-            }
-        };
-        
         window.iniciarDisparo = async function() { 
             const m = document.getElementById('mensagemPromo').value;
             const ar = document.getElementById('arquivoMidia').files[0]; 
             const agendamentoInput = document.getElementById('dataAgendamento').value;
             
-            // CONVERSÃO CORRETA DA DATA PARA O FUSO HORÁRIO LOCAL ANTES DE ENVIAR AO SERVIDOR
             let agendamentoTimestamp = null;
-            if (agendamentoInput) {
-                agendamentoTimestamp = new Date(agendamentoInput).getTime();
-            }
+            if (agendamentoInput) agendamentoTimestamp = new Date(agendamentoInput).getTime();
             
-            if(m === "" && !ar) return alert("⚠️ Preencha a mensagem ou anexe uma foto/pdf!"); 
+            if(m === "" && !ar) return alert("⚠️ Preencha a mensagem da campanha ou anexe uma foto!"); 
 
-            if(window.planoClienteLogado === 'basico' && ar) return alert("⚠️ O plano Básico não suporta envio de fotos ou PDFs. Faça o upgrade da sua conta!");
+            if(window.planoClienteLogado === 'basico' && ar) {
+                return alert("⚠️ O plano Básico não suporta envio de fotos em massa. Faça o upgrade da sua conta!");
+            }
             
             if (agendamentoTimestamp && window.planoClienteLogado === 'basico') {
                 const limite24h = Date.now() + (24 * 60 * 60 * 1000);
                 if (agendamentoTimestamp > limite24h) {
-                    return alert("⚠️ O plano Básico só permite agendar para no máximo 24 horas à frente. Para datas futuras maiores, adquira o Premium!");
+                    return alert("⚠️ O plano Básico só permite agendar para no máximo 24 horas à frente.");
                 }
             }
 
             let b = null, no = "", mi = ""; 
             if(ar) {
-                if((ar.size/1024/1024) > 5) return alert("⚠️ Limite 5MB."); 
+                if((ar.size/1024/1024) > 5) return alert("⚠️ O arquivo ultrapassa o limite de 5MB."); 
                 const l = new FileReader(); 
                 b = await new Promise((r) => { 
                     l.onload = (e) => r(e.target.result.split(',')[1]); 
@@ -1544,7 +2262,7 @@
 
             if(it) {
                 const c = document.querySelectorAll('#listaTagsDisparo input:checked');
-                if(c.length === 0) return alert("⚠️ Selecione uma tag!"); 
+                if(c.length === 0) return alert("⚠️ Selecione pelo menos uma tag de clientes!"); 
                 let t = Array.from(c).map(i => i.value); 
                 
                 if(t.includes("TODOS_OS_CONTATOS")) {
@@ -1556,10 +2274,10 @@
                 contatosAlvo = document.getElementById('listaNumeros').value.split('\n').map(x => x.trim()).filter(x => x !== "").map(num => ({ numero: num, nome: 'Cliente' }));
             } 
             
-            if(contatosAlvo.length === 0) return alert("⚠️ Nenhum contato na lista."); 
+            if(contatosAlvo.length === 0) return alert("⚠️ A sua lista de clientes para envio está vazia."); 
 
             if(window.planoClienteLogado === 'basico' && contatosAlvo.length > 20) {
-                return alert(`⚠️ Limite do Básico: Máximo de 20 disparos por campanha. A sua lista tem ${contatosAlvo.length}.`); 
+                return alert(`⚠️ Limite de envio excedido! No plano básico só pode enviar para 20 clientes por vez.`); 
             }
             
             window.fecharModalDisparo(); 
@@ -1567,10 +2285,10 @@
             
             if (agendamentoTimestamp) {
                 document.getElementById('titulo-aviso-envio').innerHTML = `<i class="fa-solid fa-clock"></i> Campanha Agendada!`;
-                document.getElementById('texto-aviso-envio').innerText = `O servidor disparará no dia marcado.`;
+                document.getElementById('texto-aviso-envio').innerText = `O servidor fará o envio de forma automática no dia marcado.`;
             } else {
-                document.getElementById('titulo-aviso-envio').innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Preparando...`;
-                document.getElementById('texto-aviso-envio').innerText = "Iniciando fila no servidor.";
+                document.getElementById('titulo-aviso-envio').innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Preparando Campanha...`;
+                document.getElementById('texto-aviso-envio').innerText = "Iniciando a fila no servidor.";
             }
             
             try {
@@ -1592,13 +2310,117 @@
                 });
             } catch(e) { console.log(e); } 
         }
+
+        // ==========================================
+        // 15. LISTAR E EDITAR AGENDAMENTOS
+        // ==========================================
+        window.abrirModalAgendamentos = async function() {
+            document.getElementById('modalAgendamentos').style.display = 'flex';
+            await window.carregarAgendamentos();
+        };
+
+        window.fecharModalAgendamentos = () => {
+            document.getElementById('modalAgendamentos').style.display = 'none';
+        };
+
+        window.carregarAgendamentos = async function() {
+            const tb = document.getElementById('lista-agendamentos-body');
+            tb.innerHTML = '<tr><td colspan="4" style="text-align: center;">Carregando campanhas agendadas...</td></tr>';
+            try {
+                const res = await fetch('/api-oracle/api/saas/agendamentos/listar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'x-senha': '123321' },
+                    body: JSON.stringify({ idCliente: window.idClienteLogado })
+                });
+                const data = await res.json();
+                
+                if (data.agendamentos && data.agendamentos.length > 0) {
+                    window.agendamentosMemoria = data.agendamentos; 
+                    let h = '';
+                    
+                    data.agendamentos.forEach(a => {
+                        const dataFormatada = new Date(a.tempoDisparo).toLocaleString('pt-BR');
+                        const msgCurta = a.mensagem.length > 30 ? a.mensagem.substring(0, 30) + '...' : a.mensagem;
+                        const tipoTag = a.dadosCompletos.isCobranca 
+                            ? '<span class="tag-pill" style="color:var(--danger)">Cobrança</span>' 
+                            : '<span class="tag-pill" style="color:var(--primary)">Marketing</span>';
+                        
+                        h += `<tr>
+                                <td>${dataFormatada}</td>
+                                <td>${tipoTag}</td>
+                                <td>${msgCurta}</td>
+                                <td>
+                                    <button class="btn btn-outline" style="padding: 5px 10px; font-size: 0.8rem; margin-right: 5px;" onclick="editarAgendamento('${a.id}')"><i class="fa-solid fa-pen"></i></button>
+                                    <button class="btn btn-danger" style="padding: 5px 10px; font-size: 0.8rem;" onclick="cancelarAgendamento('${a.id}')"><i class="fa-solid fa-trash"></i></button>
+                                </td>
+                              </tr>`;
+                    });
+                    tb.innerHTML = h;
+                } else {
+                    tb.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #64748b;">Ainda não tem nenhuma campanha agendada.</td></tr>';
+                }
+            } catch (e) {
+                tb.innerHTML = '<tr><td colspan="4" style="text-align: center; color: red;">Erro ao comunicar com o servidor.</td></tr>';
+            }
+        };
+
+        window.cancelarAgendamento = async function(idAgendamento) {
+            if(!confirm("Tem certeza que deseja cancelar e apagar esta campanha agendada?")) return;
+            try {
+                await fetch('/api-oracle/api/saas/agendamentos/cancelar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'x-senha': '123321' },
+                    body: JSON.stringify({ idCliente: window.idClienteLogado, idAgendamento: idAgendamento })
+                });
+                alert("✅ Agendamento cancelado com sucesso no servidor!");
+                window.carregarAgendamentos();
+            } catch (e) {
+                alert("Erro ao tentar cancelar no servidor.");
+            }
+        };
+
+        window.editarAgendamento = async function(idAgendamento) {
+            const ag = window.agendamentosMemoria.find(x => x.id === idAgendamento);
+            if(!ag) return;
+            
+            // 1. Remove da fila do servidor
+            await fetch('/api-oracle/api/saas/agendamentos/cancelar', { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json', 'x-senha': '123321' }, 
+                body: JSON.stringify({ idCliente: window.idClienteLogado, idAgendamento: idAgendamento }) 
+            });
+            
+            window.fecharModalAgendamentos();
+            alert("⚠️ Modo de Edição Ativo: Por questões de segurança, arquivos de fotos ou PDFs não ficam guardados para edição e precisam de ser anexados novamente.");
+
+            // 2. Preenche os campos com os dados antigos
+            const d = ag.dadosCompletos;
+            
+            // Converte o Timestamp (Fuso Universal) para o Fuso Local do Computador no formato YYYY-MM-DDTHH:mm
+            const dataObjeto = new Date(ag.tempoDisparo);
+            dataObjeto.setMinutes(dataObjeto.getMinutes() - dataObjeto.getTimezoneOffset());
+            const dataFormatadaInput = dataObjeto.toISOString().slice(0, 16);
+
+            if (d.isCobranca) {
+                document.getElementById('textoCobranca').value = d.mensagem;
+                document.getElementById('dataAgendamentoCobranca').value = dataFormatadaInput;
+                window.abrirModalCobranca();
+            } else {
+                document.getElementById('mensagemPromo').value = d.mensagem;
+                document.getElementById('dataAgendamento').value = dataFormatadaInput;
+                window.abrirModalDisparo();
+            }
+        };
         
+        // ==========================================
+        // 16. ANIVERSÁRIOS
+        // ==========================================
         window.abrirModalAniversario = async () => { 
             document.getElementById('modalAniversario').style.display='flex';
             try {
                 const s = await getDoc(doc(db,"configuracoes_loja",window.idClienteLogado));
-                if(s.exists()&&s.data().msgAniversario) {
-                    document.getElementById('textoAniversario').value=s.data().msgAniversario;
+                if(s.exists() && s.data().msgAniversario) {
+                    document.getElementById('textoAniversario').value = s.data().msgAniversario;
                 }
             } catch(e) {} 
         }
@@ -1611,42 +2433,46 @@
             const t = document.getElementById('textoAniversario').value;
             const im = document.getElementById('arquivoMidiaAniversario');
             const b = document.getElementById('btnSalvarAniversario');
-            if(!t) return alert("⚠️ Digite uma mensagem.");
             
-            b.innerText="Salvando...";
-            b.disabled=true;
+            if(!t) return alert("⚠️ A mensagem de aniversário não pode estar vazia.");
             
-            let mi=null, mim=null, n=null;
+            b.innerText = "A guardar...";
+            b.disabled = true;
+            
+            let mi = null, mim = null, n = null;
             
             if(im.files[0]){
-                if((im.files[0].size/1024/1024)>5){
-                    b.innerText="Salvar";
-                    b.disabled=false;
-                    return alert("⚠️ Max 5MB.");
+                if((im.files[0].size/1024/1024) > 5) {
+                    b.innerText = "Salvar";
+                    b.disabled = false;
+                    return alert("⚠️ O arquivo não pode exceder 5MB.");
                 }
-                mi = await new Promise(r=>{
-                    let l=new FileReader();
-                    l.onload=(e)=>r(e.target.result.split(',')[1]);
+                mi = await new Promise(r => {
+                    let l = new FileReader();
+                    l.onload = (e) => r(e.target.result.split(',')[1]);
                     l.readAsDataURL(im.files[0]);
                 });
                 mim = im.files[0].type;
                 n = im.files[0].name;
             }
+            
             try {
-                let p = {msgAniversario:t};
+                let p = { msgAniversario: t };
                 if(mi){
                     p.imgAniversario = mi;
                     p.mimeAniversario = mim;
                     p.nomeAniversario = n;
                 }
-                await setDoc(doc(db,"configuracoes_loja",window.idClienteLogado),p,{merge:true});
-                alert("✅ Salvo.");
+                await setDoc(doc(db,"configuracoes_loja",window.idClienteLogado), p, { merge: true });
+                alert("✅ Robô de Aniversários configurado com sucesso.");
                 window.fecharModalAniversario();
             } catch(e) {}
-            b.innerText="Salvar";
-            b.disabled=false; 
+            
+            b.innerText = "Salvar";
+            b.disabled = false; 
         }
         
+        // Utilitário Interface
         window.fecharCardLateral = () => document.getElementById('cardEnviado').classList.remove('show');
     </script>
 </body>
