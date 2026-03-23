@@ -442,7 +442,7 @@
             let topClientes = [...window.listaContatos].sort((a,b) => (b.qtdPedidos || 0) - (a.qtdPedidos || 0)).slice(0, 5);
             let hClientes = '<tr><th style="padding: 8px;">Nome</th><th style="padding: 8px;">Pedidos</th><th style="padding: 8px;">Última Compra</th></tr>';
             topClientes.forEach(c => {
-                if(c.qtdPedidos) hClientes += `<tr><td style="padding: 8px;"><b>${c.nome}</b></td><td style="padding: 8px;"><b>${c.qtdPedidos}</b></td><td style="padding: 8px; color: #666;">${c.ultimaCompra || '-'}</td></tr>`;
+                if(c.qtdPedidos) hClientes += `<tr><td style="padding: 8px;">${c.nome}</td><td style="padding: 8px;"><b>${c.qtdPedidos}</b></td><td style="padding: 8px; color: #666;">${c.ultimaCompra || '-'}</td></tr>`;
             });
             document.getElementById('rel-top-clientes').innerHTML = hClientes;
 
@@ -675,7 +675,64 @@
         window.atualizarListaTagsDisparo = () => { const d=document.getElementById('listaTagsDisparo');let h='<label style="display:block; padding:10px; background:white; border-radius:8px; margin-bottom:5px; border: 1px solid #cbd5e1; font-weight:bold;"><input type="checkbox" value="TODOS_OS_CONTATOS"> 📢 TODOS OS CONTATOS</label>';let t=new Set();window.listaContatos.forEach(c=>c.tags&&c.tags.forEach(x=>t.add(x)));Array.from(t).forEach(x=>h+=`<label style="display:block; padding:10px; background:white; border-radius:8px; margin-bottom:5px; border: 1px solid #cbd5e1;"><input type="checkbox" value="${x}"> 🏷️ ${x}</label>`);d.innerHTML=h; }
         window.abrirModalDisparo = () => { window.atualizarListaTagsDisparo();document.getElementById('modalDisparo').style.display='flex'; };
         window.fecharModalDisparo = () => document.getElementById('modalDisparo').style.display='none';
-        window.iniciarDisparo = async function() { const m=document.getElementById('mensagemPromo').value, ar=document.getElementById('arquivoMidia').files[0]; if(m===""&&!ar)return alert("⚠️ Preencha!"); let b=null, no="", mi=""; if(ar){if((ar.size/1024/1024)>5)return alert("⚠️ Limite 5MB."); const l=new FileReader(); b=await new Promise((r)=>{l.onload=(e)=>r(e.target.result.split(',')[1]);l.readAsDataURL(ar);}); no=ar.name;mi=ar.type;} let n=[]; const it=document.getElementById('aba-tags').classList.contains('active'); if(it){const c=document.querySelectorAll('#listaTagsDisparo input:checked');if(c.length===0)return alert("⚠️ Selecione tag!"); let t=Array.from(c).map(i=>i.value); if(t.includes("TODOS_OS_CONTATOS"))n=window.listaContatos.map(x=>x.telefone);else n=window.listaContatos.filter(x=>x.tags&&x.tags.some(y=>t.includes(y))).map(x=>x.telefone);}else n=document.getElementById('listaNumeros').value.split('\n').map(x=>x.trim()).filter(x=>x!==""); if(n.length===0)return alert("⚠️ Vazio."); if(window.planoClienteLogado==='basico'&&n.length>200)return alert(`⚠️ Máx 200 no Básico.`); fecharModalDisparo(); document.getElementById('cardEnviado').classList.add('show'); try{await fetch('/api-oracle/api/saas/disparar',{method:'POST',headers:{'Content-Type':'application/json','x-senha':'123321'},body:JSON.stringify({idCliente:window.idClienteLogado,nomeEmpresa:window.nomeLojista,zapLojista:window.zapLojista,numeros:n,mensagem:m,midia:b,midiaNome:no,midiaMime:mi,plano:window.planoClienteLogado})});}catch(e){} }
+        
+        // A MÁGICA DO NOME PERSONALIZADO ESTÁ AQUI
+        window.iniciarDisparo = async function() { 
+            const m = document.getElementById('mensagemPromo').value;
+            const ar = document.getElementById('arquivoMidia').files[0]; 
+            if(m === "" && !ar) return alert("⚠️ Preencha!"); 
+            let b = null, no = "", mi = ""; 
+            
+            if(ar){
+                if((ar.size/1024/1024) > 5) return alert("⚠️ Limite 5MB."); 
+                const l = new FileReader(); 
+                b = await new Promise((r) => { l.onload = (e) => r(e.target.result.split(',')[1]); l.readAsDataURL(ar); }); 
+                no = ar.name; mi = ar.type;
+            } 
+            
+            let contatosAlvo = []; 
+            const it = document.getElementById('aba-tags').classList.contains('active'); 
+            
+            const pegarPrimeiroNome = (nomeCompleto) => nomeCompleto ? nomeCompleto.trim().split(' ')[0] : 'Cliente';
+
+            if(it){
+                const c = document.querySelectorAll('#listaTagsDisparo input:checked');
+                if(c.length === 0) return alert("⚠️ Selecione tag!"); 
+                let t = Array.from(c).map(i => i.value); 
+                
+                if(t.includes("TODOS_OS_CONTATOS")) {
+                    contatosAlvo = window.listaContatos.map(x => ({ numero: x.telefone, nome: pegarPrimeiroNome(x.nome) }));
+                } else {
+                    contatosAlvo = window.listaContatos.filter(x => x.tags && x.tags.some(y => t.includes(y))).map(x => ({ numero: x.telefone, nome: pegarPrimeiroNome(x.nome) }));
+                }
+            } else {
+                contatosAlvo = document.getElementById('listaNumeros').value.split('\n').map(x => x.trim()).filter(x => x !== "").map(num => ({ numero: num, nome: 'Cliente' }));
+            } 
+            
+            if(contatosAlvo.length === 0) return alert("⚠️ Vazio."); 
+            if(window.planoClienteLogado === 'basico' && contatosAlvo.length > 200) return alert(`⚠️ Máx 200 no Básico.`); 
+            
+            fecharModalDisparo(); 
+            document.getElementById('cardEnviado').classList.add('show'); 
+            
+            try {
+                await fetch('/api-oracle/api/saas/disparar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'x-senha': '123321' },
+                    body: JSON.stringify({
+                        idCliente: window.idClienteLogado,
+                        nomeEmpresa: window.nomeLojista,
+                        zapLojista: window.zapLojista,
+                        contatos: contatosAlvo,
+                        mensagem: m,
+                        midia: b,
+                        midiaNome: no,
+                        midiaMime: mi,
+                        plano: window.planoClienteLogado
+                    })
+                });
+            } catch(e) {} 
+        }
         
         window.abrirModalAniversario = async () => { document.getElementById('modalAniversario').style.display='flex';try{const s=await getDoc(doc(db,"configuracoes_loja",window.idClienteLogado));if(s.exists()&&s.data().msgAniversario)document.getElementById('textoAniversario').value=s.data().msgAniversario;}catch(e){} }
         window.fecharModalAniversario = () => document.getElementById('modalAniversario').style.display='none';
