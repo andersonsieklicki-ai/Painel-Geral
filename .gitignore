@@ -1,0 +1,16 @@
+# Ignorar a pasta de pacotes pesados do Node
+node_modules/
+
+# Ignorar a chave mestra do seu Banco de Dados (MUITO IMPORTANTE)
+firebase-key-saas.json
+
+# Ignorar as pastas de conexão do WhatsApp (para não roubarem as sessões)
+auth_*/
+auth_central_baileys/
+
+# Ignorar o arquivo de backup de mensagens
+backup_filas_saas.json
+
+# Ignorar arquivos de ambiente e logs
+.env
+npm-debug.log
