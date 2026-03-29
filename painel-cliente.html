@@ -1083,7 +1083,7 @@
         </div>
     </div>
 
-    <div class="modal" id="modalCobranca">
+   <div class="modal" id="modalCobranca">
         <div class="modal-content" style="max-width: 600px;">
             <h2 style="margin-top: 0; color: #dc3545;">
                 <i class="fa-solid fa-file-invoice-dollar"></i> Enviar Cobrança
@@ -1094,26 +1094,34 @@
             
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
                 <div>
-                    <label>2. Chave PIX (Manual):</label>
-                    <input type="text" id="pixCobranca" placeholder="Ex: 12.345.678/0001-90">
-                </div>
-                <div>
-                    <label>3. Integração Mercado Pago:</label>
+                    <label>2. Integração Mercado Pago:</label>
                     <select id="metodoPagamentoMP" style="width: 100%; padding: 12px; margin-top: 8px; border: 1px solid #cbd5e1; border-radius: 8px; font-family: inherit;">
                         <option value="manual">Apenas Chave Manual</option>
                         <option value="pix">Gerar PIX Automático</option>
                         <option value="bolbradesco">Gerar Boleto Bancário</option>
                     </select>
                 </div>
+                <div>
+                    <label>3. Valor a Cobrar (R$):</label>
+                    <input type="number" id="valorCobrancaMP" placeholder="Ex: 50.00" step="0.01">
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+                <div>
+                    <label>4. Chave PIX (Se for Manual):</label>
+                    <input type="text" id="pixCobranca" placeholder="Ex: 12.345.678/0001-90">
+                </div>
+                <div>
+                    <label>5. Agendar Cobrança:</label>
+                    <input type="datetime-local" id="dataAgendamentoCobranca">
+                </div>
             </div>
             
-            <label style="margin-top: 10px; display: block;">4. Agendar Cobrança:</label>
-            <input type="datetime-local" id="dataAgendamentoCobranca">
-            
-            <label>5. Anexar Boleto / QR Code (PDF ou Imagem):</label>
+            <label>6. Anexar Boleto/Comprovante (Se manual):</label>
             <input type="file" id="arquivoMidiaCobranca" accept="image/*, application/pdf">
             
-            <label>6. Mensagem de Cobrança:</label>
+            <label>7. Mensagem de Cobrança:</label>
             <textarea id="textoCobranca" rows="4">Olá {nome}! Tudo bem? Passando para lembrar que sua fatura vence nos próximos dias. Segue o boleto em anexo e a chave PIX abaixo:</textarea>
             
             <div style="display: flex; gap: 10px; justify-content: flex-end;">
