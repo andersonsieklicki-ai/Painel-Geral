@@ -2716,6 +2716,92 @@ window.salvarMercadoPago = async function() {
         window.fecharCardLateral = () => {
             document.getElementById('cardEnviado').classList.remove('show');
         }
+        window.renderizarTabelaCobrancas = function() {
+            const tbody = document.getElementById('tabelaCobrancas');
+            const filtro = document.getElementById('filtroStatusCobranca').value;
+            if(!tbody) return;
+            
+            let filtradas = window.listaFaturas.filter(f => filtro === 'todas' || f.status === filtro);
+            
+            if(filtradas.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#64748b;">Nenhuma cobrança encontrada.</td></tr>';
+                return;
+            }
+
+            let html = '';
+            filtradas.forEach(f => {
+                let emissao = new Date(f.dataEmissao).toLocaleDateString('pt-BR');
+                let pag = f.status === 'pago' && f.dataPagamento ? new Date(f.dataPagamento).toLocaleString('pt-BR') : '-';
+                let statusBadge = f.status === 'pago' ? '<span class="tag-pill" style="background:#d1fae5;color:#059669;">Pago</span>' : '<span class="tag-pill" style="background:#fef3c7;color:#d97706;">Pendente</span>';
+                let nsuTxt = f.nsu ? `<br><small style="color:#64748b; font-weight:bold;">NSU: ${f.nsu}</small>` : '';
+
+                html += `<tr>
+                    <td>${emissao}</td>
+                    <td><b>${f.cliente}</b><br><small>${f.telefone}</small></td>
+                    <td style="font-weight:bold;">R$ ${parseFloat(f.valor).toFixed(2).replace('.',',')}</td>
+                    <td>${statusBadge}</td>
+                    <td>${pag}${nsuTxt}</td>
+                </tr>`;
+            });
+            tbody.innerHTML = html;
+        };
+
+        window.imprimirRelatorioFinanceiro = function() {
+            let filtro = document.getElementById('filtroStatusCobranca').value;
+            let filtradas = window.listaFaturas.filter(f => filtro === 'todas' || f.status === filtro);
+            let total = filtradas.reduce((acc, curr) => acc + parseFloat(curr.valor || 0), 0);
+            
+            let relatorioHtml = `
+                <html><head><title>Relatório Financeiro</title>
+                <style>
+                    body { font-family: Arial, sans-serif; padding: 20px; color: #333; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
+                    th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+                    th { background-color: #f8f9fa; }
+                    .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #333; padding-bottom: 10px; }
+                </style>
+                </head><body>
+                <div class="header">
+                    <div>
+                        <h2 style="margin: 0;">Relatório de Cobranças</h2>
+                        <p style="margin: 5px 0 0 0;">Empresa: <b>${window.nomeLojista}</b></p>
+                    </div>
+                    <div style="text-align: right; font-size: 12px;">
+                        <p style="margin:0;">Emissão: ${new Date().toLocaleString('pt-BR')}</p>
+                        <p style="margin:0;">Filtro: <b>${filtro.toUpperCase()}</b></p>
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr><th>Emissão</th><th>Cliente / Ref.</th><th>Valor</th><th>Status</th><th>Data Liquidação</th><th>NSU</th></tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            filtradas.forEach(f => {
+                let emissao = new Date(f.dataEmissao).toLocaleDateString('pt-BR');
+                let pag = f.status === 'pago' && f.dataPagamento ? new Date(f.dataPagamento).toLocaleDateString('pt-BR') : '-';
+                relatorioHtml += `<tr>
+                    <td>${emissao}</td>
+                    <td>${f.cliente}<br><small>${f.telefone}</small></td>
+                    <td>R$ ${parseFloat(f.valor).toFixed(2).replace('.',',')}</td>
+                    <td>${f.status.toUpperCase()}</td>
+                    <td>${pag}</td>
+                    <td>${f.nsu || '-'}</td>
+                </tr>`;
+            });
+            
+            relatorioHtml += `</tbody></table>
+                <h3 style="text-align: right; margin-top: 20px; padding: 10px; background: #f8f9fa; border: 1px solid #ddd;">
+                    Total Listado: R$ ${total.toFixed(2).replace('.',',')}
+                </h3>
+                <script>window.print();</script>
+                </body></html>`;
+                
+            let janela = window.open('', '', 'width=900,height=700');
+            janela.document.write(relatorioHtml);
+            janela.document.close();
+        };
     </script>
 </body>
 </html>
