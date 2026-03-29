@@ -1545,13 +1545,12 @@
             window.verificarRamoAtivo(r); 
             alert('Perfil atualizado!'); 
         }
-
-        window.salvarMercadoPago = async function() { 
-            const token = document.getElementById('mercadoPagoToken').value.trim(); 
-            if (!token) return alert('Insira a chave da API do Mercado Pago.'); 
-            await setDoc(doc(db, "configuracoes_loja", window.idClienteLogado), { mercadoPagoToken: token }, { merge: true }); 
-            alert('✅ Chave do Mercado Pago salva! O módulo de boletos será ativado na próxima atualização.'); 
-        }
+window.salvarMercadoPago = async function() { 
+    const token = document.getElementById('mercadoPagoToken').value.trim(); 
+    if (!token) return alert('Insira a chave da API do Mercado Pago.'); 
+    await setDoc(doc(db, "configuracoes_loja", window.idClienteLogado), { mercadoPagoToken: token }, { merge: true }); 
+    alert('✅ Chave do Mercado Pago salva com sucesso! A geração de PIX e Boletos já está ativada.'); 
+}
 
         window.verificarRamoAtivo = function(r) { 
             const c = document.getElementById('cardFidelidade'); 
