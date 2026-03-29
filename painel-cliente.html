@@ -1453,6 +1453,19 @@
                     
                     document.getElementById('nomeCliente').innerText = d.nomeEmpresa; 
                     window.carregarContatosLocal(); 
+                    // --- PUXAR COBRANÇAS DO BANCO EM TEMPO REAL ---
+                    window.listaFaturas = [];
+                    const faturasRef = collection(db, "cobrancas_loja", window.idClienteLogado, "faturas");
+                    const qFaturas = query(faturasRef, orderBy("dataEmissao", "desc"));
+                    onSnapshot(qFaturas, (snapshot) => {
+                        window.listaFaturas = [];
+                        snapshot.forEach((docSnap) => {
+                            window.listaFaturas.push({ id: docSnap.id, ...docSnap.data() });
+                        });
+                        if(typeof window.renderizarTabelaCobrancas === 'function') {
+                            window.renderizarTabelaCobrancas();
+                        }
+                    });
                     
                     const areaBtn = document.getElementById('area-botao-conectar');
                     
