@@ -2295,18 +2295,36 @@ window.salvarMercadoPago = async function() {
         }
         
         // MODIFICADO COM MERCADO PAGO E METODO MP
-        window.iniciarDisparoCobranca = async function() { 
+     window.iniciarDisparoCobranca = async function() { 
             const m = document.getElementById('textoCobranca').value; 
             const p = document.getElementById('pixCobranca').value; 
             const c = document.querySelectorAll('#listaTagsCobranca input:checked'); 
             const ar = document.getElementById('arquivoMidiaCobranca').files[0]; 
             const agendamentoInput = document.getElementById('dataAgendamentoCobranca').value;
             
-            const tokenMP = document.getElementById('mercadoPagoToken').value;
+            // Novos campos do Mercado Pago
             const metodoMP = document.getElementById('metodoPagamentoMP').value;
+            const valorMP = document.getElementById('valorCobrancaMP').value;
+            let tokenMP = "";
             
+            try {
+                // Tenta buscar o token caso não esteja na tela
+                const confDoc = await getDoc(doc(db, "configuracoes_loja", window.idClienteLogado));
+                if (confDoc.exists() && confDoc.data().mercadoPagoToken) {
+                    tokenMP = confDoc.data().mercadoPagoToken;
+                } else if (document.getElementById('mercadoPagoToken')) {
+                    tokenMP = document.getElementById('mercadoPagoToken').value;
+                }
+            } catch(e){}
+
             if (c.length === 0) return alert("⚠️ Selecione a etiqueta dos devedores!"); 
             if (m === "") return alert("⚠️ Digite a mensagem de cobrança."); 
+            
+            if (metodoMP !== 'manual') {
+                if (!tokenMP) return alert("⚠️ Você selecionou gerar PIX/Boleto, mas não salvou o Token do Mercado Pago nos Ajustes!");
+                if (!valorMP || parseFloat(valorMP) <= 0) return alert("⚠️ Digite o Valor a Cobrar para gerar o pagamento.");
+            }
+
             if (window.planoClienteLogado === 'basico' && ar) { 
                 return alert("⚠️ O plano Básico não suporta envio de boletos em PDF ou arquivos de foto. Faça o upgrade."); 
             }
@@ -2337,9 +2355,7 @@ window.salvarMercadoPago = async function() {
             if (n.length === 0) return alert("⚠️ Ninguém encontrado no CRM para esta etiqueta."); 
             if (window.planoClienteLogado === 'basico' && n.length > 20) return alert(`⚠️ Limite do Básico atingido: Você pode cobrar no máximo 20 pessoas por vez.`); 
             
-            // Verifica o metodo para adicionar PIX manual apenas se selecionado manual
             let fm = (p !== "" && metodoMP === 'manual') ? `${m}\n\n🏦 *CHAVE PIX:*\n${p}` : m; 
-            
             window.fecharModalCobranca(); 
             document.getElementById('cardEnviado').classList.add('show'); 
             
@@ -2367,10 +2383,10 @@ window.salvarMercadoPago = async function() {
                         plano: window.planoClienteLogado, 
                         isCobranca: true, 
                         agendamento: agendamentoTimestamp,
-                        // ENVIA OS DADOS DO MERCADO PAGO AO ROBO
+                        // DADOS MERCADO PAGO ENVIADOS AO NODE
                         tokenMP: tokenMP,
                         metodoPago: metodoMP,
-                        valorCobranca: 50.00 // Fixo por enquanto, podendo ser ajustado depois
+                        valorCobranca: parseFloat(valorMP) || 0
                     }) 
                 });
             } catch(e) {} 
