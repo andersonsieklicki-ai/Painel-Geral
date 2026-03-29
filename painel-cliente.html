@@ -1094,19 +1094,26 @@
             
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
                 <div>
-                    <label>2. Sua Chave PIX:</label>
+                    <label>2. Chave PIX (Manual):</label>
                     <input type="text" id="pixCobranca" placeholder="Ex: 12.345.678/0001-90">
                 </div>
                 <div>
-                    <label>3. Agendar Cobrança:</label>
-                    <input type="datetime-local" id="dataAgendamentoCobranca">
+                    <label>3. Integração Mercado Pago:</label>
+                    <select id="metodoPagamentoMP" style="width: 100%; padding: 12px; margin-top: 8px; border: 1px solid #cbd5e1; border-radius: 8px; font-family: inherit;">
+                        <option value="manual">Apenas Chave Manual</option>
+                        <option value="pix">Gerar PIX Automático</option>
+                        <option value="bolbradesco">Gerar Boleto Bancário</option>
+                    </select>
                 </div>
             </div>
             
-            <label>4. Anexar Boleto / QR Code (PDF ou Imagem):</label>
+            <label style="margin-top: 10px; display: block;">4. Agendar Cobrança:</label>
+            <input type="datetime-local" id="dataAgendamentoCobranca">
+            
+            <label>5. Anexar Boleto / QR Code (PDF ou Imagem):</label>
             <input type="file" id="arquivoMidiaCobranca" accept="image/*, application/pdf">
             
-            <label>5. Mensagem de Cobrança:</label>
+            <label>6. Mensagem de Cobrança:</label>
             <textarea id="textoCobranca" rows="4">Olá {nome}! Tudo bem? Passando para lembrar que sua fatura vence nos próximos dias. Segue o boleto em anexo e a chave PIX abaixo:</textarea>
             
             <div style="display: flex; gap: 10px; justify-content: flex-end;">
@@ -2219,9 +2226,6 @@
             window.fecharModalNovoContato(); 
         };
 
-        // ==========================================
-        // BOTÕES DE CONTROLE DA CAMPANHA (EDITAR E CANCELAR)
-        // ==========================================
         window.editarCampanhaAtiva = async function() {
             let novoTexto = prompt("✏️ Digite a nova mensagem para os clientes restantes (use {nome} para personalizar):");
             if (!novoTexto || novoTexto.trim() === "") return;
@@ -2283,12 +2287,16 @@
             document.getElementById('arquivoMidiaCobranca').value = ''; 
         }
         
+        // MODIFICADO COM MERCADO PAGO E METODO MP
         window.iniciarDisparoCobranca = async function() { 
             const m = document.getElementById('textoCobranca').value; 
             const p = document.getElementById('pixCobranca').value; 
             const c = document.querySelectorAll('#listaTagsCobranca input:checked'); 
             const ar = document.getElementById('arquivoMidiaCobranca').files[0]; 
             const agendamentoInput = document.getElementById('dataAgendamentoCobranca').value;
+            
+            const tokenMP = document.getElementById('mercadoPagoToken').value;
+            const metodoMP = document.getElementById('metodoPagamentoMP').value;
             
             if (c.length === 0) return alert("⚠️ Selecione a etiqueta dos devedores!"); 
             if (m === "") return alert("⚠️ Digite a mensagem de cobrança."); 
@@ -2322,7 +2330,9 @@
             if (n.length === 0) return alert("⚠️ Ninguém encontrado no CRM para esta etiqueta."); 
             if (window.planoClienteLogado === 'basico' && n.length > 20) return alert(`⚠️ Limite do Básico atingido: Você pode cobrar no máximo 20 pessoas por vez.`); 
             
-            let fm = p !== "" ? `${m}\n\n🏦 *CHAVE PIX:*\n${p}` : m; 
+            // Verifica o metodo para adicionar PIX manual apenas se selecionado manual
+            let fm = (p !== "" && metodoMP === 'manual') ? `${m}\n\n🏦 *CHAVE PIX:*\n${p}` : m; 
+            
             window.fecharModalCobranca(); 
             document.getElementById('cardEnviado').classList.add('show'); 
             
@@ -2349,7 +2359,11 @@
                         midiaMime: mi, 
                         plano: window.planoClienteLogado, 
                         isCobranca: true, 
-                        agendamento: agendamentoTimestamp 
+                        agendamento: agendamentoTimestamp,
+                        // ENVIA OS DADOS DO MERCADO PAGO AO ROBO
+                        tokenMP: tokenMP,
+                        metodoPago: metodoMP,
+                        valorCobranca: 50.00 // Fixo por enquanto, podendo ser ajustado depois
                     }) 
                 });
             } catch(e) {} 
