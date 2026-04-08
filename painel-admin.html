@@ -12,7 +12,6 @@
         .scroll-suave::-webkit-scrollbar { width: 6px; height: 6px; }
         .scroll-suave::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         .modal-fundo { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.75); z-index: 9999; justify-content: center; align-items: center; padding: 1rem; backdrop-filter: blur(4px); }
-        .log-window { background-color: #0f172a; color: #10b981; font-family: 'Courier New', monospace; font-size: 11px; height: 80px; overflow-y: auto; padding: 10px; border-radius: 8px; border: 1px solid #334155; }
         .glow-blue { box-shadow: 0 4px 14px 0 rgba(37, 99, 235, 0.39); }
         .glow-emerald { box-shadow: 0 4px 14px 0 rgba(16, 185, 129, 0.39); }
         .tela-oculta { display: none !important; }
@@ -66,7 +65,7 @@
             
             <div class="relative w-full max-w-md hidden sm:block">
                 <i class="fa-solid fa-search absolute left-3 top-3 text-slate-400 text-sm"></i>
-                <input type="text" id="buscaSaaS" oninput="window.renderizarPainel()" placeholder="Buscar cliente por nome ou WhatsApp..." class="w-full pl-9 pr-4 py-2 bg-slate-100 border border-slate-200 rounded-xl text-sm outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100 transition">
+                <input type="text" id="buscaSaaS" oninput="window.renderizarPainel()" placeholder="Buscar cliente por nome..." class="w-full pl-9 pr-4 py-2 bg-slate-100 border border-slate-200 rounded-xl text-sm outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100 transition">
             </div>
             
             <div class="flex items-center gap-4">
@@ -85,6 +84,7 @@
             </div>
 
             <div id="aba-dashboard" class="conteudo-aba">
+                
                 <div class="grid grid-cols-2 xl:grid-cols-4 gap-3 md:gap-4 mb-6 md:mb-8">
                     <div class="bg-white p-4 md:p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-center hover:border-blue-300 transition">
                         <div class="flex justify-between items-start mb-2">
@@ -118,13 +118,19 @@
 
                 <div class="mb-6 md:mb-8" id="containerPendentes">
                     <h3 class="text-base md:text-lg font-black text-slate-800 mb-3 flex items-center gap-2"><i class="fa-solid fa-bell text-amber-500"></i> Novas Solicitações</h3>
-                    <div class="flex flex-col gap-3" id="painelPendentes">
-                        <p class="text-center text-slate-400 text-sm font-bold p-8 bg-white rounded-2xl border border-slate-200 border-dashed">Conectando ao Firebase...</p>
-                    </div>
+                    <div class="flex flex-col gap-3" id="painelPendentes"></div>
                 </div>
 
                 <div>
-                    <h3 class="text-base md:text-lg font-black text-slate-800 mb-3 flex items-center gap-2"><i class="fa-solid fa-building-circle-check text-blue-600"></i> Carteira de Clientes SaaS</h3>
+                    <div class="flex flex-col md:flex-row justify-between md:items-center gap-3 mb-4">
+                        <h3 class="text-base md:text-lg font-black text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-building-circle-check text-blue-600"></i> Carteira de Clientes
+                        </h3>
+                        <button onclick="window.abrirModalNovo()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-md transition flex items-center justify-center gap-2 glow-blue">
+                            <i class="fa-solid fa-plus"></i> Novo Cliente Externo
+                        </button>
+                    </div>
+
                     <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6" id="painelAtivos">
                         </div>
                 </div>
@@ -165,7 +171,7 @@
                                 </tr>
                             </thead>
                             <tbody id="tabelaFaturamento" class="divide-y divide-slate-100">
-                                <tr><td colspan="5" class="p-8 text-center text-slate-500 font-bold">Carregando dados financeiros...</td></tr>
+                                <tr><td colspan="5" class="p-8 text-center text-slate-500 font-bold">Carregando...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -228,14 +234,19 @@
                     <button onclick="window.copiarIdSaaS()" class="bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition flex items-center gap-2"><i class="fa-solid fa-copy"></i> <span class="hidden sm:inline">Copiar</span></button>
                 </div>
 
+                <div class="p-4 border border-slate-200 bg-white rounded-xl shadow-sm">
+                    <label class="text-[10px] md:text-xs font-bold text-slate-700 mb-1 block">Nome do Cliente / Associação:</label>
+                    <input type="text" id="editNomeEmpresa" placeholder="Ex: Associação Água São Luiz" class="w-full p-2.5 md:p-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-bold outline-none focus:border-blue-500 transition">
+                </div>
+
                 <div class="p-4 border border-blue-200 bg-blue-50/50 rounded-xl space-y-4">
                     <h3 class="text-xs md:text-sm font-black text-blue-900 uppercase tracking-wider mb-2"><i class="fa-solid fa-id-card mr-2"></i>Licença, Plano e Cobrança</h3>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="text-[10px] md:text-xs font-bold text-slate-700 mb-1 block">Nicho do Sistema:</label>
-                            <select id="editNicho" class="w-full p-2.5 md:p-3 bg-white border border-slate-300 rounded-xl text-xs md:text-sm font-bold outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition shadow-sm">
-                                <option value="associacao">🛡️ Associação / Militar</option>
+                            <select id="editNicho" class="w-full p-2.5 md:p-3 bg-white border border-slate-300 rounded-xl text-xs md:text-sm font-bold outline-none focus:border-blue-500 transition shadow-sm">
+                                <option value="associacao">🛡️ Associação / Militar / Água</option>
                                 <option value="ctg">🐎 CTG / Piquete</option>
                                 <option value="loja">🛍️ Loja Comercial</option>
                                 <option value="outro">📦 Outros</option>
@@ -243,7 +254,7 @@
                         </div>
                         <div>
                             <label class="text-[10px] md:text-xs font-bold text-slate-700 mb-1 block">Plano Contratado:</label>
-                            <select id="editPlanoConta" class="w-full p-2.5 md:p-3 bg-white border border-slate-300 rounded-xl text-xs md:text-sm font-bold outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition shadow-sm">
+                            <select id="editPlanoConta" class="w-full p-2.5 md:p-3 bg-white border border-slate-300 rounded-xl text-xs md:text-sm font-bold outline-none focus:border-blue-500 transition shadow-sm">
                                 <option value="BASICO">🥉 BÁSICO (Mensalidades)</option>
                                 <option value="PLUS">🥈 PLUS (+ CRM)</option>
                                 <option value="PREMIUM">🥇 PREMIUM (Tudo Liberado)</option>
@@ -252,18 +263,19 @@
                         
                         <div>
                             <label class="text-[10px] md:text-xs font-bold text-slate-700 mb-1 block">Tipo de Cobrança:</label>
-                            <select id="editTipoCobranca" class="w-full p-2.5 md:p-3 bg-white border border-slate-300 rounded-xl text-xs md:text-sm font-bold outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition shadow-sm">
+                            <select id="editTipoCobranca" class="w-full p-2.5 md:p-3 bg-white border border-slate-300 rounded-xl text-xs md:text-sm font-bold outline-none focus:border-blue-500 transition shadow-sm">
                                 <option value="fixo">💰 Valor Fixo Mensal</option>
                                 <option value="porcentagem">📊 Porcentagem (%)</option>
                             </select>
                         </div>
                         <div>
                             <label class="text-[10px] md:text-xs font-bold text-slate-700 mb-1 block">Valor ou % a cobrar:</label>
-                            <input type="number" id="editValorCobranca" step="0.01" placeholder="Ex: 150 ou 10" class="w-full p-2.5 md:p-3 bg-white border border-slate-300 rounded-xl text-xs md:text-sm font-bold outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition shadow-sm">
+                            <input type="number" id="editValorCobranca" step="0.01" placeholder="Ex: 150 ou 10" class="w-full p-2.5 md:p-3 bg-white border border-slate-300 rounded-xl text-xs md:text-sm font-bold outline-none focus:border-blue-500 transition shadow-sm">
                         </div>
+
                         <div class="md:col-span-2">
                             <label class="text-[10px] md:text-xs font-bold text-slate-700 mb-1 block">Status Financeiro (Bloqueio Automático):</label>
-                            <select id="editStatusConta" class="w-full p-2.5 md:p-3 bg-white border border-slate-300 rounded-xl text-xs md:text-sm font-bold outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition shadow-sm">
+                            <select id="editStatusConta" class="w-full p-2.5 md:p-3 bg-white border border-slate-300 rounded-xl text-xs md:text-sm font-bold outline-none focus:border-blue-500 transition shadow-sm">
                                 <option value="ativo">✅ ATIVO (Acesso Liberado)</option>
                                 <option value="inadimplente">⚠️ INADIMPLENTE (Aviso na tela)</option>
                                 <option value="bloqueado">🛑 SUSPENSO (Trava a tela e desliga o Robô)</option>
@@ -272,21 +284,6 @@
                     </div>
                 </div>
 
-                <div class="p-4 border border-slate-200 bg-white rounded-xl space-y-4 shadow-sm">
-                    <h3 class="text-xs md:text-sm font-black text-slate-800 uppercase tracking-wider mb-2"><i class="fa-brands fa-whatsapp text-emerald-500 mr-2"></i>Integração Robô</h3>
-                    
-                    <div>
-                        <label class="text-[10px] md:text-xs font-bold text-slate-700 mb-1 block">WhatsApp do Cliente (DDD+Número):</label>
-                        <input type="text" id="editZapLoja" placeholder="Ex: 554699999999" class="w-full p-2.5 md:p-3 bg-slate-50 border border-slate-300 rounded-xl text-xs md:text-sm font-mono outline-none focus:border-emerald-500 transition shadow-inner">
-                    </div>
-
-                    <div>
-                        <label class="text-[10px] md:text-xs font-bold text-slate-700 mb-1 block">Mensagem Base da IA / Saudação:</label>
-                        <textarea id="menuSaudacao" rows="3" class="w-full p-2.5 md:p-3 bg-slate-50 border border-slate-300 rounded-xl text-xs md:text-sm outline-none focus:border-emerald-500 transition shadow-inner resize-none" placeholder="Olá! Sou a assistente virtual..."></textarea>
-                    </div>
-                    
-                    <div class="hidden"><input type="hidden" id="opt1Nome"><input type="hidden" id="opt1Resp"></div>
-                </div>
             </div>
 
             <div class="p-4 border-t border-slate-200 bg-slate-50 flex gap-3 justify-end shrink-0">
@@ -297,9 +294,6 @@
     </div>
 
     <script>
-        window.listaEmpresas = [];
-        window.empresaEmEdicao = null; 
-
         window.mudarAbaSaaS = (idAba, elemento) => {
             document.querySelectorAll('.conteudo-aba').forEach(aba => aba.classList.add('tela-oculta'));
             document.getElementById(idAba).classList.remove('tela-oculta');
@@ -347,15 +341,16 @@
         
         window.copiarIdSaaS = () => {
             const id = document.getElementById('txtClienteId').innerText;
+            if(id === 'GERADO AO SALVAR') return alert("Salve o cliente primeiro!");
             navigator.clipboard.writeText(id).then(() => alert("ID Copiado com sucesso!"));
         };
     </script>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, doc, updateDoc, deleteDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, doc, updateDoc, deleteDoc, addDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // CREDENCIAIS DA CENTRAL SAAS
+        // CREDENCIAIS DA CENTRAL SAAS MASTER
         const firebaseConfig = {
             apiKey: "AIzaSyC4-2LavZt7iWPt2u71u-yRUYbIJu-Vzf0",
             authDomain: "central-omnichannel-saas.firebaseapp.com",
@@ -365,275 +360,255 @@
             appId: "1:869327159480:web:605be5ec37ab688d44b44d"
         };
 
-        try {
-            const app = initializeApp(firebaseConfig);
-            const db = getFirestore(app);
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        window.listaEmpresas = [];
+        window.empresaEmEdicao = null; 
 
-            onSnapshot(collection(db, "empresas"), (snapshot) => {
-                window.listaEmpresas = [];
-                snapshot.forEach((doc) => { window.listaEmpresas.push({ id: doc.id, ...doc.data() }); });
-                window.renderizarPainel();
+        onSnapshot(collection(db, "empresas"), (snapshot) => {
+            window.listaEmpresas = [];
+            snapshot.forEach((doc) => { window.listaEmpresas.push({ id: doc.id, ...doc.data() }); });
+            window.renderizarPainel();
+        });
+
+        window.renderizarPainel = () => {
+            const divP = document.getElementById('painelPendentes');
+            const divA = document.getElementById('painelAtivos');
+            divP.innerHTML = ''; divA.innerHTML = '';
+            
+            let qtdTotal = 0, qtdAtivos = 0, qtdPremium = 0, qtdPendentes = 0;
+            let mrrTotal = 0, clientesEmDia = 0, clientesInadimplentes = 0;
+
+            const filtroDesktop = document.getElementById("buscaSaaS") ? document.getElementById("buscaSaaS").value.toLowerCase().trim() : "";
+            const filtroMobile = document.getElementById("buscaSaaSMobile") ? document.getElementById("buscaSaaSMobile").value.toLowerCase().trim() : "";
+            const filtro = filtroDesktop || filtroMobile;
+
+            window.listaEmpresas.sort((a, b) => (a.nomeEmpresa || '').localeCompare(b.nomeEmpresa || ''));
+            let faturamentoHtml = "";
+
+            window.listaEmpresas.forEach(emp => {
+                qtdTotal++;
+                
+                const nomeEmpresaStr = (emp.nomeEmpresa || '').toLowerCase();
+                const zapStr = (emp.whatsappLojista || '');
+                const matchBusca = filtro === "" || nomeEmpresaStr.includes(filtro) || zapStr.includes(filtro);
+
+                const planoStr = emp.plano || 'BASICO';
+                const statusConta = emp.statusConta || 'ativo'; 
+                const tipoCobranca = emp.tipoCobranca || 'fixo';
+                const valorCobranca = parseFloat(emp.valorCobranca) || 0;
+                
+                let exibicaoValor = "";
+                if (tipoCobranca === 'fixo') {
+                    exibicaoValor = `R$ ${valorCobranca.toFixed(2).replace('.', ',')}`;
+                    if (statusConta === 'ativo') mrrTotal += valorCobranca;
+                } else {
+                    exibicaoValor = `${valorCobranca}% (Variável)`;
+                }
+
+                if (statusConta === 'ativo') clientesEmDia++;
+                else clientesInadimplentes++;
+
+                let corStatusFat = statusConta === 'ativo' ? 'bg-green-100 text-green-800' : (statusConta === 'inadimplente' ? 'bg-amber-100 text-amber-800' : 'bg-red-100 text-red-800');
+                faturamentoHtml += `
+                    <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+                        <td class="p-4 font-black text-slate-800">${emp.nomeEmpresa} <br><span class="text-[9px] font-normal text-slate-400 font-mono">${emp.whatsappLojista || 'S/ Tel'}</span></td>
+                        <td class="p-4 text-xs font-bold text-blue-600">${planoStr}</td>
+                        <td class="p-4 text-center font-black text-emerald-600">${exibicaoValor}</td>
+                        <td class="p-4 text-center"><span class="px-2 py-1 rounded-md text-[9px] font-black uppercase ${corStatusFat}">${statusConta}</span></td>
+                        <td class="p-4 text-center">
+                            <button onclick="window.abrirModal('${emp.id}')" class="bg-slate-100 text-slate-600 hover:bg-slate-200 px-3 py-1.5 rounded-lg text-xs font-bold transition">Gerir</button>
+                        </td>
+                    </tr>
+                `;
+
+                if(emp.statusRobo === 'pendente') {
+                    qtdPendentes++;
+                    divP.innerHTML += `
+                        <div class="bg-amber-50 border border-amber-200 p-4 md:p-5 rounded-2xl flex flex-col md:flex-row justify-between md:items-center gap-4 shadow-sm border-l-4 border-l-amber-500">
+                            <div>
+                                <h4 class="font-black text-amber-900 text-base md:text-lg">${emp.nomeEmpresa}</h4>
+                                <p class="text-[10px] md:text-xs text-amber-700 font-bold mt-1"><i class="fa-solid fa-envelope mr-1"></i> ${emp.email || 'S/ Email'} &nbsp;|&nbsp; <i class="fa-brands fa-whatsapp text-emerald-600 mr-1"></i> ${emp.whatsappLojista || 'Não informado'}</p>
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                <button onclick="window.excluirEmpresa('${emp.id}', '${emp.nomeEmpresa}')" class="bg-white border border-red-200 text-red-500 hover:bg-red-50 px-3 py-2 rounded-lg transition shadow-sm"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </div>
+                    `;
+                } else if (matchBusca) {
+                    const statusServidor = emp.statusRobo === 'online' || emp.statusRobo === 'ativo_central' ? 'online' : 'offline';
+                    if (statusServidor === 'online') qtdAtivos++;
+                    if (emp.plano === 'PREMIUM') qtdPremium++;
+
+                    let corCard = 'border-slate-200';
+                    let badgeConta = '<span class="px-2 py-0.5 bg-blue-50 text-blue-600 rounded-md text-[9px] font-black uppercase border border-blue-200">Ativo</span>';
+                    
+                    if (statusConta === 'inadimplente') {
+                        corCard = 'border-amber-400 bg-amber-50/20';
+                        badgeConta = '<span class="px-2 py-0.5 bg-amber-100 text-amber-700 rounded-md text-[9px] font-black uppercase border border-amber-300">Inadimplente</span>';
+                    } else if (statusConta === 'bloqueado') {
+                        corCard = 'border-red-400 bg-red-50/30 opacity-80';
+                        badgeConta = '<span class="px-2 py-0.5 bg-red-100 text-red-700 rounded-md text-[9px] font-black uppercase border border-red-300">Bloqueado</span>';
+                    }
+
+                    let iconNicho = '<i class="fa-solid fa-box"></i>';
+                    if(emp.nicho === 'associacao') iconNicho = '<i class="fa-solid fa-shield-halved text-blue-600"></i>';
+                    if(emp.nicho === 'ctg') iconNicho = '<i class="fa-solid fa-horse text-amber-600"></i>';
+                    if(emp.nicho === 'loja') iconNicho = '<i class="fa-solid fa-shop text-purple-500"></i>';
+
+                    divA.innerHTML += `
+                        <div class="bg-white rounded-2xl md:rounded-3xl p-4 md:p-5 border-2 ${corCard} shadow-sm flex flex-col hover:shadow-md transition duration-300 relative group">
+                            <div class="flex justify-between items-start mb-3 md:mb-4">
+                                <div class="flex gap-2.5 md:gap-3 items-center">
+                                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-slate-50 flex items-center justify-center text-lg md:text-xl border border-slate-200 shadow-sm">${iconNicho}</div>
+                                    <div>
+                                        <h4 class="font-black text-slate-800 text-sm md:text-base leading-tight">${emp.nomeEmpresa}</h4>
+                                        <p class="text-[9px] md:text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Plano: <span class="text-blue-600">${planoStr}</span></p>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col items-end gap-1.5">
+                                    ${statusServidor === 'online' 
+                                        ? '<span class="flex items-center gap-1.5 text-[8px] md:text-[9px] font-black uppercase text-emerald-600 bg-emerald-50 px-1.5 py-0.5 md:px-2 md:py-1 rounded border border-emerald-200"><span class="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-emerald-500 animate-pulse"></span> ON</span>' 
+                                        : '<span class="flex items-center gap-1.5 text-[8px] md:text-[9px] font-black uppercase text-slate-500 bg-slate-100 px-1.5 py-0.5 md:px-2 md:py-1 rounded border border-slate-200"><span class="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-slate-400"></span> OFF</span>'}
+                                    ${badgeConta}
+                                </div>
+                            </div>
+                            
+                            <div class="text-[11px] md:text-xs text-slate-600 mb-4 md:mb-5 flex-1 bg-slate-50 p-2.5 md:p-3 rounded-xl border border-slate-100">
+                                <p class="mb-1.5 flex items-center"><i class="fa-brands fa-whatsapp text-emerald-500 w-5 text-center text-xs md:text-sm"></i> <span class="font-mono font-bold">${emp.whatsappLojista || 'Não configurado'}</span></p>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2 md:gap-3 mt-auto">
+                                <button onclick="window.abrirModal('${emp.id}')" class="bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white font-bold py-2 md:py-2.5 rounded-lg md:rounded-xl text-[10px] md:text-xs transition border border-blue-200 shadow-sm flex justify-center items-center gap-1.5"><i class="fa-solid fa-gear"></i> Gerenciar</button>
+                                <button onclick="window.excluirEmpresa('${emp.id}', '${emp.nomeEmpresa}')" class="bg-white hover:bg-red-50 text-red-500 font-bold py-2 md:py-2.5 rounded-lg md:rounded-xl text-[10px] md:text-xs transition border border-red-200 shadow-sm flex justify-center items-center gap-1.5"><i class="fa-solid fa-trash"></i> Remover</button>
+                            </div>
+                        </div>
+                    `;
+                }
             });
 
-            window.renderizarPainel = () => {
-                const divP = document.getElementById('painelPendentes');
-                const divA = document.getElementById('painelAtivos');
-                divP.innerHTML = ''; divA.innerHTML = '';
-                
-                let qtdTotal = 0, qtdAtivos = 0, qtdPremium = 0, qtdPendentes = 0;
-                let mrrTotal = 0, clientesEmDia = 0, clientesInadimplentes = 0;
+            if(qtdPendentes === 0) {
+                divP.innerHTML = '<p class="text-center text-slate-400 text-xs md:text-sm font-bold p-6 md:p-8 bg-white rounded-2xl border border-slate-200 border-dashed">Nenhuma solicitação pendente.</p>';
+                document.getElementById('badgeNotificacao').style.display = 'none';
+            } else {
+                document.getElementById('badgeNotificacao').style.display = 'block';
+            }
 
-                // Lógica de Busca Unificada
-                const filtroDesktop = document.getElementById("buscaSaaS") ? document.getElementById("buscaSaaS").value.toLowerCase().trim() : "";
-                const filtroMobile = document.getElementById("buscaSaaSMobile") ? document.getElementById("buscaSaaSMobile").value.toLowerCase().trim() : "";
-                const filtro = filtroDesktop || filtroMobile;
+            document.getElementById('statTotal').innerText = qtdTotal;
+            document.getElementById('statAtivos').innerText = qtdAtivos;
+            document.getElementById('statPremium').innerText = qtdPremium;
+            document.getElementById('statPendentes').innerText = qtdPendentes;
 
-                window.listaEmpresas.sort((a, b) => (a.nomeEmpresa || '').localeCompare(b.nomeEmpresa || ''));
-                let faturamentoHtml = "";
+            document.getElementById('mrrEstimado').innerText = `R$ ${mrrTotal.toFixed(2).replace('.',',')}`;
+            document.getElementById('qtdEmDia').innerText = clientesEmDia;
+            document.getElementById('qtdInadimplente').innerText = clientesInadimplentes;
+            document.getElementById('tabelaFaturamento').innerHTML = faturamentoHtml || `<tr><td colspan="5" class="p-8 text-center text-slate-500 font-bold">Nenhum cliente para faturar.</td></tr>`;
+        };
 
-                window.listaEmpresas.forEach(emp => {
-                    qtdTotal++;
-                    
-                    // Verificação do Filtro de Busca
-                    const nomeEmpresaStr = (emp.nomeEmpresa || '').toLowerCase();
-                    const zapStr = (emp.whatsappLojista || '');
-                    const matchBusca = filtro === "" || nomeEmpresaStr.includes(filtro) || zapStr.includes(filtro);
+        window.filtrarSaaS = () => { window.renderizarPainel(); };
 
-                    // ===========================================
-                    // NOVO SISTEMA DE COBRANÇA (Fixo vs Porcentagem)
-                    // ===========================================
-                    const planoStr = emp.plano || 'BASICO';
-                    const statusConta = emp.statusConta || 'ativo'; 
-                    const tipoCobranca = emp.tipoCobranca || 'fixo';
-                    const valorCobranca = parseFloat(emp.valorCobranca) || 0;
-                    
-                    let exibicaoValor = "";
+        window.excluirEmpresa = async (id, nome) => {
+            if(prompt(`Para excluir permanentemente "${nome}" digite APAGAR:`) === "APAGAR") {
+                await deleteDoc(doc(db, "empresas", id));
+            }
+        };
 
-                    if (tipoCobranca === 'fixo') {
-                        exibicaoValor = `R$ ${valorCobranca.toFixed(2).replace('.', ',')}`;
-                        if (statusConta === 'ativo') mrrTotal += valorCobranca;
-                    } else {
-                        exibicaoValor = `${valorCobranca}% (Variável)`;
-                        // Valores variáveis não entram na soma exata do MRR base, 
-                        // pois dependem do faturamento real do cliente no final do mês.
-                    }
+        window.abrirModalNovo = () => {
+            window.empresaEmEdicao = null; 
+            document.getElementById('editEmpresaId').value = '';
+            document.getElementById('txtClienteId').innerText = 'GERADO AO SALVAR';
+            document.getElementById('nomeRoboEdit').innerText = 'Novo Cadastro Externo';
+            
+            document.getElementById('editNomeEmpresa').value = '';
+            document.getElementById('editNicho').value = 'associacao';
+            document.getElementById('editPlanoConta').value = 'BASICO'; 
+            document.getElementById('editStatusConta').value = 'ativo'; 
+            document.getElementById('editTipoCobranca').value = 'fixo';
+            document.getElementById('editValorCobranca').value = 0;
+            document.getElementById('editZapLoja').value = '';
+            
+            document.getElementById('modalEmpresa').style.display = 'flex';
+        };
 
-                    if (statusConta === 'ativo') {
-                        clientesEmDia++;
-                    } else {
-                        clientesInadimplentes++;
-                    }
+        window.abrirModal = (id) => {
+            const emp = window.listaEmpresas.find(e => e.id === id);
+            window.empresaEmEdicao = emp; 
+            
+            document.getElementById('editEmpresaId').value = emp.id;
+            document.getElementById('txtClienteId').innerText = emp.id;
+            document.getElementById('nomeRoboEdit').innerText = emp.nomeEmpresa;
+            
+            if(document.getElementById('editNomeEmpresa')) document.getElementById('editNomeEmpresa').value = emp.nomeEmpresa || '';
+            
+            document.getElementById('editNicho').value = emp.nicho || 'outro';
+            document.getElementById('editPlanoConta').value = emp.plano || 'BASICO'; 
+            document.getElementById('editStatusConta').value = emp.statusConta || 'ativo'; 
+            document.getElementById('editTipoCobranca').value = emp.tipoCobranca || 'fixo';
+            document.getElementById('editValorCobranca').value = emp.valorCobranca || 0;
+            document.getElementById('editZapLoja').value = emp.whatsappLojista || '';
+            
+            document.getElementById('modalEmpresa').style.display = 'flex';
+        };
 
-                    let corStatusFat = statusConta === 'ativo' ? 'bg-green-100 text-green-800' : (statusConta === 'inadimplente' ? 'bg-amber-100 text-amber-800' : 'bg-red-100 text-red-800');
-                    faturamentoHtml += `
-                        <tr class="hover:bg-slate-50 transition border-b border-slate-100">
-                            <td class="p-4 font-black text-slate-800">${emp.nomeEmpresa} <br><span class="text-[9px] font-normal text-slate-400 font-mono">${emp.whatsappLojista || 'S/ Tel'}</span></td>
-                            <td class="p-4 text-xs font-bold text-blue-600">${planoStr}</td>
-                            <td class="p-4 text-center font-black text-emerald-600">${exibicaoValor}</td>
-                            <td class="p-4 text-center"><span class="px-2 py-1 rounded-md text-[9px] font-black uppercase ${corStatusFat}">${statusConta}</span></td>
-                            <td class="p-4 text-center">
-                                <button onclick="window.abrirModal('${emp.id}')" class="bg-slate-100 text-slate-600 hover:bg-slate-200 px-3 py-1.5 rounded-lg text-xs font-bold transition">Gerir</button>
-                            </td>
-                        </tr>
-                    `;
+        window.salvarConfiguracao = async () => {
+            const id = document.getElementById('editEmpresaId').value;
+            const nomeEmpresa = document.getElementById('editNomeEmpresa').value.trim();
+            const zap = document.getElementById('editZapLoja').value.replace(/\D/g, '');
+            
+            if(!nomeEmpresa) return alert("Digite o nome do cliente!");
 
-                    // ===========================================
-                    // RENDERIZAÇÃO DOS CARDS DO DASHBOARD
-                    // ===========================================
-                    if(emp.statusRobo === 'pendente') {
-                        qtdPendentes++;
-                        divP.innerHTML += `
-                            <div class="bg-amber-50 border border-amber-200 p-4 md:p-5 rounded-2xl flex flex-col md:flex-row justify-between md:items-center gap-4 shadow-sm border-l-4 border-l-amber-500">
-                                <div>
-                                    <h4 class="font-black text-amber-900 text-base md:text-lg">${emp.nomeEmpresa}</h4>
-                                    <p class="text-[10px] md:text-xs text-amber-700 font-bold mt-1"><i class="fa-solid fa-envelope mr-1"></i> ${emp.email || 'S/ Email'} &nbsp;|&nbsp; <i class="fa-brands fa-whatsapp text-emerald-600 mr-1"></i> ${emp.whatsappLojista || 'Não informado'}</p>
-                                </div>
-                                <div class="flex flex-wrap gap-2">
-                                    <button onclick="window.aprovarCliente('${emp.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs font-bold transition shadow glow-emerald"><i class="fa-solid fa-check mr-1"></i> Aprovar</button>
-                                    <button onclick="window.excluirEmpresa('${emp.id}', '${emp.nomeEmpresa}')" class="bg-white border border-red-200 text-red-500 hover:bg-red-50 px-3 py-2 rounded-lg transition shadow-sm"><i class="fa-solid fa-trash"></i></button>
-                                </div>
-                            </div>
-                        `;
-                    } else if (matchBusca) {
-                        const statusServidor = emp.statusRobo === 'online' || emp.statusRobo === 'ativo_central' ? 'online' : 'offline';
-                        if (statusServidor === 'online') qtdAtivos++;
-                        if (emp.plano === 'PREMIUM') qtdPremium++;
-
-                        let corCard = 'border-slate-200';
-                        let badgeConta = '<span class="px-2 py-0.5 bg-blue-50 text-blue-600 rounded-md text-[9px] font-black uppercase border border-blue-200">Ativo</span>';
-                        
-                        if (statusConta === 'inadimplente') {
-                            corCard = 'border-amber-400 bg-amber-50/20';
-                            badgeConta = '<span class="px-2 py-0.5 bg-amber-100 text-amber-700 rounded-md text-[9px] font-black uppercase border border-amber-300">Inadimplente</span>';
-                        } else if (statusConta === 'bloqueado') {
-                            corCard = 'border-red-400 bg-red-50/30 opacity-80';
-                            badgeConta = '<span class="px-2 py-0.5 bg-red-100 text-red-700 rounded-md text-[9px] font-black uppercase border border-red-300">Bloqueado</span>';
-                        }
-
-                        let iconNicho = '<i class="fa-solid fa-box"></i>';
-                        if(emp.nicho === 'associacao') iconNicho = '<i class="fa-solid fa-shield-halved text-blue-600"></i>';
-                        if(emp.nicho === 'ctg') iconNicho = '<i class="fa-solid fa-horse text-amber-600"></i>';
-                        if(emp.nicho === 'loja') iconNicho = '<i class="fa-solid fa-shop text-purple-500"></i>';
-
-                        divA.innerHTML += `
-                            <div class="bg-white rounded-2xl md:rounded-3xl p-4 md:p-5 border-2 ${corCard} shadow-sm flex flex-col hover:shadow-md transition duration-300 relative group">
-                                <div class="flex justify-between items-start mb-3 md:mb-4">
-                                    <div class="flex gap-2.5 md:gap-3 items-center">
-                                        <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-slate-50 flex items-center justify-center text-lg md:text-xl border border-slate-200 shadow-sm">${iconNicho}</div>
-                                        <div>
-                                            <h4 class="font-black text-slate-800 text-sm md:text-base leading-tight">${emp.nomeEmpresa}</h4>
-                                            <p class="text-[9px] md:text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Plano: <span class="text-blue-600">${emp.plano || 'BÁSICO'}</span></p>
-                                        </div>
-                                    </div>
-                                    <div class="flex flex-col items-end gap-1.5">
-                                        ${statusServidor === 'online' 
-                                            ? '<span class="flex items-center gap-1.5 text-[8px] md:text-[9px] font-black uppercase text-emerald-600 bg-emerald-50 px-1.5 py-0.5 md:px-2 md:py-1 rounded border border-emerald-200"><span class="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-emerald-500 animate-pulse"></span> ON</span>' 
-                                            : '<span class="flex items-center gap-1.5 text-[8px] md:text-[9px] font-black uppercase text-slate-500 bg-slate-100 px-1.5 py-0.5 md:px-2 md:py-1 rounded border border-slate-200"><span class="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-slate-400"></span> OFF</span>'}
-                                        ${badgeConta}
-                                    </div>
-                                </div>
-                                
-                                <div class="text-[11px] md:text-xs text-slate-600 mb-4 md:mb-5 flex-1 bg-slate-50 p-2.5 md:p-3 rounded-xl border border-slate-100">
-                                    <p class="mb-1.5 flex items-center"><i class="fa-brands fa-whatsapp text-emerald-500 w-5 text-center text-xs md:text-sm"></i> <span class="font-mono font-bold">${emp.whatsappLojista || 'Não configurado'}</span></p>
-                                    <p class="flex items-center"><i class="fa-solid fa-envelope text-slate-400 w-5 text-center"></i> <span class="truncate">${emp.email || 'N/A'}</span></p>
-                                </div>
-
-                                <div class="grid grid-cols-2 gap-2 md:gap-3 mt-auto">
-                                    <button onclick="window.abrirModal('${emp.id}')" class="bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white font-bold py-2 md:py-2.5 rounded-lg md:rounded-xl text-[10px] md:text-xs transition border border-blue-200 shadow-sm flex justify-center items-center gap-1.5"><i class="fa-solid fa-gear"></i> Gerenciar</button>
-                                    <button onclick="window.excluirEmpresa('${emp.id}', '${emp.nomeEmpresa}')" class="bg-white hover:bg-red-50 text-red-500 font-bold py-2 md:py-2.5 rounded-lg md:rounded-xl text-[10px] md:text-xs transition border border-red-200 shadow-sm flex justify-center items-center gap-1.5"><i class="fa-solid fa-trash"></i> Remover</button>
-                                </div>
-                            </div>
-                        `;
-                    }
-                });
-
-                if(qtdPendentes === 0) {
-                    divP.innerHTML = '<p class="text-center text-slate-400 text-xs md:text-sm font-bold p-6 md:p-8 bg-white rounded-2xl border border-slate-200 border-dashed">Nenhuma solicitação pendente.</p>';
-                    document.getElementById('badgeNotificacao').style.display = 'none';
-                } else {
-                    document.getElementById('badgeNotificacao').style.display = 'block';
-                }
-
-                document.getElementById('statTotal').innerText = qtdTotal;
-                document.getElementById('statAtivos').innerText = qtdAtivos;
-                document.getElementById('statPremium').innerText = qtdPremium;
-                document.getElementById('statPendentes').innerText = qtdPendentes;
-
-                document.getElementById('mrrEstimado').innerText = `R$ ${mrrTotal.toFixed(2).replace('.',',')}`;
-                document.getElementById('qtdEmDia').innerText = clientesEmDia;
-                document.getElementById('qtdInadimplente').innerText = clientesInadimplentes;
-                document.getElementById('tabelaFaturamento').innerHTML = faturamentoHtml || `<tr><td colspan="5" class="p-8 text-center text-slate-500 font-bold">Nenhum cliente para faturar.</td></tr>`;
+            const dadosParaSalvar = {
+                nomeEmpresa: nomeEmpresa,
+                whatsappLojista: zap, 
+                plano: document.getElementById('editPlanoConta').value,
+                statusConta: document.getElementById('editStatusConta').value,
+                nicho: document.getElementById('editNicho').value,
+                tipoCobranca: document.getElementById('editTipoCobranca').value,
+                valorCobranca: parseFloat(document.getElementById('editValorCobranca').value) || 0
             };
-
-            window.aprovarCliente = async (id) => {
-                if(confirm("Confirmar aprovação deste cliente?")) {
-                    await updateDoc(doc(db, "empresas", id), { 
-                        statusRobo: 'ativo_central', 
-                        plano: 'BASICO',
-                        tipoCobranca: 'fixo',
-                        valorCobranca: 97.00,
-                        statusConta: 'ativo',
-                        nicho: 'outro' 
-                    });
-                }
-            };
-
-            window.excluirEmpresa = async (id, nome) => {
-                if(prompt(`Para excluir permanentemente "${nome}" digite APAGAR:`) === "APAGAR") {
-                    await deleteDoc(doc(db, "empresas", id));
-                }
-            };
-
-            window.abrirModal = (id) => {
-                const emp = window.listaEmpresas.find(e => e.id === id);
-                window.empresaEmEdicao = emp; 
-                
-                document.getElementById('editEmpresaId').value = emp.id;
-                document.getElementById('txtClienteId').innerText = emp.id;
-                document.getElementById('nomeRoboEdit').innerText = emp.nomeEmpresa;
-                
-                document.getElementById('editNicho').value = emp.nicho || 'outro';
-                document.getElementById('editPlanoConta').value = emp.plano || 'BASICO'; 
-                document.getElementById('editStatusConta').value = emp.statusConta || 'ativo'; 
-                
-                // Novos Campos
-                document.getElementById('editTipoCobranca').value = emp.tipoCobranca || 'fixo';
-                document.getElementById('editValorCobranca').value = emp.valorCobranca || 0;
-
-                document.getElementById('editZapLoja').value = emp.whatsappLojista || '';
-                
-                if(emp.menu) {
-                    document.getElementById('menuSaudacao').value = emp.menu.saudacao || '';
-                    document.getElementById('opt1Nome').value = emp.menu.opt1Nome || '';
-                    document.getElementById('opt1Resp').value = emp.menu.opt1Resp || '';
-                } else {
-                    document.getElementById('menuSaudacao').value = '';
-                    document.getElementById('opt1Nome').value = '';
-                    document.getElementById('opt1Resp').value = '';
-                }
-                document.getElementById('modalEmpresa').style.display = 'flex';
-            };
-
-            window.salvarConfiguracao = async () => {
-                const id = document.getElementById('editEmpresaId').value;
-                const zap = document.getElementById('editZapLoja').value.replace(/\D/g, '');
-                const novoPlano = document.getElementById('editPlanoConta').value;
-                const novoStatusConta = document.getElementById('editStatusConta').value;
-                const novoNicho = document.getElementById('editNicho').value;
-                const tipoCob = document.getElementById('editTipoCobranca').value;
-                const valorCob = parseFloat(document.getElementById('editValorCobranca').value) || 0;
-
-                const menu = {
-                    saudacao: document.getElementById('menuSaudacao').value,
-                    opt1Nome: document.getElementById('opt1Nome').value,
-                    opt1Resp: document.getElementById('opt1Resp').value
-                };
-                
-                await updateDoc(doc(db, "empresas", id), { 
-                    whatsappLojista: zap, 
-                    menu: menu,
-                    plano: novoPlano,
-                    statusConta: novoStatusConta,
-                    nicho: novoNicho,
-                    tipoCobranca: tipoCob,
-                    valorCobranca: valorCob
-                });
-                
-                window.fecharModal();
+            
+            if (id) {
+                await updateDoc(doc(db, "empresas", id), dadosParaSalvar);
                 alert("✅ Ficha atualizada com sucesso!");
-            };
+            } else {
+                dadosParaSalvar.dataCadastro = new Date().toISOString();
+                dadosParaSalvar.statusRobo = 'online'; 
+                
+                const docRef = await addDoc(collection(db, "empresas"), dadosParaSalvar);
+                alert("✅ Cliente criado! O ID gerado é:\n\n" + docRef.id + "\n\nCopie este ID e coloque no código do cliente.");
+            }
+            
+            window.fecharModal();
+        };
 
-            window.enviarAvisoGlobal = async (tipo) => {
-                const msg = document.getElementById('msgGlobalSaaS').value.trim();
-                if(!msg) return alert("Digite uma mensagem primeiro!");
-                if(!confirm(`Deseja enviar este comunicado para TODOS os sistemas dos clientes?`)) return;
+        // --- SISTEMA DE COMUNICADO GLOBAL (BROADCAST) ---
+        window.enviarAvisoGlobal = async (tipo) => {
+            const msg = document.getElementById('msgGlobalSaaS').value.trim();
+            if(!msg) return alert("Digite uma mensagem primeiro!");
+            if(!confirm(`Deseja enviar este comunicado para TODOS os sistemas dos clientes?`)) return;
 
-                try {
-                    await setDoc(doc(db, "config", "comunicado_global"), {
-                        mensagem: msg,
-                        tipo: tipo, 
-                        data_envio: new Date().toISOString(),
-                        ativo: true
-                    });
-                    alert("✅ Comunicado enviado! Os sistemas dos clientes exibirão o aviso na tela.");
-                    document.getElementById('msgGlobalSaaS').value = "";
-                } catch(e) {
-                    alert("Erro ao enviar comunicado: " + e.message);
-                }
-            };
+            try {
+                await setDoc(doc(db, "config", "comunicado_global"), {
+                    mensagem: msg,
+                    tipo: tipo, 
+                    data_envio: new Date().toISOString(),
+                    ativo: true
+                });
+                alert("✅ Comunicado enviado! Os sistemas dos clientes exibirão o aviso na tela.");
+                document.getElementById('msgGlobalSaaS').value = "";
+            } catch(e) {
+                alert("Erro ao enviar comunicado: " + e.message);
+            }
+        };
 
-            window.limparAvisosGlobais = async () => {
-                if(!confirm("Remover o comunicado atual da tela dos clientes?")) return;
-                try {
-                    await setDoc(doc(db, "config", "comunicado_global"), { ativo: false }, { merge: true });
-                    alert("Telas limpas!");
-                } catch(e) {}
-            };
+        window.limparAvisosGlobais = async () => {
+            if(!confirm("Remover o comunicado atual da tela dos clientes?")) return;
+            try {
+                await setDoc(doc(db, "config", "comunicado_global"), { ativo: false }, { merge: true });
+                alert("Telas limpas!");
+            } catch(e) {}
+        };
 
-        } catch (error) {
-            console.error("Erro ao iniciar o Firebase:", error);
-            alert("Ocorreu um erro ao carregar o sistema. Verifique o console.");
-        }
     </script>
 </body>
 </html>
