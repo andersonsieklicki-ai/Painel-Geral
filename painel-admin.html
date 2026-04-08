@@ -3,101 +3,222 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Master Admin - Central Omnichannel</title>
+    <title>Master Admin SaaS - Central Omnichannel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --primary: #003399; --bg-color: #f4f7f6; --card-bg: #ffffff; --text-dark: #333; --terminal-bg: #1e1e1e; --danger: #dc3545; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); margin: 0; padding: 20px; color: var(--text-dark); }
-        
-        .header { display: flex; justify-content: space-between; align-items: center; background-color: var(--primary); color: white; padding: 15px 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 30px; }
-        .btn { background-color: #28a745; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: background 0.3s; font-size: 13px; display: inline-flex; align-items: center; gap: 5px; }
-        .btn:hover { background-color: #218838; }
-        .btn-danger { background-color: var(--danger); }
-        .btn-danger:hover { background-color: #c82333; }
-        .btn-outline { background-color: transparent; color: var(--primary); border: 1px solid var(--primary); }
-        .btn-edit { background-color: #ffc107; color: black; }
-
-        .section-title { font-size: 20px; color: var(--primary); border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 20px; margin-top: 40px; display: flex; align-items: center; gap: 10px;}
-        
-        .lista-pendentes { display: flex; flex-direction: column; gap: 15px; margin-bottom: 40px; }
-        .card-pendente { background: #fff3cd; border-left: 5px solid #ffc107; padding: 15px 20px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .info-pendente h4 { margin: 0 0 5px 0; color: #856404; font-size: 18px; }
-        .info-pendente p { margin: 0; font-size: 14px; color: #666; }
-
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
-        .card { background: var(--card-bg); border-radius: 8px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-top: 4px solid var(--primary); display: flex; flex-direction: column; position: relative; }
-        .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
-        .empresa-nome { font-size: 18px; font-weight: bold; color: var(--primary); }
-        .empresa-sub { font-size: 11px; color: #777; margin-top: 3px; }
-        
-        .status-tag { font-size: 10px; padding: 4px 8px; border-radius: 12px; color: white; font-weight: bold; text-transform: uppercase; }
-        .status-tag.online { background-color: #28a745; }
-        .status-tag.offline { background-color: #6c757d; }
-
-        .log-window { background-color: var(--terminal-bg); color: #00ff00; font-family: 'Courier New', monospace; font-size: 11px; height: 100px; overflow-y: auto; padding: 10px; border-radius: 5px; margin-bottom: 15px; border: 1px solid #333; }
-        
-        .card-actions { display: flex; gap: 8px; margin-top: auto; }
-        .card-actions button { flex: 1; }
-
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: white; padding: 30px; border-radius: 8px; width: 550px; max-width: 95%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
-        .modal label { font-weight: bold; font-size: 13px; display: block; margin-bottom: 5px; color: #555; }
-        .modal input, .modal textarea, .modal select { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: inherit; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .scroll-suave::-webkit-scrollbar { width: 6px; height: 6px; }
+        .scroll-suave::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .modal-fundo { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.75); z-index: 100; justify-content: center; align-items: center; padding: 1rem; backdrop-filter: blur(4px); }
+        .log-window { background-color: #0f172a; color: #10b981; font-family: 'Courier New', monospace; font-size: 11px; height: 80px; overflow-y: auto; padding: 10px; border-radius: 8px; border: 1px solid #334155; }
+        .glow-blue { box-shadow: 0 4px 14px 0 rgba(37, 99, 235, 0.39); }
+        .glow-red { box-shadow: 0 4px 14px 0 rgba(239, 68, 68, 0.39); }
+        .glow-emerald { box-shadow: 0 4px 14px 0 rgba(16, 185, 129, 0.39); }
     </style>
 </head>
-<body>
+<body class="flex h-screen overflow-hidden text-slate-800">
 
-    <div class="header">
-        <h2>🛠️ Painel Admin - Central Omnichannel</h2>
-        <div>Logado como: <strong>Anderson Sieklicki</strong></div>
-    </div>
-
-    <h3 class="section-title">🔔 Solicitações Pendentes</h3>
-    <div class="lista-pendentes" id="painelPendentes">
-        <p style="text-align: center; color: #999;">Conectando ao Firebase...</p>
-    </div>
-
-    <h3 class="section-title">🤖 Clientes Ativos</h3>
-    <div class="grid" id="painelAtivos"></div>
-
-    <div class="modal" id="modalEmpresa">
-        <div class="modal-content">
-            <h2 style="margin-top: 0; color: var(--primary);">⚙️ Editar Cliente: <span id="nomeRoboEdit"></span></h2>
-            <input type="hidden" id="editEmpresaId">
-            
-            <label>Plano da Conta:</label>
-            <select id="editPlanoConta">
-                <option value="basico">🥉 Plano Básico</option>
-                <option value="premium">🥇 Plano Premium (WhatsApp Próprio)</option>
-            </select>
-            
-            <label>WhatsApp de Atendimento (Link wa.me):</label>
-            <input type="text" id="editZapLoja" placeholder="Ex: 46999999999">
-
-            <label>Mensagem de Boas-vindas (Plano Premium):</label>
-            <textarea id="menuSaudacao" rows="3"></textarea>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <div>
-                    <label>Opção 1 (Botão):</label>
-                    <input type="text" id="opt1Nome" placeholder="Ex: Catálogo">
+    <aside class="w-64 bg-slate-900 text-white flex flex-col hidden md:flex shadow-2xl z-20">
+        <div class="p-6 border-b border-slate-800 flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-xl glow-blue">
+                <i class="fa-solid fa-server"></i>
+            </div>
+            <div>
+                <h1 class="text-sm font-black tracking-wider text-slate-100">MASTER SaaS</h1>
+                <p class="text-[10px] text-blue-400 font-bold uppercase tracking-widest">Automatiza Tech</p>
+            </div>
+        </div>
+        
+        <nav class="flex-1 p-4 space-y-2 overflow-y-auto scroll-suave text-sm font-medium">
+            <button class="w-full flex items-center p-3 rounded-xl bg-blue-600 text-white transition glow-blue"><i class="fa-solid fa-chart-line w-6"></i> Dashboard</button>
+            <button class="w-full flex items-center p-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition"><i class="fa-solid fa-users w-6"></i> Clientes</button>
+            <button class="w-full flex items-center p-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition"><i class="fa-solid fa-file-invoice-dollar w-6"></i> Faturamento</button>
+            <button class="w-full flex items-center p-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition" onclick="document.getElementById('sessaoComunicado').scrollIntoView({behavior: 'smooth'})"><i class="fa-solid fa-bullhorn w-6"></i> Comunicados</button>
+        </nav>
+        
+        <div class="p-4 border-t border-slate-800 bg-slate-900">
+            <div class="flex items-center gap-3 mb-4 px-2">
+                <div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center border border-slate-600"><i class="fa-solid fa-user-tie text-xs"></i></div>
+                <div class="text-xs">
+                    <p class="font-bold text-slate-200">Anderson Sieklicki</p>
+                    <p class="text-[10px] text-emerald-400 font-black">SUPER ADMIN</p>
                 </div>
-                <div>
-                    <label>Resposta Opção 1:</label>
-                    <input type="text" id="opt1Resp">
+            </div>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-screen overflow-hidden bg-slate-50">
+        
+        <header class="bg-white border-b border-slate-200 p-4 flex justify-between items-center shadow-sm z-10">
+            <div class="flex items-center gap-4">
+                <button class="md:hidden text-slate-500 hover:text-blue-600"><i class="fa-solid fa-bars text-xl"></i></button>
+                <h2 class="text-lg font-black text-slate-800 hidden sm:block">Visão Geral do Sistema</h2>
+            </div>
+            <div class="relative w-full max-w-md hidden sm:block">
+                <i class="fa-solid fa-search absolute left-3 top-3 text-slate-400 text-sm"></i>
+                <input type="text" id="buscaSaaS" onkeyup="window.filtrarSaaS()" placeholder="Buscar cliente por nome ou WhatsApp..." class="w-full pl-9 pr-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-sm outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100 transition">
+            </div>
+            <div class="flex items-center gap-4">
+                <button class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center relative hover:bg-blue-100 transition border border-blue-100">
+                    <i class="fa-solid fa-bell"></i>
+                    <span class="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 border-white hidden" id="badgeNotificacao"></span>
+                </button>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-4 md:p-8 scroll-suave">
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-center hover:border-blue-300 transition">
+                    <div class="flex justify-between items-start mb-2">
+                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total de Clientes</p>
+                        <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center"><i class="fa-solid fa-users"></i></div>
+                    </div>
+                    <h3 class="text-3xl font-black text-slate-800" id="statTotal">0</h3>
+                </div>
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-center hover:border-emerald-300 transition">
+                    <div class="flex justify-between items-start mb-2">
+                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Robôs Ativos</p>
+                        <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center"><i class="fa-solid fa-robot"></i></div>
+                    </div>
+                    <h3 class="text-3xl font-black text-slate-800" id="statAtivos">0</h3>
+                </div>
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-center hover:border-purple-300 transition">
+                    <div class="flex justify-between items-start mb-2">
+                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Planos Premium</p>
+                        <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center"><i class="fa-solid fa-crown"></i></div>
+                    </div>
+                    <h3 class="text-3xl font-black text-slate-800" id="statPremium">0</h3>
+                </div>
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-center hover:border-red-300 transition">
+                    <div class="flex justify-between items-start mb-2">
+                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Pendências</p>
+                        <div class="w-8 h-8 rounded-lg bg-red-50 text-red-600 flex items-center justify-center"><i class="fa-solid fa-clock"></i></div>
+                    </div>
+                    <h3 class="text-3xl font-black text-slate-800" id="statPendentes">0</h3>
                 </div>
             </div>
 
-            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
-                <button class="btn btn-outline" onclick="fecharModal()">Cancelar</button>
-                <button class="btn" onclick="salvarConfiguracao()">💾 Salvar Alterações</button>
+            <div class="mb-8" id="containerPendentes">
+                <h3 class="text-lg font-black text-slate-800 mb-4 flex items-center gap-2"><i class="fa-solid fa-bell text-amber-500"></i> Novas Solicitações de Assinatura</h3>
+                <div class="flex flex-col gap-3" id="painelPendentes">
+                    <p class="text-center text-slate-400 text-sm font-bold p-8 bg-white rounded-2xl border border-slate-200 border-dashed">Conectando ao Firebase...</p>
+                </div>
+            </div>
+
+            <div class="mb-8">
+                <h3 class="text-lg font-black text-slate-800 mb-4 flex items-center gap-2"><i class="fa-solid fa-building-circle-check text-blue-600"></i> Carteira de Clientes SaaS</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" id="painelAtivos">
+                    </div>
+            </div>
+
+            <div id="sessaoComunicado" class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-slate-200 mb-8">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-lg"><i class="fa-solid fa-bullhorn"></i></div>
+                    <div>
+                        <h3 class="font-black text-lg text-slate-800">Comunicado Global SaaS</h3>
+                        <p class="text-xs text-slate-500 font-medium">Dispare um aviso na tela de todos os sistemas dos seus clientes.</p>
+                    </div>
+                </div>
+                
+                <textarea id="msgGlobalSaaS" rows="3" class="w-full mt-4 p-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition resize-none" placeholder="Ex: Olá! Informamos que a partir do próximo mês o plano PLUS terá novas funções..."></textarea>
+                
+                <div class="flex flex-wrap gap-3 mt-4">
+                    <button onclick="window.enviarAvisoGlobal('info')" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl font-bold text-sm transition glow-blue flex items-center gap-2"><i class="fa-solid fa-circle-info"></i> Informativo</button>
+                    <button onclick="window.enviarAvisoGlobal('urgente')" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2.5 rounded-xl font-bold text-sm transition glow-red flex items-center gap-2"><i class="fa-solid fa-triangle-exclamation"></i> Urgente / Reajuste</button>
+                    <button onclick="window.limparAvisosGlobais()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-6 py-2.5 rounded-xl font-bold text-sm transition flex items-center gap-2 border border-slate-300"><i class="fa-solid fa-eraser"></i> Limpar Telas</button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <div class="modal-fundo" id="modalEmpresa">
+        <div class="bg-white rounded-3xl shadow-2xl w-[95%] md:w-full max-w-2xl mx-auto flex flex-col max-h-[90vh] overflow-hidden">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                <div>
+                    <h2 class="text-xl font-black text-slate-800 flex items-center gap-2"><i class="fa-solid fa-user-gear text-blue-600"></i> Gestão do Cliente</h2>
+                    <p class="text-xs font-bold text-slate-500 mt-1" id="nomeRoboEdit">Nome da Empresa</p>
+                </div>
+                <button onclick="window.fecharModal()" class="w-8 h-8 rounded-full bg-slate-200 hover:bg-red-100 hover:text-red-600 text-slate-500 transition flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="p-6 overflow-y-auto scroll-suave space-y-6">
+                <input type="hidden" id="editEmpresaId">
+                
+                <div class="p-4 border border-slate-200 bg-slate-50 rounded-xl flex justify-between items-center">
+                    <div>
+                        <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">ID do Cliente SaaS</p>
+                        <p class="text-sm font-mono font-bold text-slate-800 mt-0.5" id="txtClienteId">ID_AQUI</p>
+                    </div>
+                    <button onclick="window.copiarIdSaaS()" class="bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition flex items-center gap-2"><i class="fa-solid fa-copy"></i> Copiar ID</button>
+                </div>
+
+                <div class="p-5 border border-blue-200 bg-blue-50/50 rounded-xl space-y-4">
+                    <h3 class="text-sm font-black text-blue-900 uppercase tracking-wider mb-2"><i class="fa-solid fa-id-card mr-2"></i>Licença e Assinatura</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-xs font-bold text-slate-700 mb-1 block">Nicho do Sistema:</label>
+                            <select id="editNicho" class="w-full p-3 bg-white border border-slate-300 rounded-xl text-sm font-bold outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition shadow-sm">
+                                <option value="associacao">🛡️ Associação (Militar/Civil)</option>
+                                <option value="ctg">🐎 CTG / Piquete</option>
+                                <option value="loja">🛍️ Loja Comercial</option>
+                                <option value="outro">📦 Outros</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-slate-700 mb-1 block">Plano Contratado:</label>
+                            <select id="editPlanoConta" class="w-full p-3 bg-white border border-slate-300 rounded-xl text-sm font-bold outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition shadow-sm">
+                                <option value="BASICO">🥉 BÁSICO (Mensalidades)</option>
+                                <option value="PLUS">🥈 PLUS (+ CRM)</option>
+                                <option value="PREMIUM">🥇 PREMIUM (Tudo Liberado)</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="text-xs font-bold text-slate-700 mb-1 block">Status Financeiro (Bloqueio Automático):</label>
+                            <select id="editStatusConta" class="w-full p-3 bg-white border border-slate-300 rounded-xl text-sm font-bold outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition shadow-sm">
+                                <option value="ativo">✅ ATIVO (Acesso Liberado)</option>
+                                <option value="inadimplente">⚠️ INADIMPLENTE (Aviso na tela, acesso mantido)</option>
+                                <option value="bloqueado">🛑 SUSPENSO (Trava a tela e desliga o Robô)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-5 border border-slate-200 bg-white rounded-xl space-y-4 shadow-sm">
+                    <h3 class="text-sm font-black text-slate-800 uppercase tracking-wider mb-2"><i class="fa-brands fa-whatsapp text-emerald-500 mr-2"></i>Integração Robô / IA</h3>
+                    
+                    <div>
+                        <label class="text-xs font-bold text-slate-700 mb-1 block">WhatsApp do Cliente (DDD+Número):</label>
+                        <input type="text" id="editZapLoja" placeholder="Ex: 554699999999" class="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-mono outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 transition shadow-inner">
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-bold text-slate-700 mb-1 block">Mensagem Base da IA / Saudação:</label>
+                        <textarea id="menuSaudacao" rows="3" class="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 transition shadow-inner resize-none" placeholder="Olá! Sou a assistente virtual..."></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 hidden">
+                        <div><input type="hidden" id="opt1Nome"><input type="hidden" id="opt1Resp"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-5 border-t border-slate-200 bg-slate-50 flex gap-3 justify-end">
+                <button class="px-5 py-3 rounded-xl text-sm font-bold text-slate-600 bg-white border border-slate-300 hover:bg-slate-100 transition shadow-sm" onclick="window.fecharModal()">Cancelar</button>
+                <button class="px-8 py-3 rounded-xl text-sm font-bold text-white bg-blue-600 shadow-lg shadow-blue-600/30 hover:bg-blue-700 active:scale-95 transition flex items-center gap-2" onclick="window.salvarConfiguracao()"><i class="fa-solid fa-save"></i> Salvar Alterações</button>
             </div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, doc, updateDoc, deleteDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
+        // CREDENCIAIS DA SUA CENTRAL OMNICHANNEL SAAS
         const firebaseConfig = {
             apiKey: "AIzaSyC4-2LavZt7iWPt2u71u-yRUYbIJu-Vzf0",
             authDomain: "central-omnichannel-saas.firebaseapp.com",
@@ -111,90 +232,145 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         let listaEmpresas = [];
-        window.empresaEmEdicao = null; // Guarda a empresa que está sendo editada
+        window.empresaEmEdicao = null; 
 
         onSnapshot(collection(db, "empresas"), (snapshot) => {
             listaEmpresas = [];
             snapshot.forEach((doc) => { listaEmpresas.push({ id: doc.id, ...doc.data() }); });
-            renderizarPainel();
+            window.renderizarPainel();
         });
 
-        function renderizarPainel() {
+        window.renderizarPainel = () => {
             const divP = document.getElementById('painelPendentes');
             const divA = document.getElementById('painelAtivos');
             divP.innerHTML = ''; divA.innerHTML = '';
-            let temP = false;
+            
+            let qtdTotal = 0, qtdAtivos = 0, qtdPremium = 0, qtdPendentes = 0;
+            const filtro = document.getElementById("buscaSaaS") ? document.getElementById("buscaSaaS").value.toLowerCase() : "";
 
             listaEmpresas.sort((a, b) => (a.nomeEmpresa || '').localeCompare(b.nomeEmpresa || ''));
 
             listaEmpresas.forEach(emp => {
+                qtdTotal++;
+                const matchBusca = !filtro || (emp.nomeEmpresa && emp.nomeEmpresa.toLowerCase().includes(filtro)) || (emp.whatsappLojista && emp.whatsappLojista.includes(filtro));
+
                 if(emp.statusRobo === 'pendente') {
-                    temP = true;
+                    qtdPendentes++;
                     divP.innerHTML += `
-                        <div class="card-pendente">
-                            <div class="info-pendente">
-                                <h4>🏢 ${emp.nomeEmpresa}</h4>
-                                <p>📧 ${emp.email} | 📱 ${emp.whatsappLojista || 'S/ Zap'} | 📅 ${new Date(emp.dataCadastro).toLocaleDateString()}</p>
+                        <div class="bg-amber-50 border border-amber-200 p-5 rounded-2xl flex flex-col md:flex-row justify-between md:items-center gap-4 shadow-sm border-l-4 border-l-amber-500">
+                            <div>
+                                <h4 class="font-black text-amber-900 text-lg">${emp.nomeEmpresa}</h4>
+                                <p class="text-xs text-amber-700 font-bold mt-1"><i class="fa-solid fa-envelope mr-1"></i> ${emp.email || 'S/ Email'} &nbsp;|&nbsp; <i class="fa-brands fa-whatsapp text-emerald-600 mr-1"></i> ${emp.whatsappLojista || 'Não informado'} &nbsp;|&nbsp; <i class="fa-regular fa-calendar mr-1"></i> ${new Date(emp.dataCadastro || Date.now()).toLocaleDateString()}</p>
                             </div>
-                            <div style="display: flex; gap: 10px;">
-                                <select id="plano-${emp.id}" class="btn-outline" style="padding: 5px; border-radius: 4px;">
-                                    <option value="basico">🥉 Básico</option>
-                                    <option value="premium">🥇 Premium</option>
+                            <div class="flex flex-wrap gap-2">
+                                <select id="plano-${emp.id}" class="p-2 border border-amber-300 rounded-lg text-xs font-bold text-amber-900 bg-white outline-none">
+                                    <option value="BASICO">Plano BÁSICO</option>
+                                    <option value="PLUS">Plano PLUS</option>
+                                    <option value="PREMIUM">Plano PREMIUM</option>
                                 </select>
-                                <button class="btn" onclick="aprovarCliente('${emp.id}')">✅ Aprovar</button>
-                                <button class="btn btn-danger" onclick="excluirEmpresa('${emp.id}', '${emp.nomeEmpresa}')">🗑️</button>
+                                <button onclick="window.aprovarCliente('${emp.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition shadow glow-emerald"><i class="fa-solid fa-check mr-1"></i> Aprovar</button>
+                                <button onclick="window.excluirEmpresa('${emp.id}', '${emp.nomeEmpresa}')" class="bg-white border border-red-200 text-red-500 hover:bg-red-50 hover:text-red-700 px-3 py-2 rounded-lg transition shadow-sm"><i class="fa-solid fa-trash"></i></button>
                             </div>
                         </div>
                     `;
-                } else {
-                    const premium = emp.plano === 'premium';
-                    const status = emp.statusRobo === 'ativo_central' || emp.statusRobo === 'online' ? 'online' : 'offline';
+                } else if (matchBusca) {
+                    const statusServidor = emp.statusRobo === 'online' || emp.statusRobo === 'ativo_central' ? 'online' : 'offline';
+                    if (statusServidor === 'online') qtdAtivos++;
+                    if (emp.plano === 'PREMIUM') qtdPremium++;
+
+                    const statusConta = emp.statusConta || 'ativo'; 
+                    let corCard = 'border-slate-200';
+                    let badgeConta = '<span class="px-2 py-0.5 bg-blue-50 text-blue-600 rounded-md text-[9px] font-black uppercase border border-blue-200">Ativo</span>';
                     
+                    if (statusConta === 'inadimplente') {
+                        corCard = 'border-amber-400 bg-amber-50/20';
+                        badgeConta = '<span class="px-2 py-0.5 bg-amber-100 text-amber-700 rounded-md text-[9px] font-black uppercase border border-amber-300">Inadimplente</span>';
+                    } else if (statusConta === 'bloqueado') {
+                        corCard = 'border-red-400 bg-red-50/30 opacity-80';
+                        badgeConta = '<span class="px-2 py-0.5 bg-red-100 text-red-700 rounded-md text-[9px] font-black uppercase border border-red-300">Bloqueado</span>';
+                    }
+
+                    let iconNicho = '<i class="fa-solid fa-box"></i>';
+                    if(emp.nicho === 'associacao') iconNicho = '<i class="fa-solid fa-shield-halved text-blue-600"></i>';
+                    if(emp.nicho === 'ctg') iconNicho = '<i class="fa-solid fa-horse text-amber-600"></i>';
+                    if(emp.nicho === 'loja') iconNicho = '<i class="fa-solid fa-shop text-purple-500"></i>';
+
                     divA.innerHTML += `
-                        <div class="card">
-                            <div class="card-header">
-                                <div>
-                                    <div class="empresa-nome">${emp.nomeEmpresa}</div>
-                                    <div class="empresa-sub">${premium ? '🥇 PREMIUM' : '🥉 BÁSICO'} | 📱 ${emp.whatsappLojista || 'N/A'}</div>
+                        <div class="bg-white rounded-3xl p-5 border-2 ${corCard} shadow-sm flex flex-col hover:shadow-lg transition duration-300 relative group">
+                            <div class="flex justify-between items-start mb-4">
+                                <div class="flex gap-3 items-center">
+                                    <div class="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center text-xl border border-slate-200 shadow-sm">${iconNicho}</div>
+                                    <div>
+                                        <h4 class="font-black text-slate-800 text-base leading-tight">${emp.nomeEmpresa}</h4>
+                                        <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Plano: <span class="text-blue-600">${emp.plano || 'BÁSICO'}</span></p>
+                                    </div>
                                 </div>
-                                <span class="status-tag ${status}">${status}</span>
+                                <div class="flex flex-col items-end gap-1.5">
+                                    ${statusServidor === 'online' 
+                                        ? '<span class="flex items-center gap-1.5 text-[9px] font-black uppercase text-emerald-600 bg-emerald-50 px-2 py-1 rounded border border-emerald-200"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Robô ON</span>' 
+                                        : '<span class="flex items-center gap-1.5 text-[9px] font-black uppercase text-slate-500 bg-slate-100 px-2 py-1 rounded border border-slate-200"><span class="w-2 h-2 rounded-full bg-slate-400"></span> Robô OFF</span>'}
+                                    ${badgeConta}
+                                </div>
                             </div>
-                            <div class="log-window">
-                                > [${new Date().toLocaleTimeString()}] Sistema pronto.<br>
-                                > [Status] ${premium ? (status === 'online' ? 'Conectado à IA.' : 'Aguardando QR Code...') : 'Conectado à Central.'}
+                            
+                            <div class="text-xs text-slate-600 mb-5 flex-1 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                <p class="mb-1.5 flex items-center"><i class="fa-brands fa-whatsapp text-emerald-500 w-5 text-center text-sm"></i> <span class="font-mono font-bold">${emp.whatsappLojista || 'Não configurado'}</span></p>
+                                <p class="flex items-center"><i class="fa-solid fa-envelope text-slate-400 w-5 text-center"></i> <span class="truncate">${emp.email || 'N/A'}</span></p>
                             </div>
-                            <div class="card-actions">
-                                <button class="btn btn-edit" onclick="abrirModal('${emp.id}')">⚙️ Editar Conta</button>
-                                <button class="btn btn-danger" onclick="excluirEmpresa('${emp.id}', '${emp.nomeEmpresa}')" style="flex:0; padding: 10px 12px;">🗑️</button>
+
+                            <div class="grid grid-cols-2 gap-3 mt-auto">
+                                <button onclick="window.abrirModal('${emp.id}')" class="bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white font-bold py-2.5 rounded-xl text-xs transition border border-blue-200 shadow-sm flex justify-center items-center gap-1.5"><i class="fa-solid fa-gear"></i> Gerenciar</button>
+                                <button onclick="window.excluirEmpresa('${emp.id}', '${emp.nomeEmpresa}')" class="bg-white hover:bg-red-50 text-red-500 font-bold py-2.5 rounded-xl text-xs transition border border-red-200 shadow-sm flex justify-center items-center gap-1.5"><i class="fa-solid fa-trash"></i> Remover</button>
                             </div>
                         </div>
                     `;
                 }
             });
-            if(!temP) divP.innerHTML = '<p style="text-align: center; color: #999;">Nenhuma solicitação nova.</p>';
-        }
+
+            if(qtdPendentes === 0) {
+                divP.innerHTML = '<p class="text-center text-slate-400 text-sm font-bold p-8 bg-white rounded-2xl border border-slate-200 border-dashed">Nenhuma solicitação pendente no momento.</p>';
+                document.getElementById('badgeNotificacao').style.display = 'none';
+            } else {
+                document.getElementById('badgeNotificacao').style.display = 'block';
+            }
+
+            document.getElementById('statTotal').innerText = qtdTotal;
+            document.getElementById('statAtivos').innerText = qtdAtivos;
+            document.getElementById('statPremium').innerText = qtdPremium;
+            document.getElementById('statPendentes').innerText = qtdPendentes;
+        };
+
+        window.filtrarSaaS = () => { window.renderizarPainel(); };
 
         window.aprovarCliente = async (id) => {
             const plano = document.getElementById('plano-'+id).value;
-            if(confirm("Confirmar aprovação?")) {
-                const status = plano === 'basico' ? 'ativo_central' : 'offline';
-                await updateDoc(doc(db, "empresas", id), { statusRobo: status, plano: plano });
+            if(confirm("Confirmar aprovação deste cliente?")) {
+                await updateDoc(doc(db, "empresas", id), { 
+                    statusRobo: 'ativo_central', 
+                    plano: plano,
+                    statusConta: 'ativo',
+                    nicho: 'outro' 
+                });
             }
         };
 
         window.excluirEmpresa = async (id, nome) => {
-            if(confirm(`Excluir permanentemente "${nome}"?`)) {
+            if(prompt(`Para excluir permanentemente "${nome}" digite APAGAR:`) === "APAGAR") {
                 await deleteDoc(doc(db, "empresas", id));
             }
         };
 
         window.abrirModal = (id) => {
             const emp = listaEmpresas.find(e => e.id === id);
-            window.empresaEmEdicao = emp; // Salva para usarmos no momento de salvar
+            window.empresaEmEdicao = emp; 
             
             document.getElementById('editEmpresaId').value = emp.id;
+            document.getElementById('txtClienteId').innerText = emp.id;
             document.getElementById('nomeRoboEdit').innerText = emp.nomeEmpresa;
-            document.getElementById('editPlanoConta').value = emp.plano || 'basico'; // Carrega o plano atual
+            
+            document.getElementById('editNicho').value = emp.nicho || 'outro';
+            document.getElementById('editPlanoConta').value = emp.plano || 'BASICO'; 
+            document.getElementById('editStatusConta').value = emp.statusConta || 'ativo'; 
             document.getElementById('editZapLoja').value = emp.whatsappLojista || '';
             
             if(emp.menu) {
@@ -211,18 +387,17 @@
 
         window.fecharModal = () => document.getElementById('modalEmpresa').style.display = 'none';
 
+        window.copiarIdSaaS = () => {
+            const id = document.getElementById('txtClienteId').innerText;
+            navigator.clipboard.writeText(id).then(() => alert("ID Copiado com sucesso!"));
+        };
+
         window.salvarConfiguracao = async () => {
             const id = document.getElementById('editEmpresaId').value;
             const zap = document.getElementById('editZapLoja').value.replace(/\D/g, '');
             const novoPlano = document.getElementById('editPlanoConta').value;
-            const emp = window.empresaEmEdicao;
-
-            // Inteligência de troca de plano:
-            let novoStatus = emp.statusRobo;
-            if (emp.plano !== novoPlano) {
-                // Se mudou para básico, já fica online pela central. Se mudou para premium, fica offline até ler o QR Code.
-                novoStatus = (novoPlano === 'basico') ? 'ativo_central' : 'offline';
-            }
+            const novoStatusConta = document.getElementById('editStatusConta').value;
+            const novoNicho = document.getElementById('editNicho').value;
 
             const menu = {
                 saudacao: document.getElementById('menuSaudacao').value,
@@ -234,11 +409,41 @@
                 whatsappLojista: zap, 
                 menu: menu,
                 plano: novoPlano,
-                statusRobo: novoStatus
+                statusConta: novoStatusConta,
+                nicho: novoNicho
             });
             
-            fecharModal();
-            alert("✅ Atualizado! Plano e configurações salvas com sucesso.");
+            window.fecharModal();
+            alert("✅ Ficha atualizada com sucesso!");
+        };
+
+        // --- SISTEMA DE COMUNICADO GLOBAL (BROADCAST) ---
+        window.enviarAvisoGlobal = async (tipo) => {
+            const msg = document.getElementById('msgGlobalSaaS').value.trim();
+            if(!msg) return alert("Digite uma mensagem primeiro!");
+            if(!confirm(`Deseja enviar este comunicado para TODOS os sistemas dos clientes?`)) return;
+
+            try {
+                // Salva a mensagem em um documento global que os sistemas clientes podem "escutar"
+                await setDoc(doc(db, "config", "comunicado_global"), {
+                    mensagem: msg,
+                    tipo: tipo, // 'info' ou 'urgente'
+                    data_envio: new Date().toISOString(),
+                    ativo: true
+                });
+                alert("✅ Comunicado enviado! Os sistemas dos clientes exibirão o aviso na tela.");
+                document.getElementById('msgGlobalSaaS').value = "";
+            } catch(e) {
+                alert("Erro ao enviar comunicado: " + e.message);
+            }
+        };
+
+        window.limparAvisosGlobais = async () => {
+            if(!confirm("Remover o comunicado atual da tela dos clientes?")) return;
+            try {
+                await setDoc(doc(db, "config", "comunicado_global"), { ativo: false }, { merge: true });
+                alert("Telas limpas!");
+            } catch(e) {}
         };
     </script>
 </body>
