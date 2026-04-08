@@ -14,8 +14,6 @@
         .modal-fundo { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.8); z-index: 9999; justify-content: center; align-items: center; padding: 1rem; backdrop-filter: blur(4px); }
         .glow-blue { box-shadow: 0 4px 14px 0 rgba(37, 99, 235, 0.39); }
         .tela-oculta { display: none !important; }
-        
-        /* Spinner de Carregamento */
         .loader { border: 3px solid #f3f3f3; border-top: 3px solid #2563eb; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
@@ -170,7 +168,7 @@
                             <thead class="bg-slate-100 text-slate-600 font-bold uppercase text-[10px]">
                                 <tr>
                                     <th class="p-4">Cliente / Sistema</th>
-                                    <th class="p-4">Plano</th>
+                                    <th class="p-4">Vencimento</th>
                                     <th class="p-4 text-center">Cobrança Mensal</th>
                                     <th class="p-4 text-center">Status Conta</th>
                                     <th class="p-4 text-center">Ações</th>
@@ -267,16 +265,22 @@
                             </select>
                         </div>
                         
-                        <div>
-                            <label class="text-[10px] md:text-xs font-bold text-slate-700 mb-1 block">Formato da Sua Cobrança:</label>
-                            <select id="editTipoCobranca" class="w-full p-3 bg-white border border-slate-300 rounded-xl text-xs md:text-sm font-bold outline-none focus:border-blue-500 transition shadow-sm">
-                                <option value="fixo">💰 Valor Fixo Mensal (R$)</option>
-                                <option value="porcentagem">📊 Porcentagem de Arrecadação (%)</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="text-[10px] md:text-xs font-bold text-slate-700 mb-1 block">Valor ou Percentual (Apenas Número):</label>
-                            <input type="number" id="editValorCobranca" step="0.01" placeholder="Ex: 150 ou 10" class="w-full p-3 bg-white border border-slate-300 rounded-xl text-xs md:text-sm font-bold outline-none focus:border-blue-500 transition shadow-sm">
+                        <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="text-[10px] md:text-xs font-bold text-slate-700 mb-1 block">Formato da Cobrança:</label>
+                                <select id="editTipoCobranca" class="w-full p-3 bg-white border border-slate-300 rounded-xl text-xs md:text-sm font-bold outline-none focus:border-blue-500 transition shadow-sm">
+                                    <option value="fixo">💰 Valor Fixo Mensal</option>
+                                    <option value="porcentagem">📊 Porcentagem (%)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-[10px] md:text-xs font-bold text-slate-700 mb-1 block">Valor ou Percentual:</label>
+                                <input type="number" id="editValorCobranca" step="0.01" placeholder="Ex: 150 ou 10" class="w-full p-3 bg-white border border-slate-300 rounded-xl text-xs md:text-sm font-bold outline-none focus:border-blue-500 transition shadow-sm">
+                            </div>
+                            <div>
+                                <label class="text-[10px] md:text-xs font-bold text-slate-700 mb-1 block">Dia do Vencimento:</label>
+                                <input type="number" id="editDiaVencimento" min="1" max="31" placeholder="Ex: 10" class="w-full p-3 bg-white border border-slate-300 rounded-xl text-xs md:text-sm font-bold outline-none focus:border-blue-500 transition shadow-sm">
+                            </div>
                         </div>
 
                         <div class="md:col-span-2">
@@ -422,6 +426,7 @@
                     const statusConta = emp.statusConta || 'ativo'; 
                     const tipoCobranca = emp.tipoCobranca || 'fixo';
                     const valorCobranca = parseFloat(emp.valorCobranca) || 0;
+                    const diaVenc = emp.diaVencimento || 10;
                     
                     let exibicaoValor = "";
                     if (tipoCobranca === 'fixo') {
@@ -440,7 +445,7 @@
                     faturamentoHtml += `
                         <tr class="hover:bg-slate-50 transition border-b border-slate-100">
                             <td class="p-4 font-black text-slate-800">${emp.nomeEmpresa || 'Sem Nome'} <br><span class="text-[9px] font-normal text-slate-400 font-mono">${emp.whatsappLojista || 'S/ Tel'}</span></td>
-                            <td class="p-4 text-xs font-bold text-blue-600">${planoStr}</td>
+                            <td class="p-4 text-xs font-bold text-slate-600">Dia ${diaVenc}</td>
                             <td class="p-4 text-center font-black text-emerald-600">${exibicaoValor}</td>
                             <td class="p-4 text-center"><span class="px-2 py-1 rounded-md text-[9px] font-black uppercase ${corStatusFat}">${statusConta}</span></td>
                             <td class="p-4 text-center">
@@ -506,6 +511,7 @@
                                 
                                 <div class="text-xs text-slate-600 mb-5 flex-1 bg-slate-50 p-3 rounded-xl border border-slate-100">
                                     <p class="flex items-center"><i class="fa-brands fa-whatsapp text-emerald-500 w-5 text-center text-sm"></i> <span class="font-mono font-bold">${emp.whatsappLojista || 'S/ Contato'}</span></p>
+                                    <p class="flex items-center mt-1 text-[10px] text-gray-500"><i class="fa-regular fa-calendar text-gray-400 w-5 text-center"></i> Vencimento: Dia ${diaVenc}</p>
                                 </div>
 
                                 <div class="grid grid-cols-2 gap-3 mt-auto">
@@ -533,7 +539,7 @@
                 document.getElementById('statTotal').innerText = qtdTotal;
                 document.getElementById('statAtivos').innerText = qtdAtivos;
                 document.getElementById('statPremium').innerText = qtdPremium;
-                document.getElementById('statPendentes').innerText = qtdInadimplentes; // Alterado para mostrar inadimplentes no Card Vermelho
+                document.getElementById('statPendentes').innerText = qtdInadimplentes; 
                 document.getElementById('statInadimplentes').innerText = clientesInadimplentes + clientesBloqueados;
 
                 document.getElementById('mrrEstimado').innerText = `R$ ${mrrTotal.toFixed(2).replace('.',',')}`;
@@ -559,6 +565,7 @@
                 document.getElementById('editStatusConta').value = 'ativo'; 
                 document.getElementById('editTipoCobranca').value = 'fixo';
                 document.getElementById('editValorCobranca').value = '';
+                document.getElementById('editDiaVencimento').value = '10'; // Padrão dia 10
                 document.getElementById('editZapLoja').value = '';
                 
                 document.getElementById('modalEmpresa').style.display = 'flex';
@@ -579,6 +586,7 @@
                 document.getElementById('editStatusConta').value = emp.statusConta || 'ativo'; 
                 document.getElementById('editTipoCobranca').value = emp.tipoCobranca || 'fixo';
                 document.getElementById('editValorCobranca').value = emp.valorCobranca || 0;
+                document.getElementById('editDiaVencimento').value = emp.diaVencimento || 10;
                 document.getElementById('editZapLoja').value = emp.whatsappLojista || '';
                 
                 document.getElementById('modalEmpresa').style.display = 'flex';
@@ -598,20 +606,18 @@
                     statusConta: document.getElementById('editStatusConta').value,
                     nicho: document.getElementById('editNicho').value,
                     tipoCobranca: document.getElementById('editTipoCobranca').value,
-                    valorCobranca: parseFloat(document.getElementById('editValorCobranca').value) || 0
+                    valorCobranca: parseFloat(document.getElementById('editValorCobranca').value) || 0,
+                    diaVencimento: parseInt(document.getElementById('editDiaVencimento').value) || 10
                 };
                 
                 try {
                     if (id) {
-                        // Atualiza Existente
-                        // Se o cliente estava 'pendente', forçamos status ativo_central pra sumir da fila de cima
                         if(window.empresaEmEdicao && window.empresaEmEdicao.statusRobo === 'pendente') {
                             dadosParaSalvar.statusRobo = 'ativo_central';
                         }
                         await updateDoc(doc(db, "empresas", id), dadosParaSalvar);
                         alert("✅ Ficha de cliente atualizada com sucesso!");
                     } else {
-                        // Cria Novo Cliente Manualmente
                         dadosParaSalvar.dataCadastro = new Date().toISOString();
                         dadosParaSalvar.statusRobo = 'ativo_central'; 
                         
