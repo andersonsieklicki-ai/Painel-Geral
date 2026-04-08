@@ -2,13 +2,13 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Master Admin SaaS - Central Omnichannel</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; -webkit-tap-highlight-color: transparent; }
         .scroll-suave::-webkit-scrollbar { width: 6px; height: 6px; }
         .scroll-suave::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         .modal-fundo { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.75); z-index: 100; justify-content: center; align-items: center; padding: 1rem; backdrop-filter: blur(4px); }
@@ -16,6 +16,8 @@
         .glow-blue { box-shadow: 0 4px 14px 0 rgba(37, 99, 235, 0.39); }
         .glow-red { box-shadow: 0 4px 14px 0 rgba(239, 68, 68, 0.39); }
         .glow-emerald { box-shadow: 0 4px 14px 0 rgba(16, 185, 129, 0.39); }
+        .tela-oculta { display: none !important; }
+        .conteudo-principal { padding-bottom: 80px; } /* Espaço para o menu mobile */
     </style>
 </head>
 <body class="flex h-screen overflow-hidden text-slate-800">
@@ -32,10 +34,15 @@
         </div>
         
         <nav class="flex-1 p-4 space-y-2 overflow-y-auto scroll-suave text-sm font-medium">
-            <button class="w-full flex items-center p-3 rounded-xl bg-blue-600 text-white transition glow-blue"><i class="fa-solid fa-chart-line w-6"></i> Dashboard</button>
-            <button class="w-full flex items-center p-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition"><i class="fa-solid fa-users w-6"></i> Clientes</button>
-            <button class="w-full flex items-center p-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition"><i class="fa-solid fa-file-invoice-dollar w-6"></i> Faturamento</button>
-            <button class="w-full flex items-center p-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition" onclick="document.getElementById('sessaoComunicado').scrollIntoView({behavior: 'smooth'})"><i class="fa-solid fa-bullhorn w-6"></i> Comunicados</button>
+            <button onclick="window.mudarAbaSaaS('aba-dashboard', this)" class="menu-btn w-full flex items-center p-3 rounded-xl bg-blue-600 text-white transition glow-blue">
+                <i class="fa-solid fa-chart-line w-6"></i> Dashboard / Clientes
+            </button>
+            <button onclick="window.mudarAbaSaaS('aba-faturamento', this)" class="menu-btn w-full flex items-center p-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition">
+                <i class="fa-solid fa-file-invoice-dollar w-6"></i> Faturamento SaaS
+            </button>
+            <button onclick="window.mudarAbaSaaS('aba-comunicados', this)" class="menu-btn w-full flex items-center p-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition">
+                <i class="fa-solid fa-bullhorn w-6"></i> Comunicados
+            </button>
         </nav>
         
         <div class="p-4 border-t border-slate-800 bg-slate-900">
@@ -49,16 +56,18 @@
         </div>
     </aside>
 
-    <main class="flex-1 flex flex-col h-screen overflow-hidden bg-slate-50">
+    <main class="flex-1 flex flex-col h-screen overflow-hidden bg-slate-50 relative">
         
-        <header class="bg-white border-b border-slate-200 p-4 flex justify-between items-center shadow-sm z-10">
+        <header class="bg-white border-b border-slate-200 p-4 flex justify-between items-center shadow-sm z-10 h-16">
             <div class="flex items-center gap-4">
-                <button class="md:hidden text-slate-500 hover:text-blue-600"><i class="fa-solid fa-bars text-xl"></i></button>
-                <h2 class="text-lg font-black text-slate-800 hidden sm:block">Visão Geral do Sistema</h2>
+                <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white md:hidden shadow-md">
+                    <i class="fa-solid fa-server text-sm"></i>
+                </div>
+                <h2 class="text-lg font-black text-slate-800 hidden sm:block" id="tituloAbaTop">Visão Geral do Sistema</h2>
             </div>
             <div class="relative w-full max-w-md hidden sm:block">
                 <i class="fa-solid fa-search absolute left-3 top-3 text-slate-400 text-sm"></i>
-                <input type="text" id="buscaSaaS" onkeyup="window.filtrarSaaS()" placeholder="Buscar cliente por nome ou WhatsApp..." class="w-full pl-9 pr-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-sm outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100 transition">
+                <input type="text" id="buscaSaaS" onkeyup="window.filtrarSaaS()" placeholder="Buscar cliente por nome ou WhatsApp..." class="w-full pl-9 pr-4 py-2 bg-slate-100 border border-slate-200 rounded-xl text-sm outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100 transition">
             </div>
             <div class="flex items-center gap-4">
                 <button class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center relative hover:bg-blue-100 transition border border-blue-100">
@@ -68,148 +77,209 @@
             </div>
         </header>
 
-        <div class="flex-1 overflow-y-auto p-4 md:p-8 scroll-suave">
+        <div class="flex-1 overflow-y-auto p-3 md:p-8 scroll-suave conteudo-principal md:pb-8">
             
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-center hover:border-blue-300 transition">
-                    <div class="flex justify-between items-start mb-2">
-                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total de Clientes</p>
-                        <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center"><i class="fa-solid fa-users"></i></div>
+            <div class="relative w-full mb-4 sm:hidden">
+                <i class="fa-solid fa-search absolute left-3 top-3.5 text-slate-400 text-sm"></i>
+                <input type="text" id="buscaSaaSMobile" onkeyup="window.filtrarSaaSMobile()" placeholder="Buscar cliente..." class="w-full pl-9 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:border-blue-500 shadow-sm transition">
+            </div>
+
+            <div id="aba-dashboard" class="conteudo-aba">
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-6 md:mb-8">
+                    <div class="bg-white p-4 md:p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-center hover:border-blue-300 transition">
+                        <div class="flex justify-between items-start mb-2">
+                            <p class="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wider">Total Clientes</p>
+                            <div class="w-6 h-6 md:w-8 md:h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xs md:text-base"><i class="fa-solid fa-users"></i></div>
+                        </div>
+                        <h3 class="text-2xl md:text-3xl font-black text-slate-800" id="statTotal">0</h3>
                     </div>
-                    <h3 class="text-3xl font-black text-slate-800" id="statTotal">0</h3>
+                    <div class="bg-white p-4 md:p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-center hover:border-emerald-300 transition">
+                        <div class="flex justify-between items-start mb-2">
+                            <p class="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wider">Robôs Ativos</p>
+                            <div class="w-6 h-6 md:w-8 md:h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-xs md:text-base"><i class="fa-solid fa-robot"></i></div>
+                        </div>
+                        <h3 class="text-2xl md:text-3xl font-black text-slate-800" id="statAtivos">0</h3>
+                    </div>
+                    <div class="bg-white p-4 md:p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-center hover:border-purple-300 transition">
+                        <div class="flex justify-between items-start mb-2">
+                            <p class="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wider">Contas Premium</p>
+                            <div class="w-6 h-6 md:w-8 md:h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center text-xs md:text-base"><i class="fa-solid fa-crown"></i></div>
+                        </div>
+                        <h3 class="text-2xl md:text-3xl font-black text-slate-800" id="statPremium">0</h3>
+                    </div>
+                    <div class="bg-white p-4 md:p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-center hover:border-red-300 transition">
+                        <div class="flex justify-between items-start mb-2">
+                            <p class="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wider">Pendências</p>
+                            <div class="w-6 h-6 md:w-8 md:h-8 rounded-lg bg-red-50 text-red-600 flex items-center justify-center text-xs md:text-base"><i class="fa-solid fa-clock"></i></div>
+                        </div>
+                        <h3 class="text-2xl md:text-3xl font-black text-slate-800" id="statPendentes">0</h3>
+                    </div>
                 </div>
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-center hover:border-emerald-300 transition">
-                    <div class="flex justify-between items-start mb-2">
-                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Robôs Ativos</p>
-                        <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center"><i class="fa-solid fa-robot"></i></div>
+
+                <div class="mb-6 md:mb-8" id="containerPendentes">
+                    <h3 class="text-base md:text-lg font-black text-slate-800 mb-3 flex items-center gap-2"><i class="fa-solid fa-bell text-amber-500"></i> Novas Solicitações</h3>
+                    <div class="flex flex-col gap-3" id="painelPendentes">
+                        <p class="text-center text-slate-400 text-sm font-bold p-8 bg-white rounded-2xl border border-slate-200 border-dashed">Conectando ao Firebase...</p>
                     </div>
-                    <h3 class="text-3xl font-black text-slate-800" id="statAtivos">0</h3>
                 </div>
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-center hover:border-purple-300 transition">
-                    <div class="flex justify-between items-start mb-2">
-                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Planos Premium</p>
-                        <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center"><i class="fa-solid fa-crown"></i></div>
-                    </div>
-                    <h3 class="text-3xl font-black text-slate-800" id="statPremium">0</h3>
-                </div>
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-center hover:border-red-300 transition">
-                    <div class="flex justify-between items-start mb-2">
-                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Pendências</p>
-                        <div class="w-8 h-8 rounded-lg bg-red-50 text-red-600 flex items-center justify-center"><i class="fa-solid fa-clock"></i></div>
-                    </div>
-                    <h3 class="text-3xl font-black text-slate-800" id="statPendentes">0</h3>
+
+                <div>
+                    <h3 class="text-base md:text-lg font-black text-slate-800 mb-3 flex items-center gap-2"><i class="fa-solid fa-building-circle-check text-blue-600"></i> Carteira de Clientes SaaS</h3>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6" id="painelAtivos">
+                        </div>
                 </div>
             </div>
 
-            <div class="mb-8" id="containerPendentes">
-                <h3 class="text-lg font-black text-slate-800 mb-4 flex items-center gap-2"><i class="fa-solid fa-bell text-amber-500"></i> Novas Solicitações de Assinatura</h3>
-                <div class="flex flex-col gap-3" id="painelPendentes">
-                    <p class="text-center text-slate-400 text-sm font-bold p-8 bg-white rounded-2xl border border-slate-200 border-dashed">Conectando ao Firebase...</p>
-                </div>
-            </div>
-
-            <div class="mb-8">
-                <h3 class="text-lg font-black text-slate-800 mb-4 flex items-center gap-2"><i class="fa-solid fa-building-circle-check text-blue-600"></i> Carteira de Clientes SaaS</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" id="painelAtivos">
-                    </div>
-            </div>
-
-            <div id="sessaoComunicado" class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-slate-200 mb-8">
-                <div class="flex items-center gap-3 mb-2">
-                    <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-lg"><i class="fa-solid fa-bullhorn"></i></div>
-                    <div>
-                        <h3 class="font-black text-lg text-slate-800">Comunicado Global SaaS</h3>
-                        <p class="text-xs text-slate-500 font-medium">Dispare um aviso na tela de todos os sistemas dos seus clientes.</p>
-                    </div>
-                </div>
+            <div id="aba-faturamento" class="conteudo-aba tela-oculta">
+                <h3 class="text-xl md:text-2xl font-black text-slate-800 mb-6 flex items-center gap-2"><i class="fa-solid fa-sack-dollar text-emerald-500"></i> Faturamento Mensal (MRR)</h3>
                 
-                <textarea id="msgGlobalSaaS" rows="3" class="w-full mt-4 p-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition resize-none" placeholder="Ex: Olá! Informamos que a partir do próximo mês o plano PLUS terá novas funções..."></textarea>
-                
-                <div class="flex flex-wrap gap-3 mt-4">
-                    <button onclick="window.enviarAvisoGlobal('info')" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl font-bold text-sm transition glow-blue flex items-center gap-2"><i class="fa-solid fa-circle-info"></i> Informativo</button>
-                    <button onclick="window.enviarAvisoGlobal('urgente')" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2.5 rounded-xl font-bold text-sm transition glow-red flex items-center gap-2"><i class="fa-solid fa-triangle-exclamation"></i> Urgente / Reajuste</button>
-                    <button onclick="window.limparAvisosGlobais()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-6 py-2.5 rounded-xl font-bold text-sm transition flex items-center gap-2 border border-slate-300"><i class="fa-solid fa-eraser"></i> Limpar Telas</button>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="bg-gradient-to-br from-emerald-500 to-emerald-700 p-6 rounded-2xl shadow-lg text-white">
+                        <p class="text-xs font-bold text-emerald-100 uppercase tracking-widest mb-1">Receita Recorrente Estimada</p>
+                        <h3 class="text-4xl font-black" id="mrrEstimado">R$ 0,00</h3>
+                        <p class="text-xs mt-2 text-emerald-50 opacity-80">Baseado nos planos ativos.</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-center">
+                        <p class="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Contas em Dia</p>
+                        <h3 class="text-2xl md:text-3xl font-black text-blue-600" id="qtdEmDia">0</h3>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-center">
+                        <p class="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Inadimplentes / Bloqueados</p>
+                        <h3 class="text-2xl md:text-3xl font-black text-red-600" id="qtdInadimplente">0</h3>
+                    </div>
+                </div>
+
+                <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+                    <div class="p-4 border-b border-slate-100 bg-slate-50">
+                        <h4 class="font-black text-slate-700"><i class="fa-solid fa-list-check mr-2"></i>Controle de Mensalidades (Clientes)</h4>
+                    </div>
+                    <div class="overflow-x-auto w-full scroll-suave">
+                        <table class="w-full text-left text-sm whitespace-nowrap min-w-[600px]">
+                            <thead class="bg-slate-100 text-slate-600 font-bold uppercase text-[10px]">
+                                <tr>
+                                    <th class="p-4">Cliente / Associação</th>
+                                    <th class="p-4">Plano</th>
+                                    <th class="p-4 text-center">Valor (Est.)</th>
+                                    <th class="p-4 text-center">Status Fatura</th>
+                                    <th class="p-4 text-center">Ações Rápidas</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabelaFaturamento" class="divide-y divide-slate-100">
+                                <tr><td colspan="5" class="p-8 text-center text-slate-500 font-bold">Carregando dados financeiros...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="aba-comunicados" class="conteudo-aba tela-oculta">
+                <div class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-slate-200">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-lg"><i class="fa-solid fa-bullhorn"></i></div>
+                        <div>
+                            <h3 class="font-black text-lg text-slate-800">Comunicado Global SaaS</h3>
+                            <p class="text-xs text-slate-500 font-medium">Dispare um aviso na tela de todos os sistemas dos seus clientes.</p>
+                        </div>
+                    </div>
+                    
+                    <textarea id="msgGlobalSaaS" rows="5" class="w-full mt-4 p-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition resize-none" placeholder="Ex: Olá! Informamos que a partir do próximo mês o plano PLUS terá novas funções..."></textarea>
+                    
+                    <div class="flex flex-col sm:flex-row gap-3 mt-4">
+                        <button onclick="window.enviarAvisoGlobal('info')" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-bold text-sm transition glow-blue flex justify-center items-center gap-2"><i class="fa-solid fa-circle-info"></i> Enviar Informativo</button>
+                        <button onclick="window.enviarAvisoGlobal('urgente')" class="flex-1 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl font-bold text-sm transition glow-red flex justify-center items-center gap-2"><i class="fa-solid fa-triangle-exclamation"></i> Aviso de Reajuste</button>
+                        <button onclick="window.limparAvisosGlobais()" class="sm:flex-none bg-slate-200 hover:bg-slate-300 text-slate-700 px-6 py-3 rounded-xl font-bold text-sm transition flex justify-center items-center gap-2 border border-slate-300"><i class="fa-solid fa-eraser"></i> Limpar Telas</button>
+                    </div>
                 </div>
             </div>
 
         </div>
     </main>
 
+    <nav class="md:hidden fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-md border-t border-slate-200 flex justify-around items-center z-50 pb-2 pt-2 shadow-[0_-4px_15px_rgba(0,0,0,0.05)] px-1 gap-1">
+        <button onclick="window.mudarAbaSaaS('aba-dashboard', this)" class="mobile-nav-btn w-full min-w-[70px] p-2 flex flex-col items-center text-blue-700 bg-blue-50 rounded-xl transition-all">
+            <i class="fa-solid fa-users text-xl mb-1"></i><span class="text-[9px] font-black uppercase">Clientes</span>
+        </button>
+        <button onclick="window.mudarAbaSaaS('aba-faturamento', this)" class="mobile-nav-btn w-full min-w-[70px] p-2 flex flex-col items-center text-slate-400 bg-transparent rounded-xl transition-all">
+            <i class="fa-solid fa-sack-dollar text-xl mb-1"></i><span class="text-[9px] font-black uppercase">Faturas</span>
+        </button>
+        <button onclick="window.mudarAbaSaaS('aba-comunicados', this)" class="mobile-nav-btn w-full min-w-[70px] p-2 flex flex-col items-center text-slate-400 bg-transparent rounded-xl transition-all">
+            <i class="fa-solid fa-bullhorn text-xl mb-1"></i><span class="text-[9px] font-black uppercase">Avisos</span>
+        </button>
+    </nav>
+
     <div class="modal-fundo" id="modalEmpresa">
         <div class="bg-white rounded-3xl shadow-2xl w-[95%] md:w-full max-w-2xl mx-auto flex flex-col max-h-[90vh] overflow-hidden">
-            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+            <div class="p-5 md:p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
                 <div>
-                    <h2 class="text-xl font-black text-slate-800 flex items-center gap-2"><i class="fa-solid fa-user-gear text-blue-600"></i> Gestão do Cliente</h2>
-                    <p class="text-xs font-bold text-slate-500 mt-1" id="nomeRoboEdit">Nome da Empresa</p>
+                    <h2 class="text-lg md:text-xl font-black text-slate-800 flex items-center gap-2"><i class="fa-solid fa-user-gear text-blue-600"></i> Gestão do Cliente</h2>
+                    <p class="text-[10px] md:text-xs font-bold text-slate-500 mt-1" id="nomeRoboEdit">Nome da Empresa</p>
                 </div>
                 <button onclick="window.fecharModal()" class="w-8 h-8 rounded-full bg-slate-200 hover:bg-red-100 hover:text-red-600 text-slate-500 transition flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
             </div>
             
-            <div class="p-6 overflow-y-auto scroll-suave space-y-6">
+            <div class="p-5 md:p-6 overflow-y-auto scroll-suave space-y-5">
                 <input type="hidden" id="editEmpresaId">
                 
                 <div class="p-4 border border-slate-200 bg-slate-50 rounded-xl flex justify-between items-center">
                     <div>
                         <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">ID do Cliente SaaS</p>
-                        <p class="text-sm font-mono font-bold text-slate-800 mt-0.5" id="txtClienteId">ID_AQUI</p>
+                        <p class="text-xs md:text-sm font-mono font-bold text-slate-800 mt-0.5" id="txtClienteId">ID_AQUI</p>
                     </div>
-                    <button onclick="window.copiarIdSaaS()" class="bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition flex items-center gap-2"><i class="fa-solid fa-copy"></i> Copiar ID</button>
+                    <button onclick="window.copiarIdSaaS()" class="bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition flex items-center gap-2"><i class="fa-solid fa-copy"></i> <span class="hidden sm:inline">Copiar</span></button>
                 </div>
 
-                <div class="p-5 border border-blue-200 bg-blue-50/50 rounded-xl space-y-4">
-                    <h3 class="text-sm font-black text-blue-900 uppercase tracking-wider mb-2"><i class="fa-solid fa-id-card mr-2"></i>Licença e Assinatura</h3>
+                <div class="p-4 border border-blue-200 bg-blue-50/50 rounded-xl space-y-4">
+                    <h3 class="text-xs md:text-sm font-black text-blue-900 uppercase tracking-wider mb-2"><i class="fa-solid fa-id-card mr-2"></i>Licença e Assinatura</h3>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="text-xs font-bold text-slate-700 mb-1 block">Nicho do Sistema:</label>
-                            <select id="editNicho" class="w-full p-3 bg-white border border-slate-300 rounded-xl text-sm font-bold outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition shadow-sm">
-                                <option value="associacao">🛡️ Associação (Militar/Civil)</option>
+                            <label class="text-[10px] md:text-xs font-bold text-slate-700 mb-1 block">Nicho do Sistema:</label>
+                            <select id="editNicho" class="w-full p-2.5 md:p-3 bg-white border border-slate-300 rounded-xl text-xs md:text-sm font-bold outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition shadow-sm">
+                                <option value="associacao">🛡️ Associação / Militar</option>
                                 <option value="ctg">🐎 CTG / Piquete</option>
                                 <option value="loja">🛍️ Loja Comercial</option>
                                 <option value="outro">📦 Outros</option>
                             </select>
                         </div>
                         <div>
-                            <label class="text-xs font-bold text-slate-700 mb-1 block">Plano Contratado:</label>
-                            <select id="editPlanoConta" class="w-full p-3 bg-white border border-slate-300 rounded-xl text-sm font-bold outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition shadow-sm">
+                            <label class="text-[10px] md:text-xs font-bold text-slate-700 mb-1 block">Plano Contratado:</label>
+                            <select id="editPlanoConta" class="w-full p-2.5 md:p-3 bg-white border border-slate-300 rounded-xl text-xs md:text-sm font-bold outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition shadow-sm">
                                 <option value="BASICO">🥉 BÁSICO (Mensalidades)</option>
                                 <option value="PLUS">🥈 PLUS (+ CRM)</option>
                                 <option value="PREMIUM">🥇 PREMIUM (Tudo Liberado)</option>
                             </select>
                         </div>
                         <div class="md:col-span-2">
-                            <label class="text-xs font-bold text-slate-700 mb-1 block">Status Financeiro (Bloqueio Automático):</label>
-                            <select id="editStatusConta" class="w-full p-3 bg-white border border-slate-300 rounded-xl text-sm font-bold outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition shadow-sm">
+                            <label class="text-[10px] md:text-xs font-bold text-slate-700 mb-1 block">Status Financeiro (Bloqueio Automático):</label>
+                            <select id="editStatusConta" class="w-full p-2.5 md:p-3 bg-white border border-slate-300 rounded-xl text-xs md:text-sm font-bold outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition shadow-sm">
                                 <option value="ativo">✅ ATIVO (Acesso Liberado)</option>
-                                <option value="inadimplente">⚠️ INADIMPLENTE (Aviso na tela, acesso mantido)</option>
+                                <option value="inadimplente">⚠️ INADIMPLENTE (Aviso na tela)</option>
                                 <option value="bloqueado">🛑 SUSPENSO (Trava a tela e desliga o Robô)</option>
                             </select>
                         </div>
                     </div>
                 </div>
 
-                <div class="p-5 border border-slate-200 bg-white rounded-xl space-y-4 shadow-sm">
-                    <h3 class="text-sm font-black text-slate-800 uppercase tracking-wider mb-2"><i class="fa-brands fa-whatsapp text-emerald-500 mr-2"></i>Integração Robô / IA</h3>
+                <div class="p-4 border border-slate-200 bg-white rounded-xl space-y-4 shadow-sm">
+                    <h3 class="text-xs md:text-sm font-black text-slate-800 uppercase tracking-wider mb-2"><i class="fa-brands fa-whatsapp text-emerald-500 mr-2"></i>Integração Robô</h3>
                     
                     <div>
-                        <label class="text-xs font-bold text-slate-700 mb-1 block">WhatsApp do Cliente (DDD+Número):</label>
-                        <input type="text" id="editZapLoja" placeholder="Ex: 554699999999" class="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-mono outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 transition shadow-inner">
+                        <label class="text-[10px] md:text-xs font-bold text-slate-700 mb-1 block">WhatsApp do Cliente (DDD+Número):</label>
+                        <input type="text" id="editZapLoja" placeholder="Ex: 554699999999" class="w-full p-2.5 md:p-3 bg-slate-50 border border-slate-300 rounded-xl text-xs md:text-sm font-mono outline-none focus:border-emerald-500 transition shadow-inner">
                     </div>
 
                     <div>
-                        <label class="text-xs font-bold text-slate-700 mb-1 block">Mensagem Base da IA / Saudação:</label>
-                        <textarea id="menuSaudacao" rows="3" class="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 transition shadow-inner resize-none" placeholder="Olá! Sou a assistente virtual..."></textarea>
+                        <label class="text-[10px] md:text-xs font-bold text-slate-700 mb-1 block">Mensagem Base da IA / Saudação:</label>
+                        <textarea id="menuSaudacao" rows="3" class="w-full p-2.5 md:p-3 bg-slate-50 border border-slate-300 rounded-xl text-xs md:text-sm outline-none focus:border-emerald-500 transition shadow-inner resize-none" placeholder="Olá! Sou a assistente virtual..."></textarea>
                     </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 hidden">
-                        <div><input type="hidden" id="opt1Nome"><input type="hidden" id="opt1Resp"></div>
-                    </div>
+                    
+                    <div class="hidden"><input type="hidden" id="opt1Nome"><input type="hidden" id="opt1Resp"></div>
                 </div>
             </div>
 
-            <div class="p-5 border-t border-slate-200 bg-slate-50 flex gap-3 justify-end">
-                <button class="px-5 py-3 rounded-xl text-sm font-bold text-slate-600 bg-white border border-slate-300 hover:bg-slate-100 transition shadow-sm" onclick="window.fecharModal()">Cancelar</button>
-                <button class="px-8 py-3 rounded-xl text-sm font-bold text-white bg-blue-600 shadow-lg shadow-blue-600/30 hover:bg-blue-700 active:scale-95 transition flex items-center gap-2" onclick="window.salvarConfiguracao()"><i class="fa-solid fa-save"></i> Salvar Alterações</button>
+            <div class="p-4 border-t border-slate-200 bg-slate-50 flex gap-3 justify-end">
+                <button class="px-4 py-2.5 rounded-xl text-xs md:text-sm font-bold text-slate-600 bg-white border border-slate-300 hover:bg-slate-100 transition shadow-sm" onclick="window.fecharModal()">Cancelar</button>
+                <button class="px-6 py-2.5 rounded-xl text-xs md:text-sm font-bold text-white bg-blue-600 shadow-lg shadow-blue-600/30 hover:bg-blue-700 active:scale-95 transition flex items-center gap-2" onclick="window.salvarConfiguracao()"><i class="fa-solid fa-save"></i> Salvar</button>
             </div>
         </div>
     </div>
@@ -218,15 +288,14 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, onSnapshot, doc, updateDoc, deleteDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // CREDENCIAIS DA SUA CENTRAL OMNICHANNEL SAAS
+        // CREDENCIAIS DO MASTER SAAS
         const firebaseConfig = {
             apiKey: "AIzaSyC4-2LavZt7iWPt2u71u-yRUYbIJu-Vzf0",
             authDomain: "central-omnichannel-saas.firebaseapp.com",
             projectId: "central-omnichannel-saas",
             storageBucket: "central-omnichannel-saas.firebasestorage.app",
             messagingSenderId: "869327159480",
-            appId: "1:869327159480:web:605be5ec37ab688d44b44d",
-            measurementId: "G-984WSSJBHP"
+            appId: "1:869327159480:web:605be5ec37ab688d44b44d"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -234,6 +303,67 @@
         let listaEmpresas = [];
         window.empresaEmEdicao = null; 
 
+        // VALORES FICTÍCIOS DOS PLANOS (Para o cálculo de faturamento)
+        const PRECOS_PLANOS = { 'BASICO': 97.00, 'PLUS': 147.00, 'PREMIUM': 197.00 };
+
+        // =======================================================
+        // GESTÃO DE NAVEGAÇÃO DAS ABAS
+        // =======================================================
+        window.mudarAbaSaaS = (idAba, elemento) => {
+            // Esconde todas as abas
+            document.querySelectorAll('.conteudo-aba').forEach(aba => aba.classList.add('tela-oculta'));
+            // Mostra a aba alvo
+            document.getElementById(idAba).classList.remove('tela-oculta');
+
+            // Reset Botoes Desktop
+            document.querySelectorAll('.menu-btn').forEach(btn => {
+                btn.classList.remove('bg-blue-600', 'text-white', 'glow-blue');
+                btn.classList.add('text-slate-400');
+            });
+
+            // Reset Botoes Mobile
+            document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
+                btn.classList.remove('text-blue-700', 'bg-blue-50');
+                btn.classList.add('text-slate-400', 'bg-transparent');
+            });
+
+            // Ativa o botão clicado (identifica se é mobile ou desktop)
+            if(elemento) {
+                if (elemento.classList.contains('mobile-nav-btn')) {
+                    elemento.classList.add('text-blue-700', 'bg-blue-50');
+                    elemento.classList.remove('text-slate-400', 'bg-transparent');
+                    
+                    // Sincroniza o Desktop equivalente (gambiarra rápida baseada no ícone)
+                    const iconeClasses = elemento.querySelector('i').className;
+                    document.querySelectorAll('.menu-btn').forEach(deskBtn => {
+                        if(deskBtn.querySelector('i').className === iconeClasses) {
+                            deskBtn.classList.add('bg-blue-600', 'text-white', 'glow-blue');
+                            deskBtn.classList.remove('text-slate-400');
+                        }
+                    });
+                } else {
+                    elemento.classList.add('bg-blue-600', 'text-white', 'glow-blue');
+                    elemento.classList.remove('text-slate-400');
+                    
+                    // Sincroniza o Mobile equivalente
+                    const iconeClasses = elemento.querySelector('i').className;
+                    document.querySelectorAll('.mobile-nav-btn').forEach(mobBtn => {
+                        if(mobBtn.querySelector('i').className === iconeClasses) {
+                            mobBtn.classList.add('text-blue-700', 'bg-blue-50');
+                            mobBtn.classList.remove('text-slate-400', 'bg-transparent');
+                        }
+                    });
+                }
+                
+                // Muda o título do topo
+                let texto = elemento.innerText.trim().toUpperCase();
+                document.getElementById('tituloAbaTop').innerText = texto;
+            }
+        };
+
+        // =======================================================
+        // RENDERIZAÇÃO DO PAINEL
+        // =======================================================
         onSnapshot(collection(db, "empresas"), (snapshot) => {
             listaEmpresas = [];
             snapshot.forEach((doc) => { listaEmpresas.push({ id: doc.id, ...doc.data() }); });
@@ -246,21 +376,53 @@
             divP.innerHTML = ''; divA.innerHTML = '';
             
             let qtdTotal = 0, qtdAtivos = 0, qtdPremium = 0, qtdPendentes = 0;
-            const filtro = document.getElementById("buscaSaaS") ? document.getElementById("buscaSaaS").value.toLowerCase() : "";
+            let mrrTotal = 0, clientesEmDia = 0, clientesInadimplentes = 0;
+
+            const filtroDesktop = document.getElementById("buscaSaaS") ? document.getElementById("buscaSaaS").value.toLowerCase() : "";
+            const filtroMobile = document.getElementById("buscaSaaSMobile") ? document.getElementById("buscaSaaSMobile").value.toLowerCase() : "";
+            const filtro = filtroDesktop || filtroMobile;
 
             listaEmpresas.sort((a, b) => (a.nomeEmpresa || '').localeCompare(b.nomeEmpresa || ''));
+            let faturamentoHtml = "";
 
             listaEmpresas.forEach(emp => {
                 qtdTotal++;
+                
+                // Calculos de Faturamento
+                const planoStr = emp.plano || 'BASICO';
+                const valorPlano = PRECOS_PLANOS[planoStr] || 0;
+                const statusConta = emp.statusConta || 'ativo'; 
+                
+                if (statusConta === 'ativo') {
+                    mrrTotal += valorPlano;
+                    clientesEmDia++;
+                } else {
+                    clientesInadimplentes++;
+                }
+
+                // Construção Tabela de Faturamento
+                let corStatusFat = statusConta === 'ativo' ? 'bg-green-100 text-green-800' : (statusConta === 'inadimplente' ? 'bg-amber-100 text-amber-800' : 'bg-red-100 text-red-800');
+                faturamentoHtml += `
+                    <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+                        <td class="p-4 font-black text-slate-800">${emp.nomeEmpresa} <br><span class="text-[9px] font-normal text-slate-400 font-mono">${emp.whatsappLojista || 'S/ Tel'}</span></td>
+                        <td class="p-4 text-xs font-bold text-blue-600">${planoStr}</td>
+                        <td class="p-4 text-center font-black text-emerald-600">R$ ${valorPlano.toFixed(2).replace('.',',')}</td>
+                        <td class="p-4 text-center"><span class="px-2 py-1 rounded-md text-[9px] font-black uppercase ${corStatusFat}">${statusConta}</span></td>
+                        <td class="p-4 text-center">
+                            <button onclick="window.abrirModal('${emp.id}')" class="bg-slate-100 text-slate-600 hover:bg-slate-200 px-3 py-1.5 rounded-lg text-xs font-bold transition">Gerir</button>
+                        </td>
+                    </tr>
+                `;
+
                 const matchBusca = !filtro || (emp.nomeEmpresa && emp.nomeEmpresa.toLowerCase().includes(filtro)) || (emp.whatsappLojista && emp.whatsappLojista.includes(filtro));
 
                 if(emp.statusRobo === 'pendente') {
                     qtdPendentes++;
                     divP.innerHTML += `
-                        <div class="bg-amber-50 border border-amber-200 p-5 rounded-2xl flex flex-col md:flex-row justify-between md:items-center gap-4 shadow-sm border-l-4 border-l-amber-500">
+                        <div class="bg-amber-50 border border-amber-200 p-4 md:p-5 rounded-2xl flex flex-col md:flex-row justify-between md:items-center gap-4 shadow-sm border-l-4 border-l-amber-500">
                             <div>
-                                <h4 class="font-black text-amber-900 text-lg">${emp.nomeEmpresa}</h4>
-                                <p class="text-xs text-amber-700 font-bold mt-1"><i class="fa-solid fa-envelope mr-1"></i> ${emp.email || 'S/ Email'} &nbsp;|&nbsp; <i class="fa-brands fa-whatsapp text-emerald-600 mr-1"></i> ${emp.whatsappLojista || 'Não informado'} &nbsp;|&nbsp; <i class="fa-regular fa-calendar mr-1"></i> ${new Date(emp.dataCadastro || Date.now()).toLocaleDateString()}</p>
+                                <h4 class="font-black text-amber-900 text-base md:text-lg">${emp.nomeEmpresa}</h4>
+                                <p class="text-[10px] md:text-xs text-amber-700 font-bold mt-1"><i class="fa-solid fa-envelope mr-1"></i> ${emp.email || 'S/ Email'} &nbsp;|&nbsp; <i class="fa-brands fa-whatsapp text-emerald-600 mr-1"></i> ${emp.whatsappLojista || 'Não informado'} &nbsp;|&nbsp; <i class="fa-regular fa-calendar mr-1"></i> ${new Date(emp.dataCadastro || Date.now()).toLocaleDateString()}</p>
                             </div>
                             <div class="flex flex-wrap gap-2">
                                 <select id="plano-${emp.id}" class="p-2 border border-amber-300 rounded-lg text-xs font-bold text-amber-900 bg-white outline-none">
@@ -268,8 +430,8 @@
                                     <option value="PLUS">Plano PLUS</option>
                                     <option value="PREMIUM">Plano PREMIUM</option>
                                 </select>
-                                <button onclick="window.aprovarCliente('${emp.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition shadow glow-emerald"><i class="fa-solid fa-check mr-1"></i> Aprovar</button>
-                                <button onclick="window.excluirEmpresa('${emp.id}', '${emp.nomeEmpresa}')" class="bg-white border border-red-200 text-red-500 hover:bg-red-50 hover:text-red-700 px-3 py-2 rounded-lg transition shadow-sm"><i class="fa-solid fa-trash"></i></button>
+                                <button onclick="window.aprovarCliente('${emp.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs font-bold transition shadow glow-emerald"><i class="fa-solid fa-check mr-1"></i> Aprovar</button>
+                                <button onclick="window.excluirEmpresa('${emp.id}', '${emp.nomeEmpresa}')" class="bg-white border border-red-200 text-red-500 hover:bg-red-50 px-3 py-2 rounded-lg transition shadow-sm"><i class="fa-solid fa-trash"></i></button>
                             </div>
                         </div>
                     `;
@@ -278,7 +440,6 @@
                     if (statusServidor === 'online') qtdAtivos++;
                     if (emp.plano === 'PREMIUM') qtdPremium++;
 
-                    const statusConta = emp.statusConta || 'ativo'; 
                     let corCard = 'border-slate-200';
                     let badgeConta = '<span class="px-2 py-0.5 bg-blue-50 text-blue-600 rounded-md text-[9px] font-black uppercase border border-blue-200">Ativo</span>';
                     
@@ -296,31 +457,31 @@
                     if(emp.nicho === 'loja') iconNicho = '<i class="fa-solid fa-shop text-purple-500"></i>';
 
                     divA.innerHTML += `
-                        <div class="bg-white rounded-3xl p-5 border-2 ${corCard} shadow-sm flex flex-col hover:shadow-lg transition duration-300 relative group">
-                            <div class="flex justify-between items-start mb-4">
-                                <div class="flex gap-3 items-center">
-                                    <div class="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center text-xl border border-slate-200 shadow-sm">${iconNicho}</div>
+                        <div class="bg-white rounded-2xl md:rounded-3xl p-4 md:p-5 border-2 ${corCard} shadow-sm flex flex-col hover:shadow-md transition duration-300 relative group">
+                            <div class="flex justify-between items-start mb-3 md:mb-4">
+                                <div class="flex gap-2.5 md:gap-3 items-center">
+                                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-slate-50 flex items-center justify-center text-lg md:text-xl border border-slate-200 shadow-sm">${iconNicho}</div>
                                     <div>
-                                        <h4 class="font-black text-slate-800 text-base leading-tight">${emp.nomeEmpresa}</h4>
-                                        <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Plano: <span class="text-blue-600">${emp.plano || 'BÁSICO'}</span></p>
+                                        <h4 class="font-black text-slate-800 text-sm md:text-base leading-tight">${emp.nomeEmpresa}</h4>
+                                        <p class="text-[9px] md:text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Plano: <span class="text-blue-600">${emp.plano || 'BÁSICO'}</span></p>
                                     </div>
                                 </div>
                                 <div class="flex flex-col items-end gap-1.5">
                                     ${statusServidor === 'online' 
-                                        ? '<span class="flex items-center gap-1.5 text-[9px] font-black uppercase text-emerald-600 bg-emerald-50 px-2 py-1 rounded border border-emerald-200"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Robô ON</span>' 
-                                        : '<span class="flex items-center gap-1.5 text-[9px] font-black uppercase text-slate-500 bg-slate-100 px-2 py-1 rounded border border-slate-200"><span class="w-2 h-2 rounded-full bg-slate-400"></span> Robô OFF</span>'}
+                                        ? '<span class="flex items-center gap-1.5 text-[8px] md:text-[9px] font-black uppercase text-emerald-600 bg-emerald-50 px-1.5 py-0.5 md:px-2 md:py-1 rounded border border-emerald-200"><span class="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-emerald-500 animate-pulse"></span> ON</span>' 
+                                        : '<span class="flex items-center gap-1.5 text-[8px] md:text-[9px] font-black uppercase text-slate-500 bg-slate-100 px-1.5 py-0.5 md:px-2 md:py-1 rounded border border-slate-200"><span class="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-slate-400"></span> OFF</span>'}
                                     ${badgeConta}
                                 </div>
                             </div>
                             
-                            <div class="text-xs text-slate-600 mb-5 flex-1 bg-slate-50 p-3 rounded-xl border border-slate-100">
-                                <p class="mb-1.5 flex items-center"><i class="fa-brands fa-whatsapp text-emerald-500 w-5 text-center text-sm"></i> <span class="font-mono font-bold">${emp.whatsappLojista || 'Não configurado'}</span></p>
+                            <div class="text-[11px] md:text-xs text-slate-600 mb-4 md:mb-5 flex-1 bg-slate-50 p-2.5 md:p-3 rounded-xl border border-slate-100">
+                                <p class="mb-1.5 flex items-center"><i class="fa-brands fa-whatsapp text-emerald-500 w-5 text-center text-xs md:text-sm"></i> <span class="font-mono font-bold">${emp.whatsappLojista || 'Não configurado'}</span></p>
                                 <p class="flex items-center"><i class="fa-solid fa-envelope text-slate-400 w-5 text-center"></i> <span class="truncate">${emp.email || 'N/A'}</span></p>
                             </div>
 
-                            <div class="grid grid-cols-2 gap-3 mt-auto">
-                                <button onclick="window.abrirModal('${emp.id}')" class="bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white font-bold py-2.5 rounded-xl text-xs transition border border-blue-200 shadow-sm flex justify-center items-center gap-1.5"><i class="fa-solid fa-gear"></i> Gerenciar</button>
-                                <button onclick="window.excluirEmpresa('${emp.id}', '${emp.nomeEmpresa}')" class="bg-white hover:bg-red-50 text-red-500 font-bold py-2.5 rounded-xl text-xs transition border border-red-200 shadow-sm flex justify-center items-center gap-1.5"><i class="fa-solid fa-trash"></i> Remover</button>
+                            <div class="grid grid-cols-2 gap-2 md:gap-3 mt-auto">
+                                <button onclick="window.abrirModal('${emp.id}')" class="bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white font-bold py-2 md:py-2.5 rounded-lg md:rounded-xl text-[10px] md:text-xs transition border border-blue-200 shadow-sm flex justify-center items-center gap-1.5"><i class="fa-solid fa-gear"></i> Gerenciar</button>
+                                <button onclick="window.excluirEmpresa('${emp.id}', '${emp.nomeEmpresa}')" class="bg-white hover:bg-red-50 text-red-500 font-bold py-2 md:py-2.5 rounded-lg md:rounded-xl text-[10px] md:text-xs transition border border-red-200 shadow-sm flex justify-center items-center gap-1.5"><i class="fa-solid fa-trash"></i> Remover</button>
                             </div>
                         </div>
                     `;
@@ -328,19 +489,27 @@
             });
 
             if(qtdPendentes === 0) {
-                divP.innerHTML = '<p class="text-center text-slate-400 text-sm font-bold p-8 bg-white rounded-2xl border border-slate-200 border-dashed">Nenhuma solicitação pendente no momento.</p>';
+                divP.innerHTML = '<p class="text-center text-slate-400 text-xs md:text-sm font-bold p-6 md:p-8 bg-white rounded-2xl border border-slate-200 border-dashed">Nenhuma solicitação pendente.</p>';
                 document.getElementById('badgeNotificacao').style.display = 'none';
             } else {
                 document.getElementById('badgeNotificacao').style.display = 'block';
             }
 
+            // Atualiza Dashboard
             document.getElementById('statTotal').innerText = qtdTotal;
             document.getElementById('statAtivos').innerText = qtdAtivos;
             document.getElementById('statPremium').innerText = qtdPremium;
             document.getElementById('statPendentes').innerText = qtdPendentes;
+
+            // Atualiza Faturamento
+            document.getElementById('mrrEstimado').innerText = `R$ ${mrrTotal.toFixed(2).replace('.',',')}`;
+            document.getElementById('qtdEmDia').innerText = clientesEmDia;
+            document.getElementById('qtdInadimplente').innerText = clientesInadimplentes;
+            document.getElementById('tabelaFaturamento').innerHTML = faturamentoHtml || `<tr><td colspan="5" class="p-8 text-center text-slate-500 font-bold">Nenhum cliente para faturar.</td></tr>`;
         };
 
         window.filtrarSaaS = () => { window.renderizarPainel(); };
+        window.filtrarSaaSMobile = () => { window.renderizarPainel(); };
 
         window.aprovarCliente = async (id) => {
             const plano = document.getElementById('plano-'+id).value;
@@ -424,10 +593,9 @@
             if(!confirm(`Deseja enviar este comunicado para TODOS os sistemas dos clientes?`)) return;
 
             try {
-                // Salva a mensagem em um documento global que os sistemas clientes podem "escutar"
                 await setDoc(doc(db, "config", "comunicado_global"), {
                     mensagem: msg,
-                    tipo: tipo, // 'info' ou 'urgente'
+                    tipo: tipo, 
                     data_envio: new Date().toISOString(),
                     ativo: true
                 });
