@@ -63,10 +63,12 @@
                 </div>
                 <h2 class="text-lg font-black text-slate-800 hidden sm:block" id="tituloAbaTop">Dashboard</h2>
             </div>
+            
             <div class="relative w-full max-w-md hidden sm:block">
                 <i class="fa-solid fa-search absolute left-3 top-3 text-slate-400 text-sm"></i>
-                <input type="text" id="buscaSaaS" onkeyup="window.filtrarSaaS()" placeholder="Buscar cliente por nome ou WhatsApp..." class="w-full pl-9 pr-4 py-2 bg-slate-100 border border-slate-200 rounded-xl text-sm outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100 transition">
+                <input type="text" id="buscaSaaS" oninput="window.renderizarPainel()" placeholder="Buscar cliente por nome ou WhatsApp..." class="w-full pl-9 pr-4 py-2 bg-slate-100 border border-slate-200 rounded-xl text-sm outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100 transition">
             </div>
+            
             <div class="flex items-center gap-4">
                 <button class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center relative hover:bg-blue-100 transition border border-blue-100">
                     <i class="fa-solid fa-bell"></i>
@@ -79,34 +81,33 @@
             
             <div class="relative w-full mb-6 sm:hidden">
                 <i class="fa-solid fa-search absolute left-3 top-3.5 text-slate-400 text-sm"></i>
-                <input type="text" id="buscaSaaSMobile" onkeyup="window.filtrarSaaS()" placeholder="Buscar cliente..." class="w-full pl-9 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:border-blue-500 shadow-sm transition">
+                <input type="text" id="buscaSaaSMobile" oninput="window.renderizarPainel()" placeholder="Buscar cliente..." class="w-full pl-9 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:border-blue-500 shadow-sm transition">
             </div>
 
             <div id="aba-dashboard" class="conteudo-aba">
-                
                 <div class="grid grid-cols-2 xl:grid-cols-4 gap-3 md:gap-4 mb-6 md:mb-8">
-                    <div class="bg-white p-4 md:p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-center">
+                    <div class="bg-white p-4 md:p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-center hover:border-blue-300 transition">
                         <div class="flex justify-between items-start mb-2">
                             <p class="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wider">Total Clientes</p>
                             <div class="w-6 h-6 md:w-8 md:h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center"><i class="fa-solid fa-users"></i></div>
                         </div>
                         <h3 class="text-2xl md:text-3xl font-black text-slate-800" id="statTotal">0</h3>
                     </div>
-                    <div class="bg-white p-4 md:p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-center">
+                    <div class="bg-white p-4 md:p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-center hover:border-emerald-300 transition">
                         <div class="flex justify-between items-start mb-2">
                             <p class="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wider">Robôs Ativos</p>
                             <div class="w-6 h-6 md:w-8 md:h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center"><i class="fa-solid fa-robot"></i></div>
                         </div>
                         <h3 class="text-2xl md:text-3xl font-black text-slate-800" id="statAtivos">0</h3>
                     </div>
-                    <div class="bg-white p-4 md:p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-center">
+                    <div class="bg-white p-4 md:p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-center hover:border-purple-300 transition">
                         <div class="flex justify-between items-start mb-2">
                             <p class="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wider">Planos Premium</p>
                             <div class="w-6 h-6 md:w-8 md:h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center"><i class="fa-solid fa-crown"></i></div>
                         </div>
                         <h3 class="text-2xl md:text-3xl font-black text-slate-800" id="statPremium">0</h3>
                     </div>
-                    <div class="bg-white p-4 md:p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-center">
+                    <div class="bg-white p-4 md:p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-center hover:border-red-300 transition">
                         <div class="flex justify-between items-start mb-2">
                             <p class="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wider">Pendências</p>
                             <div class="w-6 h-6 md:w-8 md:h-8 rounded-lg bg-red-50 text-red-600 flex items-center justify-center"><i class="fa-solid fa-clock"></i></div>
@@ -130,13 +131,13 @@
             </div>
 
             <div id="aba-faturamento" class="conteudo-aba tela-oculta">
-                <h3 class="text-xl md:text-2xl font-black text-slate-800 mb-6 flex items-center gap-2"><i class="fa-solid fa-sack-dollar text-emerald-500"></i> Faturamento Mensal (MRR)</h3>
+                <h3 class="text-xl md:text-2xl font-black text-slate-800 mb-6 flex items-center gap-2"><i class="fa-solid fa-sack-dollar text-emerald-500"></i> Faturamento Mensal (SaaS)</h3>
                 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                     <div class="bg-gradient-to-br from-emerald-500 to-emerald-700 p-6 rounded-2xl shadow-lg text-white">
-                        <p class="text-xs font-bold text-emerald-100 uppercase tracking-widest mb-1">Receita Recorrente Estimada</p>
+                        <p class="text-xs font-bold text-emerald-100 uppercase tracking-widest mb-1">Receita Fixa Estimada</p>
                         <h3 class="text-4xl font-black" id="mrrEstimado">R$ 0,00</h3>
-                        <p class="text-xs mt-2 text-emerald-50 opacity-80">Baseado nos planos ativos.</p>
+                        <p class="text-xs mt-2 text-emerald-50 opacity-80">+ Valores Variáveis (%) a calcular no fechamento.</p>
                     </div>
                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-center">
                         <p class="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Contas em Dia</p>
@@ -158,9 +159,9 @@
                                 <tr>
                                     <th class="p-4">Cliente / Associação</th>
                                     <th class="p-4">Plano</th>
-                                    <th class="p-4 text-center">Valor (Est.)</th>
-                                    <th class="p-4 text-center">Status Fatura</th>
-                                    <th class="p-4 text-center">Ações Rápidas</th>
+                                    <th class="p-4 text-center">Cobrança Mensal</th>
+                                    <th class="p-4 text-center">Status Conta</th>
+                                    <th class="p-4 text-center">Ações</th>
                                 </tr>
                             </thead>
                             <tbody id="tabelaFaturamento" class="divide-y divide-slate-100">
@@ -228,7 +229,7 @@
                 </div>
 
                 <div class="p-4 border border-blue-200 bg-blue-50/50 rounded-xl space-y-4">
-                    <h3 class="text-xs md:text-sm font-black text-blue-900 uppercase tracking-wider mb-2"><i class="fa-solid fa-id-card mr-2"></i>Licença e Assinatura</h3>
+                    <h3 class="text-xs md:text-sm font-black text-blue-900 uppercase tracking-wider mb-2"><i class="fa-solid fa-id-card mr-2"></i>Licença, Plano e Cobrança</h3>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
@@ -247,6 +248,18 @@
                                 <option value="PLUS">🥈 PLUS (+ CRM)</option>
                                 <option value="PREMIUM">🥇 PREMIUM (Tudo Liberado)</option>
                             </select>
+                        </div>
+                        
+                        <div>
+                            <label class="text-[10px] md:text-xs font-bold text-slate-700 mb-1 block">Tipo de Cobrança:</label>
+                            <select id="editTipoCobranca" class="w-full p-2.5 md:p-3 bg-white border border-slate-300 rounded-xl text-xs md:text-sm font-bold outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition shadow-sm">
+                                <option value="fixo">💰 Valor Fixo Mensal</option>
+                                <option value="porcentagem">📊 Porcentagem (%)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-[10px] md:text-xs font-bold text-slate-700 mb-1 block">Valor ou % a cobrar:</label>
+                            <input type="number" id="editValorCobranca" step="0.01" placeholder="Ex: 150 ou 10" class="w-full p-2.5 md:p-3 bg-white border border-slate-300 rounded-xl text-xs md:text-sm font-bold outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition shadow-sm">
                         </div>
                         <div class="md:col-span-2">
                             <label class="text-[10px] md:text-xs font-bold text-slate-700 mb-1 block">Status Financeiro (Bloqueio Automático):</label>
@@ -286,7 +299,6 @@
     <script>
         window.listaEmpresas = [];
         window.empresaEmEdicao = null; 
-        const PRECOS_PLANOS = { 'BASICO': 97.00, 'PLUS': 147.00, 'PREMIUM': 197.00 };
 
         window.mudarAbaSaaS = (idAba, elemento) => {
             document.querySelectorAll('.conteudo-aba').forEach(aba => aba.classList.add('tela-oculta'));
@@ -331,10 +343,8 @@
             }
         };
 
-        window.fecharModal = () => {
-            document.getElementById('modalEmpresa').style.display = 'none';
-        };
-
+        window.fecharModal = () => { document.getElementById('modalEmpresa').style.display = 'none'; };
+        
         window.copiarIdSaaS = () => {
             const id = document.getElementById('txtClienteId').innerText;
             navigator.clipboard.writeText(id).then(() => alert("ID Copiado com sucesso!"));
@@ -345,7 +355,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, onSnapshot, doc, updateDoc, deleteDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // CREDENCIAIS DO SEU BANCO DE DADOS MASTER SAAS
+        // CREDENCIAIS DA CENTRAL SAAS
         const firebaseConfig = {
             apiKey: "AIzaSyC4-2LavZt7iWPt2u71u-yRUYbIJu-Vzf0",
             authDomain: "central-omnichannel-saas.firebaseapp.com",
@@ -373,8 +383,9 @@
                 let qtdTotal = 0, qtdAtivos = 0, qtdPremium = 0, qtdPendentes = 0;
                 let mrrTotal = 0, clientesEmDia = 0, clientesInadimplentes = 0;
 
-                const filtroDesktop = document.getElementById("buscaSaaS") ? document.getElementById("buscaSaaS").value.toLowerCase() : "";
-                const filtroMobile = document.getElementById("buscaSaaSMobile") ? document.getElementById("buscaSaaSMobile").value.toLowerCase() : "";
+                // Lógica de Busca Unificada
+                const filtroDesktop = document.getElementById("buscaSaaS") ? document.getElementById("buscaSaaS").value.toLowerCase().trim() : "";
+                const filtroMobile = document.getElementById("buscaSaaSMobile") ? document.getElementById("buscaSaaSMobile").value.toLowerCase().trim() : "";
                 const filtro = filtroDesktop || filtroMobile;
 
                 window.listaEmpresas.sort((a, b) => (a.nomeEmpresa || '').localeCompare(b.nomeEmpresa || ''));
@@ -383,12 +394,31 @@
                 window.listaEmpresas.forEach(emp => {
                     qtdTotal++;
                     
+                    // Verificação do Filtro de Busca
+                    const nomeEmpresaStr = (emp.nomeEmpresa || '').toLowerCase();
+                    const zapStr = (emp.whatsappLojista || '');
+                    const matchBusca = filtro === "" || nomeEmpresaStr.includes(filtro) || zapStr.includes(filtro);
+
+                    // ===========================================
+                    // NOVO SISTEMA DE COBRANÇA (Fixo vs Porcentagem)
+                    // ===========================================
                     const planoStr = emp.plano || 'BASICO';
-                    const valorPlano = PRECOS_PLANOS[planoStr] || 0;
                     const statusConta = emp.statusConta || 'ativo'; 
+                    const tipoCobranca = emp.tipoCobranca || 'fixo';
+                    const valorCobranca = parseFloat(emp.valorCobranca) || 0;
                     
+                    let exibicaoValor = "";
+
+                    if (tipoCobranca === 'fixo') {
+                        exibicaoValor = `R$ ${valorCobranca.toFixed(2).replace('.', ',')}`;
+                        if (statusConta === 'ativo') mrrTotal += valorCobranca;
+                    } else {
+                        exibicaoValor = `${valorCobranca}% (Variável)`;
+                        // Valores variáveis não entram na soma exata do MRR base, 
+                        // pois dependem do faturamento real do cliente no final do mês.
+                    }
+
                     if (statusConta === 'ativo') {
-                        mrrTotal += valorPlano;
                         clientesEmDia++;
                     } else {
                         clientesInadimplentes++;
@@ -399,7 +429,7 @@
                         <tr class="hover:bg-slate-50 transition border-b border-slate-100">
                             <td class="p-4 font-black text-slate-800">${emp.nomeEmpresa} <br><span class="text-[9px] font-normal text-slate-400 font-mono">${emp.whatsappLojista || 'S/ Tel'}</span></td>
                             <td class="p-4 text-xs font-bold text-blue-600">${planoStr}</td>
-                            <td class="p-4 text-center font-black text-emerald-600">R$ ${valorPlano.toFixed(2).replace('.',',')}</td>
+                            <td class="p-4 text-center font-black text-emerald-600">${exibicaoValor}</td>
                             <td class="p-4 text-center"><span class="px-2 py-1 rounded-md text-[9px] font-black uppercase ${corStatusFat}">${statusConta}</span></td>
                             <td class="p-4 text-center">
                                 <button onclick="window.abrirModal('${emp.id}')" class="bg-slate-100 text-slate-600 hover:bg-slate-200 px-3 py-1.5 rounded-lg text-xs font-bold transition">Gerir</button>
@@ -407,22 +437,18 @@
                         </tr>
                     `;
 
-                    const matchBusca = !filtro || (emp.nomeEmpresa && emp.nomeEmpresa.toLowerCase().includes(filtro)) || (emp.whatsappLojista && emp.whatsappLojista.includes(filtro));
-
+                    // ===========================================
+                    // RENDERIZAÇÃO DOS CARDS DO DASHBOARD
+                    // ===========================================
                     if(emp.statusRobo === 'pendente') {
                         qtdPendentes++;
                         divP.innerHTML += `
                             <div class="bg-amber-50 border border-amber-200 p-4 md:p-5 rounded-2xl flex flex-col md:flex-row justify-between md:items-center gap-4 shadow-sm border-l-4 border-l-amber-500">
                                 <div>
                                     <h4 class="font-black text-amber-900 text-base md:text-lg">${emp.nomeEmpresa}</h4>
-                                    <p class="text-[10px] md:text-xs text-amber-700 font-bold mt-1"><i class="fa-solid fa-envelope mr-1"></i> ${emp.email || 'S/ Email'} &nbsp;|&nbsp; <i class="fa-brands fa-whatsapp text-emerald-600 mr-1"></i> ${emp.whatsappLojista || 'Não informado'} &nbsp;|&nbsp; <i class="fa-regular fa-calendar mr-1"></i> ${new Date(emp.dataCadastro || Date.now()).toLocaleDateString()}</p>
+                                    <p class="text-[10px] md:text-xs text-amber-700 font-bold mt-1"><i class="fa-solid fa-envelope mr-1"></i> ${emp.email || 'S/ Email'} &nbsp;|&nbsp; <i class="fa-brands fa-whatsapp text-emerald-600 mr-1"></i> ${emp.whatsappLojista || 'Não informado'}</p>
                                 </div>
                                 <div class="flex flex-wrap gap-2">
-                                    <select id="plano-${emp.id}" class="p-2 border border-amber-300 rounded-lg text-xs font-bold text-amber-900 bg-white outline-none">
-                                        <option value="BASICO">Plano BÁSICO</option>
-                                        <option value="PLUS">Plano PLUS</option>
-                                        <option value="PREMIUM">Plano PREMIUM</option>
-                                    </select>
                                     <button onclick="window.aprovarCliente('${emp.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs font-bold transition shadow glow-emerald"><i class="fa-solid fa-check mr-1"></i> Aprovar</button>
                                     <button onclick="window.excluirEmpresa('${emp.id}', '${emp.nomeEmpresa}')" class="bg-white border border-red-200 text-red-500 hover:bg-red-50 px-3 py-2 rounded-lg transition shadow-sm"><i class="fa-solid fa-trash"></i></button>
                                 </div>
@@ -499,14 +525,13 @@
                 document.getElementById('tabelaFaturamento').innerHTML = faturamentoHtml || `<tr><td colspan="5" class="p-8 text-center text-slate-500 font-bold">Nenhum cliente para faturar.</td></tr>`;
             };
 
-            window.filtrarSaaS = () => { window.renderizarPainel(); };
-
             window.aprovarCliente = async (id) => {
-                const plano = document.getElementById('plano-'+id).value;
                 if(confirm("Confirmar aprovação deste cliente?")) {
                     await updateDoc(doc(db, "empresas", id), { 
                         statusRobo: 'ativo_central', 
-                        plano: plano,
+                        plano: 'BASICO',
+                        tipoCobranca: 'fixo',
+                        valorCobranca: 97.00,
                         statusConta: 'ativo',
                         nicho: 'outro' 
                     });
@@ -530,6 +555,11 @@
                 document.getElementById('editNicho').value = emp.nicho || 'outro';
                 document.getElementById('editPlanoConta').value = emp.plano || 'BASICO'; 
                 document.getElementById('editStatusConta').value = emp.statusConta || 'ativo'; 
+                
+                // Novos Campos
+                document.getElementById('editTipoCobranca').value = emp.tipoCobranca || 'fixo';
+                document.getElementById('editValorCobranca').value = emp.valorCobranca || 0;
+
                 document.getElementById('editZapLoja').value = emp.whatsappLojista || '';
                 
                 if(emp.menu) {
@@ -550,6 +580,8 @@
                 const novoPlano = document.getElementById('editPlanoConta').value;
                 const novoStatusConta = document.getElementById('editStatusConta').value;
                 const novoNicho = document.getElementById('editNicho').value;
+                const tipoCob = document.getElementById('editTipoCobranca').value;
+                const valorCob = parseFloat(document.getElementById('editValorCobranca').value) || 0;
 
                 const menu = {
                     saudacao: document.getElementById('menuSaudacao').value,
@@ -562,7 +594,9 @@
                     menu: menu,
                     plano: novoPlano,
                     statusConta: novoStatusConta,
-                    nicho: novoNicho
+                    nicho: novoNicho,
+                    tipoCobranca: tipoCob,
+                    valorCobranca: valorCob
                 });
                 
                 window.fecharModal();
