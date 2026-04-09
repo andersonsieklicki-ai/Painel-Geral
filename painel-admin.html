@@ -276,6 +276,7 @@
         const db = getFirestore(app);
 		const auth = getAuth(app); // ADICIONE ESTA LINHA
         const provider = new GoogleAuthProvider(); // ADICIONE ESTA LINHA
+		provider.setCustomParameters({ prompt: 'select_account' });
 
     // REGRA DE ACESSO (Cole logo abaixo)
     const emailsAutorizados = ["andersonsieklikci@gmail.com", "silvaneazeredo83@gmail.com"];
