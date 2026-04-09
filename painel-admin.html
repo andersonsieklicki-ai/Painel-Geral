@@ -18,10 +18,10 @@
                 extend: {
                     fontFamily: { sans: ['Inter', 'sans-serif'] },
                     colors: {
-                        primary: '#2563eb', 
-                        surface: '#f8fafc', 
+                        primary: '#2563eb',
+                        surface: '#f8fafc',
                         card: '#ffffff',
-                        success: '#059669', 
+                        success: '#059669',
                         danger: '#dc2626'
                     }
                 }
@@ -53,7 +53,7 @@
     </div>
 
     <!-- SIDEBAR PC -->
-    <aside class="w-64 bg-white border-r border-slate-200 flex-col hidden md:flex z-30 shadow-sm relative">
+    <aside class="w-64 bg-white border-r border-slate-200 flex-col hidden md:flex z-30 shadow-sm relative shrink-0">
         <div class="p-6 border-b border-slate-100 flex items-center gap-3">
             <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white font-black text-xl"><i class="fa-solid fa-layer-group"></i></div>
             <div>
@@ -75,7 +75,6 @@
     </aside>
 
     <!-- ÁREA PRINCIPAL -->
-    <!-- Ajuste do overflow aqui para resolver o bug do scroll -->
     <main class="flex-1 flex flex-col min-w-0 overflow-hidden relative">
         
         <!-- HEADER -->
@@ -93,7 +92,7 @@
             </button>
         </header>
 
-        <!-- CONTEÚDO DAS ABAS COM SCROLL CORRIGIDO -->
+        <!-- CONTEÚDO DAS ABAS (Scroll corrigido) -->
         <div class="flex-1 overflow-y-auto p-4 md:p-8 pb-32 bg-surface">
             
             <!-- ABA: FATURAS / DASHBOARD -->
@@ -139,7 +138,7 @@
                 </div>
             </div>
 
-            <!-- ABA: CLIENTES (NOVO DESIGN COMPACTO) -->
+            <!-- ABA: CLIENTES (Design Compacto + Botões de Ação) -->
             <div id="aba-clientes" class="tab-content max-w-5xl mx-auto">
                 <div class="flex justify-between items-center mb-6">
                     <div>
@@ -151,8 +150,7 @@
                     </button>
                 </div>
 
-                <!-- Lista em formato Card Menor -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="gridClientes">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-3" id="gridClientes">
                     <!-- Preenchido via JS -->
                 </div>
             </div>
@@ -207,6 +205,9 @@
                         <label class="label-base text-[10px]">ID de Integração (Chave)</label>
                         <p id="cliChave" class="font-mono font-bold text-primary text-sm truncate">Gerado ao salvar...</p>
                     </div>
+                    <button onclick="copiarChave()" class="w-10 h-10 shrink-0 bg-white border border-slate-200 shadow-sm rounded-lg text-slate-600 hover:text-primary transition flex justify-center items-center">
+                        <i class="fa-regular fa-copy"></i>
+                    </button>
                 </div>
 
                 <div>
@@ -221,17 +222,43 @@
                     </div>
 
                     <div class="space-y-4 mt-2">
-                        <div class="hidden"> <!-- Escondido para simplificar, mas mantido no JS -->
-                            <select id="cliNicho" class="input-base"><option value="Geral">Geral</option></select>
-                            <select id="cliPlano" class="input-base"><option value="Básico">Básico</option></select>
+                        
+                        <!-- Restauração dos Campos Originais -->
+                        <div>
+                            <label class="label-base">Nicho de Mercado:</label>
+                            <div class="relative">
+                                <i class="fa-solid fa-shop absolute left-3 top-3.5 text-slate-400"></i>
+                                <select id="cliNicho" class="input-base pl-10 appearance-none bg-white">
+                                    <option value="Loja Comercial">Loja Comercial</option>
+                                    <option value="Associação Militar">Associação Militar</option>
+                                    <option value="Clínica / Saúde">Clínica / Saúde</option>
+                                    <option value="Imobiliária">Imobiliária</option>
+                                    <option value="Outro">Outro</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="label-base">Plano de Funcionalidades:</label>
+                            <div class="relative">
+                                <i class="fa-solid fa-medal absolute left-3 top-3.5 text-slate-400"></i>
+                                <select id="cliPlano" class="input-base pl-10 appearance-none bg-white">
+                                    <option value="Básico">BÁSICO (Padrão)</option>
+                                    <option value="Premium">PREMIUM (Avançado)</option>
+                                    <option value="White Label">WHITE LABEL</option>
+                                </select>
+                            </div>
                         </div>
 
                         <div>
                             <label class="label-base">Formato da Sua Cobrança:</label>
-                            <select id="cliFormatoCobranca" class="input-base bg-white">
-                                <option value="Fixo">Valor Fixo Mensal (R$)</option>
-                                <option value="Percentual">Percentual sobre Vendas (%)</option>
-                            </select>
+                            <div class="relative">
+                                <i class="fa-solid fa-sack-dollar absolute left-3 top-3.5 text-slate-400"></i>
+                                <select id="cliFormatoCobranca" class="input-base pl-10 appearance-none bg-white">
+                                    <option value="Fixo">Valor Fixo Mensal (R$)</option>
+                                    <option value="Percentual">Percentual sobre Vendas (%)</option>
+                                </select>
+                            </div>
                         </div>
 
                         <div class="grid grid-cols-2 gap-3">
@@ -249,7 +276,7 @@
                             <label class="label-base">Status Atual:</label>
                             <select id="cliStatus" class="input-base bg-white font-bold">
                                 <option value="ativo" class="text-success">🟢 Conta em Dia (Ativa)</option>
-                                <option value="bloqueado" class="text-danger">🔴 Bloqueado</option>
+                                <option value="bloqueado" class="text-danger">🔴 Bloqueado (Suspenso)</option>
                             </select>
                         </div>
                     </div>
@@ -314,7 +341,13 @@
             return result;
         };
 
-        // ALTERAR STATUS DIRETAMENTE PELO BOTÃO (LIGAR / SUSPENDER)
+        window.copiarChave = () => {
+            const txt = document.getElementById('cliChave').innerText;
+            if(!txt || txt.includes('Gerado')) return;
+            navigator.clipboard.writeText(txt).then(() => alert("✅ Chave de Integração copiada!"));
+        };
+
+        // LÓGICA DOS NOVOS BOTÕES (LIGAR / SUSPENDER)
         window.mudarStatusCliente = async (id, novoStatus) => {
             const acao = novoStatus === 'ativo' ? 'LIGAR (Ativar)' : 'SUSPENDER (Bloquear)';
             if(confirm(`Deseja realmente ${acao} este cliente?`)) {
@@ -322,7 +355,7 @@
                 try {
                     await updateDoc(doc(db, "inquilinos_saas", id), { statusConta: novoStatus });
                 } catch(e) {
-                    alert("Erro: " + e.message);
+                    alert("Erro ao alterar status: " + e.message);
                 }
                 document.getElementById('loadingOverlay').style.display = 'none';
             }
@@ -364,7 +397,7 @@
 
             clientesGlobal.forEach(c => {
                 const isAtivo = c.statusConta === 'ativo';
-                const valCobranca = c.formatoCobranca === 'Fixo' ? formatarMoeda(c.valorCobranca) : `${c.valorCobranca || 0}% das Vendas`;
+                const valCobranca = c.formatoCobranca === 'Fixo' ? formatarMoeda(c.valorCobranca) : `${c.valorCobranca || 0}%`;
 
                 // Tabela Dashboard
                 tbodyFat.innerHTML += `
@@ -380,7 +413,7 @@
                     </tr>
                 `;
 
-                // NOVO DESIGN DO CARD DE CLIENTE (COMPACTO)
+                // CARD COMPACTO COM BOTÕES DE AÇÃO
                 const opacityCard = isAtivo ? 'opacity-100' : 'opacity-60 grayscale';
                 const corPonto = isAtivo ? 'bg-success' : 'bg-danger';
 
@@ -389,20 +422,20 @@
                         <div class="flex-1 min-w-0 pr-2">
                             <div class="flex items-center gap-2">
                                 <span class="w-2.5 h-2.5 rounded-full ${corPonto} shrink-0"></span>
-                                <h3 class="font-black text-slate-800 text-sm truncate">${c.nome}</h3>
+                                <h3 class="font-black text-slate-800 text-sm truncate" title="${c.nome}">${c.nome}</h3>
                             </div>
                             <p class="text-xs font-bold text-primary mt-1 pl-4.5">${valCobranca} <span class="text-[9px] text-slate-400 font-normal">/mês</span></p>
                         </div>
                         
-                        <!-- BOTÕES DE AÇÃO -->
+                        <!-- BOTÕES LIGAR / SUSPENDER / EDITAR -->
                         <div class="flex gap-1.5 shrink-0">
-                            <button onclick="mudarStatusCliente('${c.id}', 'ativo')" class="w-8 h-8 rounded-lg bg-green-50 text-green-600 hover:bg-green-600 hover:text-white flex justify-center items-center transition" title="Ligar (Ativar)">
+                            <button onclick="mudarStatusCliente('${c.id}', 'ativo')" class="w-8 h-8 rounded-lg bg-green-50 text-green-600 hover:bg-green-600 hover:text-white flex justify-center items-center transition" title="Ligar (Ativar Conta)">
                                 <i class="fa-solid fa-play text-xs"></i>
                             </button>
-                            <button onclick="mudarStatusCliente('${c.id}', 'bloqueado')" class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white flex justify-center items-center transition" title="Suspender (Bloquear)">
+                            <button onclick="mudarStatusCliente('${c.id}', 'bloqueado')" class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white flex justify-center items-center transition" title="Suspender (Bloquear Conta)">
                                 <i class="fa-solid fa-pause text-xs"></i>
                             </button>
-                            <button onclick="abrirModalCliente('${c.id}')" class="w-8 h-8 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-300 flex justify-center items-center transition" title="Editar">
+                            <button onclick="abrirModalCliente('${c.id}')" class="w-8 h-8 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-300 flex justify-center items-center transition" title="Editar Configurações">
                                 <i class="fa-solid fa-pen text-xs"></i>
                             </button>
                         </div>
@@ -417,7 +450,7 @@
                 document.getElementById('cliId').value = c.id;
                 document.getElementById('cliChave').innerText = c.chaveIntegracao;
                 document.getElementById('cliNome').value = c.nome;
-                document.getElementById('cliNicho').value = c.nicho || 'Geral';
+                document.getElementById('cliNicho').value = c.nicho || 'Loja Comercial';
                 document.getElementById('cliPlano').value = c.plano || 'Básico';
                 document.getElementById('cliFormatoCobranca').value = c.formatoCobranca;
                 document.getElementById('cliValor').value = c.valorCobranca;
