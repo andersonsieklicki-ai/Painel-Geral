@@ -892,7 +892,7 @@
                     <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 15px;">
                         Cole seu Access Token para permitir a geração automática de boletos e PIX no futuro.
                     </p>
-                    <input type="text" id="mercadoPagoToken" placeholder="APP_USR-123456789...">
+                  <input type="password" id="mercadoPagoToken" placeholder="Apenas cole se quiser substituir a chave atual...">
                     <button class="btn btn-block" style="background-color: var(--mp-blue); color: white;" onclick="salvarMercadoPago()">
                         <i class="fa-solid fa-link"></i> Salvar Chave API
                     </button>
@@ -1597,7 +1597,7 @@
                             window.verificarRamoAtivo(sC.data().ramo); 
                         }
                         if (sC.data().mercadoPagoToken) { 
-                            document.getElementById('mercadoPagoToken').value = sC.data().mercadoPagoToken; 
+                            document.getElementById('mercadoPagoToken').value = "************************"; 
                         }
                     }
                 } catch(e) {}
@@ -1615,11 +1615,20 @@
             alert('Perfil atualizado!'); 
         }
 
-        window.salvarMercadoPago = async function() { 
+      window.salvarMercadoPago = async function() { 
             const token = document.getElementById('mercadoPagoToken').value.trim(); 
+            
             if (!token) return alert('Insira a chave da API do Mercado Pago.'); 
+            
+            // Se o valor for a máscara, significa que o cliente não o alterou
+            if (token === "************************") {
+                return alert('✅ A chave do Mercado Pago já está configurada e segura!'); 
+            }
+
+            // Se for um valor novo, guarda-o e volta a colocar a máscara
             await setDoc(doc(db, "configuracoes_loja", window.idClienteLogado), { mercadoPagoToken: token }, { merge: true }); 
-            alert('✅ Chave do Mercado Pago salva com sucesso! A geração de PIX e Boletos já está ativada.'); 
+            document.getElementById('mercadoPagoToken').value = "************************";
+            alert('✅ Chave do Mercado Pago salva com segurança! A geração de PIX e Boletos já está ativada.'); 
         }
 
         window.verificarRamoAtivo = function(r) { 
