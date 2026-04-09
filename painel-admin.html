@@ -219,19 +219,17 @@
                             </div>
                         </div>
 
-                       <!-- FORMATO DE COBRANÇA -->
-                       <div>
-              <label class="input-label">Formato da Sua Cobrança:</label>
-               <div class="relative">
-            <span class="absolute left-4 top-3 text-sm">💰</span>
-           <select id="cliFormatoCobranca" class="input-field pl-10 bg-white">
+                      <!-- FORMATO DE COBRANÇA -->
+<div class="mb-4">
+    <label class="input-label">Formato da Sua Cobrança:</label>
+    <div class="relative">
+        <span class="absolute left-4 top-3 text-sm">💰</span>
+        <select id="cliFormatoCobranca" class="input-field pl-10 bg-white">
             <option value="Valor Fixo Mensal (R$)">Valor Fixo Mensal (R$)</option>
-            <!-- O robô no central.js buscará este valor para contar os alunos no banco -->
             <option value="Percentual sobre Alunos (%)">Percentual sobre Alunos (%)</option>
-                 </select>
-                </div>
-                   </div>
-
+        </select>
+    </div>
+</div>
                         <div class="grid grid-cols-2 gap-3">
                             <div>
                                 <label class="input-label">Valor/Perc (Núm):</label>
@@ -480,35 +478,36 @@
         // ==========================================
         // MODAL DO CLIENTE (SALVAR E INJETAR LICENÇA)
         // ==========================================
-        window.abrirModalCliente = (id = null) => {
-            if(id) {
-                const c = clientesGlobal.find(x => x.id === id);
-                document.getElementById('cliId').value = c.id;
-                document.getElementById('cliChave').innerText = c.chaveIntegracao;
-                document.getElementById('cliNome').value = c.nome;
-                document.getElementById('cliNicho').value = c.nicho || 'Loja Comercial';
-                document.getElementById('cliPlano').value = c.plano || 'BÁSICO (Padrão)';
-                document.getElementById('cliFormatoCobranca').value = c.formatoCobranca || 'Valor Fixo Mensal (R$)';
-                document.getElementById('cliValor').value = c.valorCobranca;
-                document.getElementById('cliVencimento').value = c.diaVencimento;
-                document.getElementById('cliStatus').value = c.statusConta;
-                document.getElementById('subtituloModal').innerText = c.nome;
-            } else {
-                document.getElementById('cliId').value = "";
-                document.getElementById('cliChave').innerText = gerarChave();
-                document.getElementById('cliNome').value = "";
-                document.getElementById('cliValor').value = "";
-                document.getElementById('cliVencimento').value = "";
-                document.getElementById('cliStatus').value = "ativo";
-                document.getElementById('subtituloModal').innerText = "Novo Registro";
-            }
-            document.getElementById('modalCliente').style.display = 'flex';
-        };
-
-        window.fecharModalCliente = () => {
-            document.getElementById('modalCliente').style.display = 'none';
-        };
-
+       window.abrirModalCliente = (id = null) => {
+    if(id) {
+        const c = clientesGlobal.find(x => x.id === id);
+        document.getElementById('cliId').value = c.id;
+        document.getElementById('cliChave').innerText = c.chaveIntegracao;
+        document.getElementById('cliNome').value = c.nome;
+        document.getElementById('cliNicho').value = c.nicho || 'Loja Comercial';
+        document.getElementById('cliPlano').value = c.plano || 'BÁSICO (Padrão)';
+        
+        // ESTA LINHA ABAIXO É A MAIS IMPORTANTE:
+        // Ela força o seletor a mostrar o que está salvo no banco (Fixo ou Percentual)
+        document.getElementById('cliFormatoCobranca').value = c.formatoCobranca || 'Valor Fixo Mensal (R$)';
+        
+        document.getElementById('cliValor').value = c.valorCobranca;
+        document.getElementById('cliVencimento').value = c.diaVencimento;
+        document.getElementById('cliStatus').value = c.statusConta;
+        document.getElementById('subtituloModal').innerText = c.nome;
+    } else {
+        // Limpa para novo registro
+        document.getElementById('cliId').value = "";
+        document.getElementById('cliChave').innerText = gerarChave();
+        document.getElementById('cliNome').value = "";
+        document.getElementById('cliFormatoCobranca').value = "Valor Fixo Mensal (R$)"; // Valor padrão
+        document.getElementById('cliValor').value = "";
+        document.getElementById('cliVencimento').value = "";
+        document.getElementById('cliStatus').value = "ativo";
+        document.getElementById('subtituloModal').innerText = "Novo Registro";
+    }
+    document.getElementById('modalCliente').style.display = 'flex';
+};
         window.salvarCliente = async () => {
             const id = document.getElementById('cliId').value || document.getElementById('cliChave').innerText;
             const obj = {
