@@ -60,62 +60,80 @@
         </button>
     </header>
 
-    <main class="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-8 pb-28">
+   <main class="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-8 pb-28">
         
-        <div id="aba-faturas" class="tab-content active max-w-4xl mx-auto">
-            <div class="bg-success rounded-[16px] p-6 mb-4 text-white shadow-md relative overflow-hidden">
-                <p class="text-[11px] font-bold tracking-widest uppercase mb-1 opacity-90">Receita Fixa Estimada</p>
-                <h2 class="text-4xl md:text-5xl font-black tracking-tighter mb-2 drop-shadow-sm" id="dashReceita">R$ 0,00</h2>
-                <p class="text-[10px] font-medium opacity-90">+ Valores Variáveis (%) calculados no fechamento.</p>
-            </div>
-
-            <div class="bg-white rounded-[16px] p-5 mb-4 border border-slate-100 shadow-sm">
-                <p class="text-[10px] font-black text-textMuted uppercase tracking-widest mb-1">Contas em Dia</p>
-                <h3 class="text-3xl md:text-4xl font-black text-primary" id="dashEmDia">0</h3>
-            </div>
+        <!-- ABA FATURAS -->
+        <div id="aba-faturas" class="tab-content active max-w-5xl mx-auto">
             
-            <div class="bg-white rounded-[16px] p-5 mb-6 border border-slate-100 shadow-sm">
-                <p class="text-[10px] font-black text-textMuted uppercase tracking-widest mb-1">Bloqueios por falta de pagto</p>
-                <h3 class="text-3xl md:text-4xl font-black text-danger" id="dashBloqueios">0</h3>
+            <!-- Cards de Resumo Modernos (Em Grid) -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div class="bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-[20px] p-6 text-white shadow-lg shadow-emerald-200 flex flex-col justify-center">
+                    <p class="text-[11px] font-bold tracking-widest uppercase mb-1 opacity-90 text-emerald-50">Receita Estimada</p>
+                    <h2 class="text-4xl font-black mb-1 drop-shadow-sm" id="dashReceita">R$ 0,00</h2>
+                    <p class="text-[10px] font-medium opacity-90">+ Variáveis no fechamento</p>
+                </div>
+
+                <div class="bg-white rounded-[20px] p-6 border border-slate-100 shadow-sm flex flex-col justify-center">
+                    <div class="flex justify-between items-center mb-2">
+                        <p class="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Contas em Dia</p>
+                        <div class="w-8 h-8 rounded-full bg-blue-50 text-primary flex items-center justify-center"><i class="fa-solid fa-check text-sm"></i></div>
+                    </div>
+                    <h3 class="text-4xl font-black text-slate-800" id="dashEmDia">0</h3>
+                </div>
+                
+                <div class="bg-white rounded-[20px] p-6 border border-slate-100 shadow-sm flex flex-col justify-center">
+                    <div class="flex justify-between items-center mb-2">
+                        <p class="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Bloqueados</p>
+                        <div class="w-8 h-8 rounded-full bg-red-50 text-danger flex items-center justify-center"><i class="fa-solid fa-lock text-sm"></i></div>
+                    </div>
+                    <h3 class="text-4xl font-black text-danger" id="dashBloqueios">0</h3>
+                </div>
             </div>
 
-           <div class="bg-white rounded-[16px] border border-slate-100 shadow-sm overflow-hidden mb-6">
-                <!-- CABEÇALHO CORRIGIDO E LIMPO -->
-                <div class="p-5 flex justify-between items-center gap-3">
+            <!-- Tabela de Faturas -->
+            <div class="bg-white rounded-[20px] border border-slate-100 shadow-sm overflow-hidden mb-6">
+                <div class="p-5 flex flex-wrap justify-between items-center gap-4 border-b border-slate-50">
                     <div class="flex items-center gap-3">
-                        <i class="fa-solid fa-list-check text-slate-700"></i>
-                        <h3 class="font-black text-textDark text-lg">Controle de Pagamentos</h3>
+                        <div class="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-600"><i class="fa-solid fa-list-check"></i></div>
+                        <h3 class="font-black text-slate-800 text-lg">Histórico de Cobranças</h3>
                     </div>
-                    <button onclick="window.imprimirRelatorioSaaS()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 shadow-sm">
-                        <i class="fa-solid fa-print"></i> Imprimir Relatório
+                    <button onclick="window.imprimirRelatorioSaaS()" class="bg-slate-50 hover:bg-slate-100 text-slate-600 px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 border border-slate-200 shadow-sm">
+                        <i class="fa-solid fa-print text-primary"></i> Imprimir Relatório
                     </button>
                 </div>
                 
-                <div class="bg-slate-50/70 border-y border-slate-100 px-5 py-3 flex text-[10px] text-textMuted uppercase font-black tracking-widest">
-                    <div class="flex-[2]">Cliente / Sistema</div>
-                    <div class="flex-1 text-center">Vencimento</div>
-                    <div class="flex-1 text-right">Cobrança</div>
+                <div class="bg-slate-50/50 px-5 py-3 flex text-[10px] text-slate-400 uppercase font-black tracking-widest border-b border-slate-100">
+                    <div class="flex-[2]">Cliente & Contato</div>
+                    <div class="flex-1 text-center hidden md:block">Situação</div>
+                    <div class="flex-1 text-right">Valor Pago</div>
                 </div>
                 <div id="tabelaFaturas" class="divide-y divide-slate-100">
-                    <div class="p-6 text-center text-sm font-bold text-slate-400">Aguarde...</div>
+                    <div class="p-8 text-center text-sm font-bold text-slate-400">Aguarde, carregando faturas...</div>
                 </div>
             </div>
+        </div>
 
-        <div id="aba-clientes" class="tab-content max-w-4xl mx-auto">
+        <!-- ABA CLIENTES -->
+        <div id="aba-clientes" class="tab-content max-w-5xl mx-auto">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-black text-textDark">Painel de Clientes</h2>
-                <button onclick="window.abrirModalCliente()" class="bg-primary text-white px-4 py-2 rounded-xl font-bold text-sm shadow-md">
-                    + Novo
+                <h2 class="text-2xl font-black text-slate-800">Meus Inquilinos</h2>
+                <button onclick="window.abrirModalCliente()" class="bg-primary hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-blue-200 transition flex items-center gap-2">
+                    <i class="fa-solid fa-plus"></i> Novo Cliente
                 </button>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="gridClientes"></div>
+            <!-- Grid de Clientes (Ajustado para telas grandes) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="gridClientes"></div>
         </div>
 
-        <div id="aba-avisos" class="tab-content max-w-4xl mx-auto text-center py-16">
-            <i class="fa-solid fa-bullhorn text-5xl text-slate-300 mb-4"></i>
-            <h2 class="text-lg font-black text-textDark">Avisos</h2>
-            <p class="text-xs text-textMuted mt-2">Módulo em desenvolvimento.</p>
+        <!-- ABA AVISOS -->
+        <div id="aba-avisos" class="tab-content max-w-4xl mx-auto text-center py-20">
+            <div class="w-20 h-20 mx-auto bg-slate-50 rounded-full flex items-center justify-center mb-4">
+                <i class="fa-solid fa-bullhorn text-3xl text-slate-300"></i>
+            </div>
+            <h2 class="text-xl font-black text-slate-800">Central de Avisos</h2>
+            <p class="text-sm text-slate-500 mt-2">Módulo em desenvolvimento para comunicados globais.</p>
         </div>
+
     </main>
 
     <nav class="fixed bottom-0 w-full bg-white border-t border-slate-200 flex justify-around items-center pb-safe pt-2 px-2 shadow-[0_-5px_15px_rgba(0,0,0,0.05)] z-40">
@@ -309,21 +327,23 @@
             lista.sort((a, b) => new Date(b.dataEmissao) - new Date(a.dataEmissao));
             
             lista.forEach(f => {
-                const cor = f.status === 'pago' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600';
-                
-                // Pega a hora exata que o robô empurrou pra fila
-                let dataEnvio = f.msgEnviadaEm ? new Date(f.msgEnviadaEm).toLocaleString('pt-BR') : 'Sem registro';
+                const corBadge = f.status === 'pago' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700';
+                let dataEnvio = f.msgEnviadaEm ? new Date(f.msgEnviadaEm).toLocaleDateString('pt-BR') : 'S/ Registro';
 
                 tbody.innerHTML += `
-                    <div class="p-4 border-b border-slate-100 flex justify-between items-center hover:bg-slate-50 transition">
-                        <div>
-                            <p class="font-bold text-sm">${f.clienteNome}</p>
-                            <p class="text-[10px] text-slate-500 mt-0.5"><i class="fa-brands fa-whatsapp text-success"></i> Enviado em: ${dataEnvio}</p>
-                            <p class="text-[10px] text-slate-400 mt-0.5">NSU: ${f.nsu || 'Aguardando Pagamento'}</p>
+                    <div class="px-5 py-4 flex items-center justify-between hover:bg-slate-50 transition duration-150">
+                        <div class="flex-[2]">
+                            <p class="font-bold text-sm text-slate-800">${f.clienteNome}</p>
+                            <p class="text-[11px] text-slate-500 mt-1 flex items-center gap-1"><i class="fa-brands fa-whatsapp text-success"></i> Enviado: ${dataEnvio}</p>
                         </div>
-                        <div class="text-right">
-                            <p class="font-black text-sm">${formatarMoeda(f.valor)}</p>
-                            <span class="${cor} text-[9px] px-2 py-1 rounded font-bold uppercase tracking-wider mt-1 inline-block">${f.status}</span>
+                        <div class="flex-1 text-center hidden md:flex flex-col items-center">
+                            <span class="${corBadge} text-[9px] px-2.5 py-1 rounded-md font-bold uppercase tracking-wider">${f.status}</span>
+                            <p class="text-[10px] text-slate-400 mt-1" title="NSU">${f.nsu || 'Pendente'}</p>
+                        </div>
+                        <div class="flex-1 text-right flex flex-col items-end">
+                            <p class="font-black text-sm text-slate-800">${formatarMoeda(f.valor)}</p>
+                            <!-- Badge no mobile se esconde no meio e aparece aqui -->
+                            <span class="md:hidden mt-1 ${corBadge} text-[9px] px-2 py-0.5 rounded font-bold uppercase">${f.status}</span>
                         </div>
                     </div>`;
             });
@@ -391,17 +411,42 @@
             const gridCli = document.getElementById('gridClientes');
             gridCli.innerHTML = '';
             clientesGlobal.forEach(c => {
-                const cor = c.statusConta === 'ativo' ? 'bg-success' : 'bg-danger';
+                const isAtivo = c.statusConta === 'ativo';
+                const corIcone = isAtivo ? 'bg-emerald-50 text-emerald-500' : 'bg-red-50 text-red-500';
+                const corBadge = isAtivo ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700';
+                const iconeStatus = isAtivo ? 'fa-building-circle-check' : 'fa-building-circle-xmark';
+                
                 const textoValor = c.formatoCobranca && c.formatoCobranca.includes('Fixo') ? formatarMoeda(parseFloat(c.valorCobranca)||0) : `${c.valorCobranca||0}%`;
+                
                 gridCli.innerHTML += `
-                    <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex items-center justify-between">
-                        <div class="flex-1">
-                            <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full ${cor}"></span><p class="font-bold text-sm text-textDark">${c.nome}</p></div>
-                            <p class="text-xs font-bold text-primary ml-4.5 mt-0.5">${textoValor}</p>
+                    <div class="bg-white rounded-[20px] border border-slate-100 p-5 shadow-sm hover:shadow-md transition duration-200 flex flex-col gap-4">
+                        <div class="flex items-start justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl ${corIcone} flex items-center justify-center text-lg">
+                                    <i class="fa-solid ${iconeStatus}"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-sm text-slate-800 line-clamp-1">${c.nome}</h4>
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-bold ${corBadge} uppercase tracking-wider mt-1">
+                                        ${c.statusConta}
+                                    </span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="flex gap-2">
-                            <button onclick="window.gerarCobrancaSaaS('${c.id}', '${c.nome}', '${c.telefone}', ${c.valorCobranca})" class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex justify-center items-center"><i class="fa-solid fa-file-invoice-dollar"></i></button>
-                            <button onclick="window.abrirModalCliente('${c.id}')" class="w-8 h-8 rounded-lg bg-slate-100 text-slate-500 flex justify-center items-center"><i class="fa-solid fa-pen"></i></button>
+                        
+                        <div class="flex items-end justify-between border-t border-slate-50 pt-4 mt-auto">
+                            <div>
+                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Mensalidade</p>
+                                <p class="text-sm font-black text-primary">${textoValor}</p>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="window.gerarCobrancaSaaS('${c.id}', '${c.nome}', '${c.telefone}', ${c.valorCobranca})" class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 hover:bg-amber-100 transition flex justify-center items-center" title="Forçar Cobrança">
+                                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                                </button>
+                                <button onclick="window.abrirModalCliente('${c.id}')" class="w-9 h-9 rounded-xl bg-slate-50 text-slate-600 hover:bg-slate-100 transition flex justify-center items-center" title="Editar Cadastro">
+                                    <i class="fa-solid fa-pen"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>`;
             });
