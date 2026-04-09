@@ -159,16 +159,21 @@
                     <input type="text" id="cliNome" class="input-field" placeholder="Ex: CTG Sentinela">
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
-                    <div>
-                        <label class="input-label">E-mail para Faturas:</label>
-                        <input type="email" id="cliEmail" class="input-field" placeholder="email@cliente.com">
-                    </div>
-                    <div>
-                        <label class="input-label">CPF ou CNPJ (Só números):</label>
-                        <input type="number" id="cliDocumento" class="input-field" placeholder="00000000000">
-                    </div>
-                </div>
+                <!-- DOCUMENTO, EMAIL E WHATSAPP -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+    <div>
+        <label class="input-label">E-mail para Faturas:</label>
+        <input type="email" id="cliEmail" class="input-field" placeholder="email@cliente.com">
+    </div>
+    <div>
+        <label class="input-label">WhatsApp (DDD+Num):</label>
+        <input type="number" id="cliTelefone" class="input-field" placeholder="5546999999999">
+    </div>
+    <div>
+        <label class="input-label">CPF ou CNPJ:</label>
+        <input type="number" id="cliDocumento" class="input-field" placeholder="00000000000">
+    </div>
+</div>
 
                 <div class="input-card border-blue-100 bg-blue-50/10">
                     <div class="flex items-center gap-2 mb-4">
@@ -338,6 +343,7 @@
                 document.getElementById('cliVencimento').value = c.diaVencimento;
                 document.getElementById('cliStatus').value = c.statusConta;
                 document.getElementById('subtituloModal').innerText = c.nome;
+				document.getElementById('cliTelefone').value = c.telefone || '';
             } else {
                 document.getElementById('cliId').value = "";
                 document.getElementById('cliChave').innerText = gerarChave();
@@ -346,13 +352,20 @@
                 document.getElementById('cliDocumento').value = "";
                 document.getElementById('cliFormatoCobranca').value = "Valor Fixo Mensal (R$)";
                 document.getElementById('subtituloModal').innerText = "Novo Registro";
+				document.getElementById('cliTelefone').value = "";
             }
             document.getElementById('modalCliente').style.display = 'flex';
         };
 
-        window.salvarCliente = async () => {
+window.salvarCliente = async () => {
             const id = document.getElementById('cliId').value || document.getElementById('cliChave').innerText;
+            
+            // Prompt obrigatório para o robô saber em qual banco de dados injetar a licença
+            const proj = prompt("Digite o ID Projeto (Ex: ctg, pracas, agua, loja):", "loja");
+            if (!proj) return;
+
             const obj = {
+                telefone: document.getElementById('cliTelefone').value.trim(),
                 chaveIntegracao: document.getElementById('cliChave').innerText,
                 nome: document.getElementById('cliNome').value.trim(),
                 email: document.getElementById('cliEmail').value.trim(),
@@ -361,12 +374,12 @@
                 valorCobranca: document.getElementById('cliValor').value,
                 diaVencimento: document.getElementById('cliVencimento').value,
                 statusConta: document.getElementById('cliStatus').value,
+                idProjeto: proj, 
                 dataAtualizacao: new Date().toISOString()
             };
 
             if(!obj.nome) return alert("Preencha o nome do cliente.");
-            const tel = prompt("WhatsApp (DDI+DDD+Num)?", "55"); if(!tel) return; obj.telefone = tel;
-            const proj = prompt("ID Projeto (Ex: ctg)?", "ctg"); if(!proj) return; obj.idProjeto = proj;
+            if(!obj.telefone) return alert("Preencha o WhatsApp do cliente.");
 
             document.getElementById('loadingOverlay').style.display = 'flex';
             try {
@@ -380,7 +393,6 @@
             } catch(e) { alert("Erro: " + e.message); }
             document.getElementById('loadingOverlay').style.display = 'none';
         };
-
         window.gerarCobrancaSaaS = async (idCliente, nome, telefone, valor) => {
             if(!telefone || telefone.length < 10) return alert("WhatsApp inválido.");
             document.getElementById('loadingOverlay').style.display = 'flex';
