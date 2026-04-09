@@ -116,7 +116,7 @@
         <!-- ABA CLIENTES -->
         <div id="aba-clientes" class="tab-content max-w-5xl mx-auto">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-black text-slate-800">Meus Inquilinos</h2>
+                <h2 class="text-2xl font-black text-slate-800">Meus Clientes</h2>
                 <button onclick="window.abrirModalCliente()" class="bg-primary hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-blue-200 transition flex items-center gap-2">
                     <i class="fa-solid fa-plus"></i> Novo Cliente
                 </button>
@@ -261,7 +261,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, doc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, doc, setDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyC4-2LavZt7iWPt2u71u-yRUYbIJu-Vzf0",
@@ -289,6 +289,21 @@
         const formatarMoeda = (valor) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor || 0);
         const gerarChave = () => [...Array(24)].map(() => Math.random().toString(36)[2]).join('');
 
+window.excluirClienteSaaS = async (id, nome) => {
+            if(!confirm(`⚠️ Tem certeza que deseja EXCLUIR o cliente ${nome}?\nIsso apagará o cadastro dele do seu painel.`)) return;
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            try {
+                await deleteDoc(doc(db, "inquilinos_saas", id));
+            } catch(e) { alert("Erro ao excluir cliente: " + e.message); }
+            document.getElementById('loadingOverlay').style.display = 'none';
+        };
+
+        window.excluirFaturaSaaS = async (id) => {
+            if(!confirm(`Deseja realmente apagar este registro de fatura do seu histórico?`)) return;
+            try {
+                await deleteDoc(doc(db, "faturas_saas", id));
+            } catch(e) { alert("Erro ao excluir fatura: " + e.message); }
+        };
         window.copiarChave = () => {
             const txt = document.getElementById('cliChave').innerText;
             if(!txt || txt.includes('Gerado')) return;
