@@ -446,40 +446,33 @@
             });
         };
 
-      // ==========================================
+        // ==========================================
         // GERAÇÃO DE COBRANÇA (ENVIO PRO NODEJS)
         // ==========================================
         window.gerarCobrancaSaaS = async (idCliente, nome, telefone, valor) => {
-            if(!telefone || telefone.length < 10) return alert("Este cliente não tem um telefone válido (WhatsApp) registrado.");[cite: 3]
+            if(!telefone || telefone.length < 10) return alert("Este cliente não tem um telefone válido (WhatsApp) registrado.");
+            if(valor <= 0) return alert("O valor da mensalidade deste cliente está zerado.");
             
-            // Para cobrança por porcentagem/alunos, o valor base no banco deve ser > 0 (ex: 10.00 por aluno)
-            if(valor <= 0) return alert("O valor base da mensalidade deste cliente está zerado.");[cite: 3]
-            
-            if(!confirm(`Deseja processar a fatura para ${nome}? O sistema calculará o valor final (Fixo ou por Alunos) e enviará o PIX no WhatsApp dele.`)) return;[cite: 3]
+            if(!confirm(`Gerar fatura de R$ ${valor} para ${nome} e enviar PIX no WhatsApp dele?`)) return;
 
-            document.getElementById('loadingOverlay').style.display = 'flex';[cite: 3]
+            document.getElementById('loadingOverlay').style.display = 'flex';
             try {
-                const reqCob = await fetch(`${API_URL}/api/gerar-cobranca-saas`, {[cite: 3]
-                    method: 'POST',[cite: 3]
-                    headers: { 'Content-Type': 'application/json', 'x-senha': '123321' },[cite: 3]
-                    body: JSON.stringify({ 
-                        clienteId: idCliente, 
-                        nome: nome, 
-                        telefone: telefone, 
-                        valor: valor // O central.js usará este valor como base para o cálculo dinâmico
-                    })[cite: 3]
+                const reqCob = await fetch(`${API_URL}/api/gerar-cobranca-saas`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'x-senha': '123321' },
+                    body: JSON.stringify({ clienteId: idCliente, nome: nome, telefone: telefone, valor: valor })
                 });
                 
-                const resCob = await reqCob.json();[cite: 3]
+                const resCob = await reqCob.json();
                 if(resCob.sucesso) {
-                    alert("✅ Fatura processada e enviada via WhatsApp com sucesso!");[cite: 3]
+                    alert("✅ Fatura gerada e enviada via WhatsApp com sucesso!");
                 } else {
-                    alert("❌ Erro ao enviar cobrança: " + resCob.erro);[cite: 3]
+                    alert("❌ Erro ao enviar cobrança: " + resCob.erro);
                 }
             } catch(e) {
-                alert("Erro de comunicação com o servidor Node.js: " + e.message);[cite: 3]
+                alert("Erro de comunicação com o servidor Node.js: " + e.message);
             }
-            document.getElementById('loadingOverlay').style.display = 'none';[cite: 3]
+            document.getElementById('loadingOverlay').style.display = 'none';
         };
 
         // ==========================================
