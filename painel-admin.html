@@ -559,12 +559,10 @@
                     alert("⚠️ Cliente salvo no Master, mas houve erro ao injetar a licença: " + resLicenca.erro);
                 }
 
-               window.fecharModalCliente();
-            } catch(e) {
-                alert("Erro ao salvar: " + e.message);
-            }
-            document.getElementById('loadingOverlay').style.display = 'none';
-        };
+// Procure onde você criou a função e deixe exatamente assim:
+window.fecharModalCliente = () => { 
+    document.getElementById('modalCliente').style.display = 'none'; 
+};
     </script>
 </body>
 </html>
