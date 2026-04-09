@@ -2,1184 +2,326 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gestão - Praças Unidos do Paraná</title>
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Admin - Central Omnichannel</title>
     <style>
-        body { -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; -webkit-touch-callout: none; font-family: 'Inter', sans-serif; background-color: #f3f4f6; overflow-x: hidden; position: relative; }
-        .card-militar { background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(8px); border: 1px solid rgba(30, 58, 138, 0.15); }
-        .fundo-login { background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); }
-        .cor-primaria { background-color: #1e3a8a; } 
-        .borda-destaque { border-bottom: 3px solid #fbbf24; } 
-        .tela-oculta { display: none !important; }
-        .logo-blend { mix-blend-mode: multiply; }
-        .loading-overlay { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.95); z-index: 9999; justify-content: center; align-items: center; flex-direction: column; }
-        .spinner { border: 4px solid #e2e8f0; border-top: 4px solid #1e3a8a; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .scroll-suave::-webkit-scrollbar { height: 6px; width: 6px; }
-        .scroll-suave::-webkit-scrollbar-thumb { background: rgba(30, 58, 138, 0.3); border-radius: 4px; }
-        .conteudo-principal { padding-bottom: 100px; display: flex; flex-direction: column; min-height: 100vh; } 
-        .modal-fundo { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 10000; justify-content: center; align-items: center; padding: 1rem; backdrop-filter: blur(3px); }
-        .linha-cr { background-color: #0f172a; color: white; text-transform: uppercase; font-weight: 900; font-size: 0.95rem; }
-        .linha-batalhao { background-color: #1e3a8a; color: white; text-transform: uppercase; font-weight: 900; font-size: 0.85rem; }
-        .linha-corporacao { background-color: #e5e7eb; color: #1e293b; text-transform: uppercase; font-weight: 900; }
+        :root { --primary: #003399; --bg-color: #f4f7f6; --card-bg: #ffffff; --text-dark: #333; --terminal-bg: #1e1e1e; --danger: #dc3545; --success: #28a745; --warning: #ffc107; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); margin: 0; padding: 20px; color: var(--text-dark); }
         
-        /* ESTILOS CRM TIPO SAAS */
-        .btn-saas { padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: none; font-size: 0.9rem; }
-        .btn-primary-saas { background-color: #2563eb; color: white; }
-        .btn-success-saas { background-color: #10b981; color: white; }
-        .btn-warning-saas { background-color: #f59e0b; color: white; }
-        .btn-danger-saas { background-color: #ef4444; color: white; }
-        .btn-outline-saas { background-color: transparent; border: 1px solid #cbd5e1; color: #334155; }
-        .tag-pill { background: #e2e8f0; color: #475569; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; margin: 2px; white-space: nowrap; }
-        .tag-remove { background: none; border: none; color: #ef4444; cursor: pointer; font-size: 1rem; line-height: 1; padding: 0 2px; }
+        /* HEADER E BOTÕES */
+        .header { display: flex; justify-content: space-between; align-items: center; background-color: var(--primary); color: white; padding: 15px 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .btn { background-color: var(--success); color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: background 0.3s; font-size: 13px; display: inline-flex; align-items: center; justify-content: center; gap: 5px; }
+        .btn:hover { background-color: #218838; }
+        .btn-danger { background-color: var(--danger); }
+        .btn-danger:hover { background-color: #c82333; }
+        .btn-outline { background-color: transparent; color: var(--primary); border: 1px solid var(--primary); }
+        .btn-edit { background-color: var(--warning); color: black; }
+
+        /* DASHBOARD METRICS */
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .dash-card { background: var(--card-bg); padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); text-align: center; border-bottom: 4px solid var(--primary); }
+        .dash-card.warning { border-bottom-color: var(--warning); }
+        .dash-card.success { border-bottom-color: var(--success); }
+        .dash-title { font-size: 12px; color: #666; text-transform: uppercase; font-weight: bold; margin-bottom: 10px; }
+        .dash-value { font-size: 28px; font-weight: 900; color: var(--primary); margin: 0; }
+
+        .section-title { font-size: 20px; color: var(--primary); border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 20px; margin-top: 20px; display: flex; align-items: center; gap: 10px;}
         
-        .table-container-saas { background: white; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; }
-        .table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; } 
-        .table-saas { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 600px; } 
-        .table-saas th { background-color: #f8fafc; padding: 12px 15px; text-align: left; border-bottom: 1px solid #e2e8f0; font-weight: 600; color: #2563eb; white-space: nowrap; cursor: pointer; user-select: none; }
-        .table-saas th:hover { background-color: #e2e8f0; }
-        .table-saas td { padding: 12px 15px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+        /* LISTA PENDENTES */
+        .lista-pendentes { display: flex; flex-direction: column; gap: 15px; margin-bottom: 40px; }
+        .card-pendente { background: #fff3cd; border-left: 5px solid var(--warning); padding: 15px 20px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .info-pendente h4 { margin: 0 0 5px 0; color: #856404; font-size: 18px; }
+        .info-pendente p { margin: 0; font-size: 14px; color: #666; }
 
-        .progress-bar-container { width: 100%; background-color: #e2e8f0; border-radius: 9999px; overflow: hidden; height: 12px; margin-top: 8px; }
-        .progress-bar-fill { height: 100%; background-color: #10b981; transition: width 0.5s ease-out; }
+        /* GRID ATIVOS */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
+        .card { background: var(--card-bg); border-radius: 8px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-top: 4px solid var(--primary); display: flex; flex-direction: column; position: relative; }
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
+        .empresa-nome { font-size: 18px; font-weight: bold; color: var(--primary); }
+        .empresa-sub { font-size: 11px; color: #777; margin-top: 3px; }
+        
+        .status-tag { font-size: 10px; padding: 4px 8px; border-radius: 12px; color: white; font-weight: bold; text-transform: uppercase; }
+        .status-tag.online { background-color: var(--success); }
+        .status-tag.offline { background-color: #6c757d; }
 
-        @media (max-width: 768px) {
-            .btn-saas { padding: 8px 12px; font-size: 0.8rem; width: 100%; margin-bottom: 5px; } 
-            .flex-mobile-col { flex-direction: column; width: 100%; } 
-        }
+        .log-window { background-color: var(--terminal-bg); color: #00ff00; font-family: 'Courier New', monospace; font-size: 11px; height: 100px; overflow-y: auto; padding: 10px; border-radius: 5px; margin-bottom: 15px; border: 1px solid #333; }
+        
+        .card-actions { display: flex; gap: 8px; margin-top: auto; }
+        .card-actions button { flex: 1; }
 
-        @media print { 
-            @page { size: A4 portrait; margin: 10mm; }
-            .no-print, aside, nav, .md\:hidden, #loginAdmin, #loading { display: none !important; } 
-            body { background: white !important; } 
-        }
+        /* MODAL */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; padding: 30px; border-radius: 8px; width: 600px; max-width: 95%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+        .modal label { font-weight: bold; font-size: 13px; display: block; margin-bottom: 5px; color: #555; margin-top: 15px; }
+        .modal input, .modal textarea, .modal select { width: 100%; padding: 10px; margin-bottom: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: inherit; font-size: 14px; }
+        .menu-row { display: grid; grid-template-columns: 1fr 2fr; gap: 15px; background: #f9f9f9; padding: 10px; border-radius: 6px; border: 1px solid #eee; margin-bottom: 10px; }
     </style>
 </head>
+<body>
 
-<body id="meuBody" class="text-gray-800 h-screen flex overflow-hidden">
-
-    <div id="loading" class="loading-overlay no-print">
-        <div class="spinner"></div>
-        <p id="loadingMsg" class="mt-6 font-bold text-slate-700 text-center px-4 text-sm md:text-base"></p>
+    <div class="header">
+        <h2>🛠️ Painel Admin - Central Omnichannel SaaS</h2>
+        <div>Sistema Operacional</div>
     </div>
 
-    <div id="loginAdmin" class="fixed inset-0 fundo-login flex justify-center items-center z-50 p-4 no-print">
-        <div class="bg-white/95 backdrop-blur-md p-8 md:p-10 rounded-3xl shadow-2xl w-full max-w-sm text-center border-4 border-blue-900 relative overflow-hidden">
-            <img src="pracasunidos.png" alt="Logo" class="w-32 h-auto object-contain mx-auto mb-6 drop-shadow-xl" onerror="this.style.display='none'">
-            <h2 class="text-2xl font-black mb-2 text-blue-900 tracking-tight">Acesso Restrito</h2>
-            <p class="text-sm text-slate-600 mb-8">Gestão Associação Praças Unidos</p>
-            <button onclick="window.loginGoogle()" class="w-full bg-white border border-slate-300 hover:bg-slate-50 text-slate-800 font-bold py-4 px-6 rounded-2xl shadow-lg active:scale-95 transition flex items-center justify-center gap-3">
-                <i class="fa-brands fa-google text-2xl text-red-500"></i> Acessar com Google
-            </button>
-            <p id="erroLogin" class="text-red-500 text-xs font-bold mt-4 hidden bg-red-50 p-2 rounded-lg border border-red-200"></p>
+    <!-- DASHBOARD DE MÉTRICAS -->
+    <div class="dashboard-grid">
+        <div class="dash-card">
+            <div class="dash-title">Total de Clientes Ativos</div>
+            <p class="dash-value" id="dashAtivos">0</p>
+        </div>
+        <div class="dash-card success">
+            <div class="dash-title">Contas Premium (Robô Próprio)</div>
+            <p class="dash-value" id="dashPremium" style="color: var(--success);">0</p>
+        </div>
+        <div class="dash-card warning">
+            <div class="dash-title">Aguardando Aprovação</div>
+            <p class="dash-value" id="dashPendentes" style="color: var(--warning);">0</p>
         </div>
     </div>
- 
-    <div id="painelAdmin" class="flex w-full h-full tela-oculta relative">
-        
-        <aside class="w-64 cor-primaria borda-destaque text-white flex-col hidden md:flex shadow-[4px_0_24px_rgba(0,0,0,0.15)] z-30 relative no-print">
-            <div class="p-6 text-center border-b border-blue-800/50 pt-8 flex flex-col items-center">
-               <img src="pracasunidos.png" alt="Logo" class="w-24 h-auto mx-auto mb-3 drop-shadow-lg" onerror="this.style.display='none'">
-                <h1 class="text-lg font-black leading-tight mt-2">Praças Unidos</h1>
-                <p class="text-[10px] text-yellow-400 font-bold uppercase tracking-widest mt-2" id="lblUsuarioAtivo">Paraná</p>
-            </div>
-            
-            <nav class="flex-1 p-4 space-y-2 overflow-y-auto scroll-suave text-sm text-blue-100/70">
-                <button onclick="window.mudarAba('aba-alunos', this)" class="menu-btn w-full flex items-center p-3 rounded-xl bg-blue-700 text-white font-bold transition shadow-md"><i class="fa-solid fa-users-viewfinder w-6 mr-2"></i> Associados</button>
-                <button onclick="window.mudarAba('aba-crm', this)" class="menu-btn w-full flex items-center p-3 rounded-xl hover:bg-blue-800 hover:text-white font-bold transition"><i class="fa-solid fa-address-book w-6 mr-2"></i> CRM & Disparos</button>
-                <button onclick="window.mudarAba('aba-mensalidades', this)" class="menu-btn w-full flex items-center p-3 rounded-xl hover:bg-blue-800 hover:text-white font-bold transition"><i class="fa-solid fa-file-invoice-dollar w-6 mr-2"></i> Mensalidades</button>
-                <button onclick="window.mudarAba('aba-juridico', this)" class="menu-btn w-full flex items-center p-3 rounded-xl hover:bg-blue-800 hover:text-white font-bold transition"><i class="fa-solid fa-scale-balanced w-6 mr-2"></i> Jurídico</button>
-                <button onclick="window.mudarAba('aba-avulso', this)" class="menu-btn w-full flex items-center p-3 rounded-xl hover:bg-blue-800 hover:text-white font-bold transition"><i class="fa-solid fa-bullhorn w-6 mr-2"></i> Avisos Oficiais</button>
-                <button onclick="window.mudarAba('aba-abertas', this)" class="menu-btn w-full flex items-center p-3 rounded-xl hover:bg-blue-800 font-bold transition text-amber-400 hover:text-amber-300"><i class="fa-solid fa-hourglass-half w-6 mr-2"></i> Fila do Robô</button>
-                <button onclick="window.mudarAba('aba-recebimentos', this)" class="menu-btn w-full flex items-center p-3 rounded-xl hover:bg-blue-800 hover:text-white font-bold transition"><i class="fa-solid fa-check-double w-6 mr-2"></i> Recebidos</button>
-                <button onclick="window.mudarAba('aba-relatorios', this)" class="menu-btn w-full flex items-center p-3 rounded-xl hover:bg-blue-800 hover:text-white font-bold transition"><i class="fa-solid fa-chart-pie w-6 mr-2"></i> Relatórios</button>
-                <button onclick="window.mudarAba('aba-config', this)" class="menu-btn w-full flex items-center p-3 rounded-xl hover:bg-blue-800 hover:text-white font-bold transition"><i class="fa-solid fa-gear w-6 mr-2"></i> Configurações</button>
-            </nav>
-            
-            <div class="pt-4 mt-auto border-t border-blue-800/50 flex flex-col items-center pb-6">
-                <button onclick="window.sairAdmin()" class="w-full bg-red-900/40 hover:bg-red-600 text-white font-bold py-3 rounded-xl transition mx-4" style="width: calc(100% - 2rem);">Sair do Sistema</button>
-            </div>
-        </aside>
 
-        <main id="mainArea" class="flex-1 overflow-y-auto bg-transparent conteudo-principal w-full flex flex-col">
-            
-            <div class="md:hidden cor-primaria text-white p-3 sticky top-0 z-40 shadow-md font-bold flex justify-between items-center relative borda-destaque no-print h-16">
-                <div class="w-10"></div> 
-                <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center w-full pointer-events-none mt-1">
-                    <img src="pracasunidos.png" class="w-8 h-auto drop-shadow-md" onerror="this.style.display='none'">
-                    <span class="text-[10px] tracking-wide mt-0.5 leading-none">Praças Unidos</span>
-                </div>
-                <button onclick="window.sairAdmin()" class="text-red-300 bg-blue-900 px-3 py-1.5 rounded-lg text-xs shadow relative z-10"><i class="fa-solid fa-right-from-bracket"></i></button>
-            </div>
-            
-            <div class="p-2 md:p-8 max-w-7xl mx-auto w-full print-area flex-1">
-                
-                <div id="aba-alunos" class="conteudo-aba">
-                    <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-3 no-print">
-                        <h2 class="text-xl md:text-2xl font-black text-blue-900 drop-shadow-sm">👥 Militares Associados</h2>
-                        <button onclick="window.abrirModalAluno()" class="w-full sm:w-auto bg-blue-700 hover:bg-blue-800 text-white px-5 py-3 rounded-xl font-bold shadow-lg transition text-sm border border-blue-600">+ Cadastrar Associado</button>
-                    </div>
-					<div class="bg-blue-50 p-4 rounded-xl border border-blue-200 mb-4 flex flex-col md:flex-row justify-between items-center">
-                        <div>
-                            <h4 class="font-black text-blue-900 text-sm italic">🎖️ INTELIGÊNCIA DE PROMOÇÕES (ABR/AGO/DEZ)</h4>
-                            <p class="text-xs text-blue-700">Importe o boletim em PDF para atualizar postos e parabenizar sócios.</p>
-                        </div>
-                        <input type="file" id="pdfPromocao" accept=".pdf" class="hidden" onchange="window.processarBoletim(event)">
-                        <button onclick="document.getElementById('pdfPromocao').click()" class="mt-2 md:mt-0 bg-blue-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-blue-700 transition flex items-center">
-                            <i class="fa-solid fa-file-pdf mr-2"></i> Selecionar Boletim
-                        </button>
-                    </div>
-                    
-                    <div class="card-militar rounded-2xl shadow-lg p-2 md:p-4 no-print">
-                        <div class="flex gap-2 mb-4 bg-gray-100 p-1 rounded-xl border border-gray-200 overflow-x-auto scroll-suave">
-                            <button onclick="window.mudarSubAbaAlunos('TODOS')" id="sub-todos" class="flex-1 py-2.5 px-3 rounded-lg font-black text-[11px] md:text-sm text-white bg-blue-800 shadow transition-all duration-300 min-w-[80px]">TODOS 👥</button>
-                            <button onclick="window.mudarSubAbaAlunos('PMPR')" id="sub-pmpr" class="flex-1 py-2.5 px-3 rounded-lg font-black text-[11px] md:text-sm text-blue-900 bg-transparent hover:bg-gray-200 transition-all duration-300 min-w-[80px]">PMPR 🚓</button>
-                            <button onclick="window.mudarSubAbaAlunos('BMPR')" id="sub-bmpr" class="flex-1 py-2.5 px-3 rounded-lg font-black text-[11px] md:text-sm text-blue-900 bg-transparent hover:bg-gray-200 transition-all duration-300 min-w-[80px]">BMPR 🚒</button>
-                            <button onclick="window.mudarSubAbaAlunos('Reserva')" id="sub-reserva" class="flex-1 py-2.5 px-3 rounded-lg font-black text-[11px] md:text-sm text-blue-900 bg-transparent hover:bg-gray-200 transition-all duration-300 min-w-[80px]">RESERVA 🎖️</button>
-                        </div>
-
-                        <div class="flex gap-2 mb-2 no-print">
-                            <input type="text" id="buscaAluno" onkeyup="window.filtrarTabela('buscaAluno', 'tabelaAlunos')" placeholder="🔍 Buscar por nome ou matrícula..." class="w-full p-3 md:p-4 bg-white border border-blue-200 rounded-xl outline-none text-sm md:text-base focus:border-blue-500 transition shadow-inner">
-                        </div>
-                        
-                        <div class="table-wrapper">
-                            <table class="table-saas border border-gray-200 rounded-xl mt-2">
-                                <thead>
-                                    <tr>
-                                        <th class="w-1/3">Militar / Matrícula</th>
-                                        <th>Posto / Lotação</th>
-                                        <th>Contato / E-mail</th>
-                                        <th class="text-center no-print acoes-coluna">Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tabelaAlunos" class="divide-y divide-gray-100 bg-white">
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="aba-crm" class="conteudo-aba tela-oculta no-print">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
-                        <div>
-                            <h2 class="text-xl md:text-2xl font-black text-blue-900 drop-shadow-sm">🚀 CRM & Campanhas</h2>
-                            <p class="text-xs text-gray-500 mt-1">Gerencie contatos, adicione etiquetas e faça convites em massa.</p>
-                        </div>
-                        <div class="flex flex-mobile-col gap-2">
-                            <button class="btn-saas btn-success-saas" onclick="window.abrirModalNovoContatoCrm()"><i class="fa-solid fa-plus"></i> Contato</button>
-                            <button class="btn-saas btn-primary-saas" onclick="document.getElementById('fileImportCrmSaas').click()"><i class="fa-solid fa-upload"></i> CSV/VCF</button>
-                            <input type="file" id="fileImportCrmSaas" accept=".csv, .vcf" class="hidden" onchange="window.lidarUploadCrmSaas(event)">
-                            <button class="btn-saas btn-warning-saas" onclick="window.abrirModalDisparoCrm()"><i class="fa-solid fa-paper-plane"></i> Campanha</button>
-                        </div>
-                    </div>
-
-                    <div id="painelCampanhaStatus" class="hidden mb-6 bg-white p-4 rounded-xl border border-blue-200 shadow-md">
-                        <div class="flex justify-between items-center mb-2">
-                            <h3 class="font-black text-blue-800"><i class="fa-solid fa-satellite-dish"></i> Status da Campanha</h3>
-                            <span id="txtProgressoCampanha" class="text-sm font-bold text-gray-600">0% Concluído</span>
-                        </div>
-                        <div class="progress-bar-container">
-                            <div id="barraProgressoCampanha" class="progress-bar-fill" style="width: 0%;"></div>
-                        </div>
-                        <div class="flex justify-between items-center mt-4">
-                            <div class="text-xs font-bold text-gray-500">
-                                Enviados: <span id="qtdEnviados" class="text-green-600">0</span> | Pendentes: <span id="qtdPendentes" class="text-amber-600">0</span> | Erros: <span id="qtdErros" class="text-red-600">0</span>
-                            </div>
-                            <div class="flex gap-2">
-                                <button id="btnPausarCampanha" onclick="window.pausarCampanha()" class="bg-amber-100 text-amber-700 hover:bg-amber-200 px-3 py-1.5 rounded-lg text-xs font-bold transition shadow-sm border border-amber-300"><i class="fa-solid fa-pause"></i> Pausar</button>
-                                <button id="btnRetomarCampanha" onclick="window.retomarCampanha()" class="hidden bg-green-100 text-green-700 hover:bg-green-200 px-3 py-1.5 rounded-lg text-xs font-bold transition shadow-sm border border-green-300"><i class="fa-solid fa-play"></i> Retomar</button>
-                                <button onclick="window.cancelarCampanha()" class="bg-red-100 text-red-700 hover:bg-red-200 px-3 py-1.5 rounded-lg text-xs font-bold transition shadow-sm border border-red-300"><i class="fa-solid fa-stop"></i> Cancelar Envio</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="table-container-saas shadow-lg">
-                        <div class="flex flex-col lg:flex-row justify-between mb-4 gap-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
-                            <div class="flex-1 grid grid-cols-1 md:grid-cols-3 gap-2">
-                                <input type="text" id="buscaCrmSaas" class="w-full p-3 border border-gray-300 rounded-xl text-sm outline-none focus:border-blue-500 shadow-inner" placeholder="Buscar nome ou número..." onkeyup="window.debounceRenderCrm()">
-                                <select id="filtroCorpCrm" class="w-full p-3 border border-gray-300 rounded-xl text-sm outline-none" onchange="window.renderizarTabelaCrm()">
-                                    <option value="TODOS">Todas as Corporações</option>
-                                    <option value="PMPR">PMPR</option>
-                                    <option value="BMPR">BMPR</option>
-                                    <option value="Reserva">Reserva</option>
-                                    <option value="Nenhuma">Não Informada</option>
-                                </select>
-                                <select id="filtroMesCrm" class="w-full p-3 border border-gray-300 rounded-xl text-sm outline-none" onchange="window.renderizarTabelaCrm()">
-                                    <option value="TODOS">Todos os Meses</option>
-                                    <option value="-01-">Janeiro</option><option value="-02-">Fevereiro</option>
-                                    <option value="-03-">Março</option><option value="-04-">Abril</option>
-                                    <option value="-05-">Maio</option><option value="-06-">Junho</option>
-                                    <option value="-07-">Julho</option><option value="-08-">Agosto</option>
-                                    <option value="-09-">Setembro</option><option value="-10-">Outubro</option>
-                                    <option value="-11-">Novembro</option><option value="-12-">Dezembro</option>
-                                </select>
-                            </div>
-                            <div class="flex flex-mobile-col gap-2 min-w-max">
-                                <button class="btn-saas btn-outline-saas bg-white" onclick="window.abrirModalEtiquetaCrm()"><i class="fa-solid fa-tags"></i> Etiquetar</button>
-                                <button class="btn-saas btn-outline-saas bg-white text-red-500 border-red-200 hover:bg-red-50" onclick="window.apagarSelecionadosCrm()"><i class="fa-solid fa-trash"></i> Apagar</button>
-                            </div>
-                        </div>
-                        
-                        <div class="table-wrapper border border-gray-200 rounded-xl">
-                            <table class="table-saas bg-white">
-                                <thead>
-                                    <tr>
-                                        <th style="width: 40px; text-align: center;"><input type="checkbox" id="checkTodosCrm" onclick="window.alternarTodosChecksCrm()" class="w-4 h-4 rounded border-gray-300 cursor-pointer"></th>
-                                        <th onclick="window.ordenarCrm('nome')">Nome do Contato <i class="fa-solid fa-sort ml-1 text-gray-400"></i></th>
-                                        <th>WhatsApp / Detalhes</th>
-                                        <th onclick="window.ordenarCrm('etiqueta')">Etiquetas (Tags) <i class="fa-solid fa-sort ml-1 text-gray-400"></i></th>
-                                        <th class="text-center">Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tabelaCrmData">
-                                    <tr><td colspan="5" class="p-8 text-center text-gray-500">A carregar base de contatos...</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="aba-juridico" class="conteudo-aba tela-oculta no-print">
-                    <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-3">
-                        <div>
-                            <h2 class="text-xl md:text-2xl font-black text-blue-900 drop-shadow-sm">⚖️ Departamento Jurídico</h2>
-                            <p class="text-xs text-gray-500 mt-1">Acompanhamento de processos e notificações aos associados via Robô.</p>
-                        </div>
-                        <button class="btn-saas btn-primary-saas" onclick="window.abrirModalJuridico()"><i class="fa-solid fa-plus"></i> Novo Processo</button>
-                    </div>
-
-                    <div class="table-container-saas shadow-lg">
-                        <div class="p-4 bg-gray-50 border-b border-gray-200 flex gap-2">
-                             <input type="text" id="buscaJuridico" class="w-full md:w-1/2 p-3 border border-gray-300 rounded-xl text-sm outline-none focus:border-blue-500 shadow-inner" placeholder="Buscar por nome, CPF ou número do processo..." onkeyup="window.renderizarTabelaJuridico()">
-                        </div>
-                        <div class="table-wrapper">
-                            <table class="table-saas bg-white">
-                                <thead>
-                                    <tr>
-                                        <th>Associado / CPF</th>
-                                        <th>Nº do Processo</th>
-                                        <th>Status / Assunto</th>
-                                        <th>Última Atualização</th>
-                                        <th class="text-center">Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tabelaJuridicoData">
-                                    <tr><td colspan="5" class="p-8 text-center text-gray-500 font-bold">A carregar processos...</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="aba-mensalidades" class="conteudo-aba tela-oculta">
-                    <div class="mb-4 flex flex-col md:flex-row justify-between items-start md:items-end gap-3 no-print">
-                        <h2 class="text-xl md:text-2xl font-black text-blue-900 drop-shadow-sm">📝 Lote de Mensalidades</h2>
-                        <div class="flex flex-wrap gap-2 text-xs w-full md:w-auto">
-                            <select id="loteFiltroCorporacao" onchange="window.carregarLoteFaturas()" class="p-3 border border-blue-200 rounded-xl font-bold outline-none shadow-sm"><option value="TODOS">Todas as Corporações</option><option value="PMPR">PMPR</option><option value="BMPR">BMPR</option><option value="Reserva">Reserva</option></select>
-                            <input type="text" id="mesReferencia" value="05/2026" class="p-3 border border-blue-200 rounded-xl font-bold text-center outline-none shadow-sm">
-                            <input type="date" id="dataVencimento" class="p-3 border border-blue-200 rounded-xl font-bold text-center outline-none shadow-sm">
-                        </div>
-                    </div>
-                    <button onclick="window.gerarFaturasEmLote()" class="w-full bg-blue-800 hover:bg-blue-900 text-white py-4 rounded-2xl font-black text-lg shadow-xl active:scale-95 transition mb-6">🚀 GERAR MENSALIDADES DO MÊS</button>
-                    <div class="card-militar rounded-2xl shadow-lg p-2 md:p-4 no-print">
-                        <div class="table-wrapper">
-                            <table class="table-saas border border-gray-200 rounded-xl">
-                                <thead><tr><th class="pl-4">Associado</th><th class="text-center">Valor Base</th><th class="text-center">Extras</th><th class="text-right">Total a Cobrar</th><th class="text-center">Status</th></tr></thead>
-                                <tbody id="corpoTabelaLote" class="divide-y divide-gray-100 bg-white"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="aba-avulso" class="conteudo-aba tela-oculta no-print">
-                    <div class="flex flex-col lg:flex-row gap-6">
-                        <div class="flex-1">
-                            <h2 class="text-xl md:text-2xl font-black text-blue-900 mb-4">📢 Enviar Comunicado Oficial</h2>
-                            <div class="card-militar rounded-2xl shadow-lg p-6 bg-white border-t-4 border-blue-500">
-                                <label class="block text-xs font-bold text-gray-800 uppercase mb-2">Público Alvo</label>
-                                <select id="avisoPublico" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none font-bold text-gray-700 mb-4"><option value="TODOS">🌟 TODOS os Associados</option><option value="PMPR">🚓 Apenas PMPR</option><option value="BMPR">🚒 Apenas BMPR</option><option value="Reserva">🎖️ Apenas Reserva</option></select>
-                                <label class="block text-xs font-bold text-gray-800 uppercase mb-2">Mensagem</label>
-                                <textarea id="avisoMensagem" rows="6" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-blue-500 shadow-sm text-sm" placeholder="Digite o comunicado da Diretoria..."></textarea>
-                                <button onclick="window.enviarAvisoDiretoria()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-xl shadow-lg mt-4"><i class="fa-solid fa-paper-plane mr-2"></i> Agendar Aviso</button>
-                            </div>
-                        </div>
-                        <div class="flex-1">
-                            <h2 class="text-xl md:text-2xl font-black text-blue-900 mb-4">🛡️ Lançar Taxa / Evento</h2>
-                            <div class="card-militar rounded-2xl shadow-lg p-6">
-                                <form onsubmit="window.submitAvulso(event)" class="space-y-4">
-                                    <select id="avulsoTipo" class="w-full p-3 bg-blue-50 border border-blue-200 rounded-xl outline-none font-bold text-blue-900"><option value="somar_proxima">➕ Adicionar na próxima Mensalidade</option><option value="pix_agora">⚡ Gerar PIX Imediato</option></select>
-                                    <select id="avulsoModoDestino" onchange="window.mudarModoAvulso()" class="w-full p-3 bg-white border border-gray-200 rounded-xl outline-none font-bold text-gray-700"><option value="todos">🌟 Cobrar de TODOS</option><option value="corporacao">🏢 Por Corporação</option><option value="manual">👤 Selecionar Militares</option></select>
-                                    <div id="blocoAvulsoCorporacao" style="display: none;"><select id="avulsoCorpSelect" class="w-full p-3 bg-white border border-gray-200 rounded-xl font-bold"><option value="PMPR">PMPR</option><option value="BMPR">BMPR</option><option value="Reserva">Reserva</option></select></div>
-                                    <div id="blocoAvulsoManual" style="display: none;"><div class="relative"><input type="text" id="avulsoBuscaNome" autocomplete="off" placeholder="Buscar associado..." oninput="window.buscarAssociadosAvulso()" class="w-full p-4 pl-10 bg-gray-50 border border-gray-300 rounded-xl outline-none"><div id="dropdownAvulso" class="absolute z-50 w-full bg-white border border-blue-300 rounded-xl shadow-2xl mt-1 hidden max-h-48 overflow-y-auto"></div></div><div id="listaAssociadosSelecionados" class="mt-4 flex flex-col gap-2"></div></div>
-                                    <input type="text" id="avulsoDescricao" required placeholder="Ex: EVENTO, DOAÇÃO" class="w-full p-3 bg-white border border-gray-200 rounded-xl uppercase font-bold outline-none">
-                       <div class="flex gap-2">
-                    <input type="text" inputmode="numeric" id="avulsoValor" required placeholder="Valor (R$)" oninput="let v=this.value.replace(/\D/g,''); v=(v/100).toFixed(2).replace('.',','); this.value=v;" class="w-full p-3 bg-white border border-gray-200 rounded-xl outline-none focus:border-blue-500 font-bold text-gray-700 transition shadow-sm">
-                </div>
-                <input type="date" id="avulsoVencimento" required class="w-full p-3 bg-white border border-gray-200 rounded-xl outline-none focus:border-blue-500 font-bold text-gray-700 transition shadow-sm mt-2">
-                                    <button type="submit" class="w-full bg-blue-800 hover:bg-blue-900 text-white font-black py-4 rounded-xl shadow-lg">Lançar Cobrança</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="aba-abertas" class="conteudo-aba tela-oculta">
-                    <h2 class="text-xl font-black text-amber-600 mb-4">⏳ Fila de Envios (Robô WhatsApp)</h2>
-                    <div class="card-militar rounded-2xl shadow-lg p-2 md:p-4 no-print">
-                        <div class="table-wrapper border border-gray-200 rounded-xl">
-                            <table class="table-saas bg-white">
-                                <thead>
-                                    <tr>
-                                        <th class="p-3">Vencimento</th>
-                                        <th class="p-3">Militar</th>
-                                        <th class="p-3 text-right">Valor Total</th>
-                                        <th class="p-3 text-center">Status / Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tabelaAbertas" class="divide-y divide-gray-100"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="aba-recebimentos" class="conteudo-aba tela-oculta">
-                    <h2 class="text-xl font-black text-blue-900 mb-4">✅ Histórico de Recebimentos</h2>
-                    <div class="card-militar rounded-2xl shadow-lg p-2 md:p-4">
-                        <div class="table-wrapper border border-gray-200 rounded-xl">
-                            <table class="table-saas bg-white">
-                                <thead>
-                                    <tr>
-                                        <th class="p-3">Data da Baixa</th>
-                                        <th class="p-3">Militar</th>
-                                        <th class="p-3 text-right">Valor Total</th>
-                                        <th class="p-3 text-center">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tabelaPagos" class="divide-y divide-gray-100"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="aba-relatorios" class="conteudo-aba tela-oculta relative">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-xl font-black text-blue-900">📊 Relatórios Financeiros</h2>
-                        <div class="flex gap-2">
-                            <select id="relTipo" onchange="window.mudarTipoRelatorio()" class="p-3 bg-white border-2 border-blue-800 text-blue-900 font-black rounded-xl"><option value="financeiro">Relatório Financeiro</option><option value="alunos">Lista de Associados</option></select>
-                            <button onclick="window.imprimirDocumentoSeguro()" class="bg-blue-800 text-white px-6 py-3 rounded-xl font-bold shadow-lg"><i class="fa-solid fa-print"></i></button>
-                        </div>
-                    </div>
-                    <div id="cardsFinanceiros" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                        <div class="card-militar p-4 text-center"><p class="text-[10px] text-gray-500 font-bold">Faturas</p><p class="text-xl font-black" id="relCardQtd">0</p></div>
-                        <div class="card-militar p-4 text-center bg-amber-50"><p class="text-[10px] text-amber-700 font-bold">A Receber</p><p class="text-xl font-black text-amber-800" id="relCardPendente">R$ 0,00</p></div>
-                        <div class="card-militar p-4 text-center bg-red-50"><p class="text-[10px] text-red-700 font-bold">Atrasados</p><p class="text-xl font-black text-red-700" id="relCardInadimplente">R$ 0,00</p></div>
-                        <div class="card-militar p-4 text-center bg-green-50"><p class="text-[10px] text-green-800 font-bold">Recebido Caixa</p><p class="text-xl font-black text-green-700" id="relCardPago">R$ 0,00</p></div>
-                    </div>
-                    <div id="filtrosFinanceiro" class="flex flex-wrap gap-3 mb-6">
-                        <input type="date" id="relDataInicio" class="p-2 border rounded-lg flex-1">
-                        <input type="date" id="relDataFim" class="p-2 border rounded-lg flex-1">
-                        <select id="relStatus" class="p-2 border rounded-lg flex-1"><option value="TODOS">Geral</option><option value="pago">Pagas</option><option value="pendente">Pendentes</option></select>
-                        <input type="text" id="relBusca" class="flex-[2] p-2 border rounded-lg" placeholder="Pesquisar...">
-                        <button onclick="window.gerarRelatorioFiltrado()" class="bg-blue-700 text-white px-4 rounded-lg">Filtrar</button>
-                    </div>
-                    <div id="filtrosAlunos" class="flex gap-3 mb-6 hidden">
-                        <input type="text" id="relBuscaAlunoApenas" class="flex-1 p-3 border rounded-lg" placeholder="Buscar associado...">
-                        <button onclick="window.gerarRelatorioFiltrado()" class="bg-blue-700 text-white px-6 rounded-lg">Buscar</button>
-                    </div>
-                    <div class="card-militar rounded-2xl shadow-lg p-2 md:p-4 mb-8">
-                        <div class="table-wrapper border border-gray-200 rounded-xl">
-                            <table class="table-saas bg-white"><thead id="theadRelatorio"></thead><tbody id="tabelaRelatorio" class="divide-y divide-gray-200"></tbody></table>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="aba-config" class="conteudo-aba tela-oculta no-print">
-                    <h2 class="text-xl font-black text-blue-900 mb-6">⚙️ Configurações e Sistema</h2>
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div class="card-militar p-6 rounded-3xl shadow-lg relative border-2 border-green-500 bg-green-50/40">
-                            <h3 class="font-black text-lg text-green-900 mb-4">Conexão do Robô</h3>
-                            <p class="text-sm text-slate-600 mb-4 font-bold">Status: <span id="ctgStatusRobo" class="bg-gray-200 px-3 py-1 rounded-lg">Aguardando...</span></p>
-                            <div class="flex gap-3">
-                                <button onclick="window.enviarComandoCtgRobo('conectar', this)" class="flex-1 bg-green-600 text-white font-bold py-3 rounded-xl">🟢 Ligar Robô</button>
-                                <button onclick="window.enviarComandoCtgRobo('desconectar', this)" class="flex-1 bg-red-600 text-white font-bold py-3 rounded-xl">🔴 Desconectar</button>
-                            </div>
-                            <div id="ctgQrContainer" class="hidden w-48 h-48 bg-white p-3 rounded-xl mx-auto mt-4"><div id="ctgQrCanvas"></div></div>
-                        </div>
-
-                        <div class="card-militar p-6 rounded-3xl shadow-lg border-l-8 border-l-blue-600 lg:col-span-2 relative">
-                            <h3 class="font-black text-lg text-blue-900 mb-2">Controle de Acessos</h3>
-                            <div class="flex flex-col sm:flex-row gap-3 mb-6 bg-blue-50/50 p-4 rounded-xl border border-blue-100">
-                                <input type="email" id="novoEmailAuth" placeholder="E-mail Google..." class="flex-1 p-2 border rounded-lg text-sm"><select id="novoNivelAuth" class="p-2 border rounded-lg text-sm font-bold"><option value="colaborador">Colaborador</option><option value="tesoureiro">Tesoureiro</option><option value="ADMINISTRADOR">Presidente</option></select><button onclick="window.adicionarUsuarioAuth()" class="bg-blue-700 text-white px-4 rounded-lg font-bold">Conceder</button>
-                            </div>
-                            <div class="table-wrapper border border-gray-200 rounded-xl">
-                                <table class="table-saas bg-white"><tbody id="tabelaUsuariosAuth" class="divide-y divide-gray-100"></tbody></table>
-                            </div>
-                        </div>
-
-                        <div class="card-militar p-6 rounded-3xl shadow-lg border-2 border-blue-100 flex flex-col justify-between">
-                            <div><h3 class="font-black text-lg text-blue-900 mb-2">Valor Base Mensalidade</h3><input type="text" id="cfgValBase" class="w-full p-4 border-2 border-blue-300 rounded-xl font-black text-blue-800 text-xl mb-4 text-center"></div>
-                            <button onclick="window.salvarConfigMensalidade()" class="w-full bg-blue-700 text-white font-black py-4 rounded-xl">💾 Salvar Valor</button>
-                        </div>
-                        
-                        <div class="card-militar p-6 rounded-3xl shadow-lg lg:col-span-2 flex flex-col sm:flex-row justify-between items-center bg-gray-50 gap-4">
-                            <div class="flex gap-2 w-full sm:w-auto">
-                                <button onclick="window.exportarBackup()" class="flex-1 bg-blue-700 text-white font-bold py-3 px-4 rounded-lg">📥 Baixar BD</button>
-                                <button onclick="window.enviarBackupTelegram()" class="flex-1 bg-sky-500 text-white font-bold py-3 px-4 rounded-lg"><i class="fa-brands fa-telegram"></i> P/ Telegram</button>
-                                <button onclick="document.getElementById('fileImport').click()" class="flex-1 bg-amber-600 text-white font-bold py-3 px-4 rounded-lg">📤 Restaurar</button>
-                                <input type="file" id="fileImport" class="hidden" accept=".json" onchange="window.importarBackup(event)">
-                            </div>
-                            <div class="flex gap-2 w-full sm:w-auto"><button onclick="window.limparApenasFaturas()" class="flex-1 bg-orange-600 text-white font-bold py-3 px-4 rounded-lg">Limpar Financeiro</button><button onclick="window.limparBaseCompleta()" class="flex-1 bg-red-600 text-white font-black py-3 px-4 rounded-lg">DESTRUIR TUDO</button></div>
-                        </div>
-                    </div>
-                </div>
-
-            </div> 
-            
-           <div class="w-full mt-12 pb-6 flex justify-center items-center px-4">
-            <img src="rodape.jpg" alt="Rodapé Praças Unidos" class="w-full max-w-5xl h-16 md:h-20 object-contain opacity-90 transition hover:opacity-100" onerror="this.style.display='none'">
-        </div>
-        </main>
-        
-        <nav class="md:hidden fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-md border-t border-gray-200 flex overflow-x-auto flex-nowrap items-center z-50 pb-2 pt-2 shadow-[0_-4px_15px_rgba(0,0,0,0.05)] px-2 no-print scroll-suave" style="-webkit-overflow-scrolling: touch;">
-            <button onclick="window.mudarAba('aba-alunos', this)" class="mobile-nav-btn min-w-[65px] p-2 flex flex-col items-center text-blue-800 bg-blue-50 rounded-xl"><i class="fa-solid fa-users text-lg mb-1"></i><span class="text-[9px] font-bold">Militar</span></button>
-            <button onclick="window.mudarAba('aba-crm', this)" class="mobile-nav-btn min-w-[65px] p-2 flex flex-col items-center text-gray-500"><i class="fa-solid fa-address-book text-lg mb-1"></i><span class="text-[9px] font-bold">CRM</span></button>
-            <button onclick="window.mudarAba('aba-juridico', this)" class="mobile-nav-btn min-w-[65px] p-2 flex flex-col items-center text-gray-500"><i class="fa-solid fa-scale-balanced text-lg mb-1"></i><span class="text-[9px] font-bold">Jurídico</span></button>
-            <button onclick="window.mudarAba('aba-mensalidades', this)" class="mobile-nav-btn min-w-[65px] p-2 flex flex-col items-center text-gray-500"><i class="fa-solid fa-file-invoice-dollar text-lg mb-1"></i><span class="text-[9px] font-bold">Gerar</span></button>
-            <button onclick="window.mudarAba('aba-abertas', this)" class="mobile-nav-btn min-w-[65px] p-2 flex flex-col items-center text-gray-500"><i class="fa-solid fa-hourglass-half text-lg mb-1"></i><span class="text-[9px] font-bold">Robô</span></button>
-            <button onclick="window.mudarAba('aba-recebimentos', this)" class="mobile-nav-btn min-w-[70px] p-2 flex flex-col items-center text-gray-500"><i class="fa-solid fa-check-double text-lg mb-1"></i><span class="text-[9px] font-bold">Recebidos</span></button>
-            <button onclick="window.mudarAba('aba-relatorios', this)" class="mobile-nav-btn min-w-[65px] p-2 flex flex-col items-center text-gray-500"><i class="fa-solid fa-chart-pie text-lg mb-1"></i><span class="text-[9px] font-bold">Relatórios</span></button>
-            <button onclick="window.mudarAba('aba-avulso', this)" class="mobile-nav-btn min-w-[65px] p-2 flex flex-col items-center text-gray-500"><i class="fa-solid fa-bullhorn text-lg mb-1"></i><span class="text-[9px] font-bold">Avisos</span></button>
-            <button onclick="window.mudarAba('aba-config', this)" class="mobile-nav-btn min-w-[65px] p-2 flex flex-col items-center text-gray-500"><i class="fa-solid fa-gear text-lg mb-1"></i><span class="text-[9px] font-bold">Config</span></button>
-        </nav>
+    <h3 class="section-title">🔔 Solicitações Pendentes</h3>
+    <div class="lista-pendentes" id="painelPendentes">
+        <p style="text-align: center; color: #999;">Conectando ao banco de dados...</p>
     </div>
 
-    <div id="modalAluno" class="modal-fundo no-print" style="z-index: 99990;">
-        <div class="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl w-[95%] md:w-full max-w-sm mx-auto overflow-hidden border border-blue-200">
-            <div class="cor-primaria p-4 flex justify-between items-center text-white border-b-2 border-yellow-400">
-                <h3 class="font-bold tracking-wide">Ficha do Associado</h3>
-                <button onclick="window.fecharModalAluno()" class="text-2xl hover:text-red-300">&times;</button>
-            </div>
-            <form id="formAluno" class="p-5 space-y-3 max-h-[75vh] overflow-y-auto" onsubmit="window.submitAluno(event)">
-                <input type="hidden" id="modId">
-                <label class="text-xs font-bold text-gray-500 block -mb-2">Matrícula no Sistema:</label>
-                <input type="text" id="modMatricula" readonly placeholder="Gerada Automaticamente no Salvar" class="w-full p-3 bg-gray-200 text-gray-500 font-mono rounded-xl border border-gray-300 outline-none cursor-not-allowed">
-                <input type="text" id="modNome" required placeholder="Nome do Militar" class="w-full p-3 bg-gray-50 rounded-xl outline-none border border-gray-200 focus:border-blue-600 font-bold">
-                <select id="modCorporacao" onchange="window.popularCR()" required class="w-full p-3 bg-white rounded-xl border border-gray-300 font-black"><option value="" disabled selected>Corporação...</option><option value="PMPR">PMPR</option><option value="BMPR">BMPR</option><option value="Reserva">Reserva</option></select>
-                <div id="divCamposLotacao" class="flex flex-col gap-3 border border-gray-200 p-3 rounded-xl bg-gray-50/50 hidden">
-                    <select id="modCR" onchange="window.popularBatalhoes()" class="w-full p-2 bg-white rounded-lg border font-bold text-sm"><option value="">Comando Regional...</option></select>
-                    <select id="modBatalhao" onchange="window.verificarBatalhaoOutro()" class="w-full p-2 bg-white rounded-lg border font-bold text-sm"><option value="">Batalhão...</option></select>
-                    <input type="text" id="modBatalhaoOutro" placeholder="Digite a Unidade... (Ex: 12bbm)" class="w-full p-2 bg-white rounded-lg border hidden">
-                    <input type="text" id="modCiaPel" placeholder="Cia / Pelotão (Ex: 2a cia / 1 pel)" class="w-full p-2 bg-white rounded-lg border text-sm">
+    <h3 class="section-title">🤖 Clientes Ativos na Plataforma</h3>
+    <div class="grid" id="painelAtivos"></div>
+
+    <!-- MODAL DE EDIÇÃO -->
+    <div class="modal" id="modalEmpresa">
+        <div class="modal-content">
+            <h2 style="margin-top: 0; color: var(--primary); border-bottom: 2px solid #eee; padding-bottom: 10px;">⚙️ Configurar Cliente: <span id="nomeRoboEdit"></span></h2>
+            <input type="hidden" id="editEmpresaId">
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div>
+                    <label>Plano da Conta:</label>
+                    <select id="editPlanoConta">
+                        <option value="basico">🥉 Plano Básico</option>
+                        <option value="premium">🥇 Plano Premium</option>
+                    </select>
                 </div>
-                <select id="modPostoGraduacao" required class="w-full p-3 bg-gray-50 rounded-xl border border-gray-300 font-bold">
-                    <option value="" disabled selected>Graduação...</option>
-                    <option value="Soldado">Soldado</option>
-                    <option value="Cabo">Cabo</option>
-                    <option value="Sargento">Sargento</option>
-                    <option value="Subtenente">Subtenente</option>
-                </select>
-                <div class="flex gap-2">
-                    <input type="date" id="modNascimento" required class="flex-[2] p-3 bg-gray-50 rounded-xl border text-sm">
-                    <select id="modDiaVencimento" required class="flex-[1] p-3 bg-gray-50 rounded-xl border text-sm"><option value="10">Dia 10</option><option value="20">Dia 20</option><option value="30">Dia 30</option></select>
+                <div>
+                    <label>WhatsApp de Atendimento:</label>
+                    <input type="text" id="editZapLoja" placeholder="Ex: 46999999999">
                 </div>
-                <input type="tel" id="modCpf" required placeholder="CPF (Apenas números)" class="w-full p-3 bg-gray-50 rounded-xl border">
-                <input type="tel" id="modTel" required placeholder="WhatsApp (Com DDD)" class="w-full p-3 bg-gray-50 rounded-xl border">
-                <input type="email" id="modEmail" placeholder="E-mail (Opcional)" class="w-full p-3 bg-gray-50 rounded-xl border">
-                <div class="flex gap-2 pt-2"><button type="button" onclick="window.fecharModalAluno()" class="flex-1 bg-gray-200 py-3 rounded-xl font-bold">Cancelar</button><button type="submit" class="flex-1 bg-blue-700 text-white py-3 rounded-xl font-bold">Salvar Ficha</button></div>
-            </form>
-        </div>
-    </div>
-    <div id="modalQRPix" class="modal-fundo no-print" style="z-index: 99995;">
-        <div class="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl w-[95%] md:w-full max-w-md mx-auto overflow-hidden border border-blue-200 flex flex-col max-h-[90vh]">
-            <div class="cor-primaria p-4 flex justify-between items-center text-white border-b-2 border-green-400">
-                <h3 class="font-bold tracking-wide"><i class="fa-brands fa-pix mr-2 text-green-300"></i> Pagamento PIX</h3>
-                <button onclick="window.fecharModalQRPix()" class="text-2xl hover:text-red-300 transition">&times;</button>
             </div>
-            <div id="listaQRs" class="p-5 space-y-6 overflow-y-auto flex-1 bg-gray-50/50"></div>
-            <div class="p-4 border-t border-gray-200 bg-white"><button onclick="window.fecharModalQRPix()" class="w-full bg-gray-200 py-3 rounded-xl font-bold transition">Fechar e Voltar</button></div>
+
+            <label>Mensagem de Boas-vindas do Robô:</label>
+            <textarea id="menuSaudacao" rows="3" placeholder="Ex: Olá! Seja bem-vindo ao nosso atendimento. Como podemos ajudar hoje?"></textarea>
+
+            <label style="color: var(--primary); border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-top: 20px;">Menu de Autoatendimento (Premium)</label>
+            
+            <div class="menu-row">
+                <div>
+                    <label style="margin-top:0;">Opção 1 (Botão):</label>
+                    <input type="text" id="opt1Nome" placeholder="Ex: Catálogo">
+                </div>
+                <div>
+                    <label style="margin-top:0;">Resposta Automática:</label>
+                    <input type="text" id="opt1Resp" placeholder="Ex: Acesse nosso catálogo em www.site.com">
+                </div>
+            </div>
+
+            <div class="menu-row">
+                <div>
+                    <label style="margin-top:0;">Opção 2 (Botão):</label>
+                    <input type="text" id="opt2Nome" placeholder="Ex: Falar com Vendedor">
+                </div>
+                <div>
+                    <label style="margin-top:0;">Resposta Automática:</label>
+                    <input type="text" id="opt2Resp" placeholder="Ex: Aguarde um momento, já vamos te atender!">
+                </div>
+            </div>
+
+            <div class="menu-row">
+                <div>
+                    <label style="margin-top:0;">Opção 3 (Botão):</label>
+                    <input type="text" id="opt3Nome" placeholder="Ex: Dúvidas / Entregas">
+                </div>
+                <div>
+                    <label style="margin-top:0;">Resposta Automática:</label>
+                    <input type="text" id="opt3Resp" placeholder="Ex: Nossas entregas são feitas em até 2 dias úteis.">
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 25px;">
+                <button class="btn btn-outline" onclick="fecharModal()">Cancelar</button>
+                <button class="btn" onclick="salvarConfiguracao()">💾 Salvar Alterações</button>
+            </div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, where, onSnapshot, setDoc, getDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // SUA CHAVE DE BANCO DE DADOS (CLIENTE)
-        const configCliente = {
-            apiKey: "AIzaSyBKweelMvdLxYipOeJ9HarFEBTGNX4DuUU",
-            authDomain: "pracas-unidos-parana.firebaseapp.com",
-            projectId: "pracas-unidos-parana",
-            storageBucket: "pracas-unidos-parana.firebasestorage.app",
-            messagingSenderId: "565617157774",
-            appId: "1:565617157774:web:5258be84a3823059224bdf"
-        };
-        
-        // CHAVE DA SUA CENTRAL MASTER SAAS
-        const configMaster = {
+        const firebaseConfig = {
             apiKey: "AIzaSyC4-2LavZt7iWPt2u71u-yRUYbIJu-Vzf0",
             authDomain: "central-omnichannel-saas.firebaseapp.com",
             projectId: "central-omnichannel-saas",
             storageBucket: "central-omnichannel-saas.firebasestorage.app",
             messagingSenderId: "869327159480",
-            appId: "1:869327159480:web:605be5ec37ab688d44b44d"
+            appId: "1:869327159480:web:605be5ec37ab688d44b44d",
+            measurementId: "G-984WSSJBHP"
         };
 
-        const app = initializeApp(configCliente); 
-        const appMaster = initializeApp(configMaster, "masterSaaS"); 
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        let listaEmpresas = [];
+        window.empresaEmEdicao = null; 
 
-        const db = getFirestore(app); 
-        const dbMaster = getFirestore(appMaster);
-        
-        window.db = db;
-        window.addDoc = addDoc;
-        window.collection = collection;
-        const auth = getAuth(app); 
-        const provider = new GoogleAuthProvider();
-
-        const CLIENTE_ID_SAAS = "zV85lCgAolIqOqQ2T4qF"; 
-
-        window.associadosGlobal = {}; 
-        window.configGlobais = { valorBase: 30.00, plano: 'BASICO', statusConta: 'ativo' }; 
-        window.nivelAcessoGlobal = null; 
-        window.emailLogado = null; 
-        window.todasFaturasCache = []; // CORREÇÃO APLICADA: Inicializa no Window para relatórios!
-        
-        onSnapshot(doc(dbMaster, "empresas", CLIENTE_ID_SAAS), (snap) => {
-            if (snap.exists()) {
-                const dadosMaster = snap.data();
-                window.configGlobais.plano = dadosMaster.plano || 'BASICO';
-                window.configGlobais.statusConta = dadosMaster.statusConta || 'ativo';
-                if (window.nivelAcessoGlobal) window.aplicarRegrasAcesso();
-            }
+        onSnapshot(collection(db, "empresas"), (snapshot) => {
+            listaEmpresas = [];
+            snapshot.forEach((doc) => { listaEmpresas.push({ id: doc.id, ...doc.data() }); });
+            renderizarPainel();
         });
 
-        window.aplicarRegrasAcesso = () => { 
-            const nv = window.nivelAcessoGlobal; 
-            const plano = window.configGlobais.plano;
-            const statusConta = window.configGlobais.statusConta;
-
-            let trava = document.getElementById('travaSaaS');
-            if (statusConta === 'bloqueado') {
-                if(!trava) {
-                    trava = document.createElement('div');
-                    trava.id = 'travaSaaS';
-                    trava.style = "position:fixed; inset:0; z-index:999999; background:#0f172a; color:white; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px;";
-                    trava.innerHTML = `<i class="fa-solid fa-lock" style="font-size:80px; color:#ef4444; margin-bottom:20px;"></i><h1 style="font-size:30px; font-weight:900;">SISTEMA SUSPENSO</h1><p style="font-size:18px; margin-top:10px;">O acesso foi temporariamente bloqueado.</p>`;
-                    document.body.appendChild(trava);
-                }
-                return;
-            } else if (trava) trava.remove(); 
-
-            let aviso = document.getElementById('avisoInadimplente');
-            if (statusConta === 'inadimplente') {
-                if(!aviso) {
-                    aviso = document.createElement('div');
-                    aviso.id = 'avisoInadimplente';
-                    aviso.style = "position:fixed; top:0; left:0; width:100%; background:#f59e0b; color:black; text-align:center; padding:8px; font-weight:bold; z-index:99999; font-size:12px; border-bottom: 2px solid #b45309;";
-                    aviso.innerHTML = "⚠️ AVISO FINANCEIRO: Sua assinatura encontra-se pendente. Regularize para evitar bloqueio automático.";
-                    document.body.appendChild(aviso);
-                }
-            } else if (aviso) aviso.remove();
-
-            document.querySelectorAll('[onclick*="aba-"]').forEach(el => el.style.display = '');
-
-            if (plano === 'BASICO') {
-                document.querySelectorAll('[onclick*="aba-crm"], [onclick*="aba-avulso"]').forEach(el => el.style.display = 'none');
-            } else if (plano === 'PLUS') {
-                document.querySelectorAll('[onclick*="aba-avulso"]').forEach(el => el.style.display = 'none');
-            }
-
-            if(nv === 'colaborador') { 
-                const restritos = ['aba-mensalidades','aba-avulso','aba-abertas','aba-recebimentos','aba-relatorios','aba-config','aba-juridico','aba-crm'];
-                restritos.forEach(aba => { document.querySelectorAll(`[onclick*="${aba}"]`).forEach(el => el.style.display = 'none'); });
-            } else if(nv === 'tesoureiro') { 
-                document.querySelectorAll('[onclick*="aba-config"]').forEach(el => el.style.display = 'none');
-            } 
-        };
-
-        // ... Mantenha todo o seu ESTRUTURA_PR e módulos que passei na última resposta
-        const ESTRUTURA_PR = {
-            'PMPR': {
-                '1º CRPM (Curitiba)': ['12º BPM', '13º BPM', '20º BPM', '23º BPM', '33º BPM', 'Outro'],
-                '2º CRPM (Londrina)': ['2º BPM', '5º BPM', '10º BPM', '15º BPM', '18º BPM', '30º BPM', '6ª CIPM', '11ª CIPM', 'Outro'],
-                '3º CRPM (Maringá)': ['4º BPM', '7º BPM', '8º BPM', '11º BPM', '25º BPM', '32º BPM', '3ª CIPM', '5ª CIPM', '9ª CIPM', 'Outro'],
-                '4º CRPM (Ponta Grossa)': ['1º BPM', '16º BPM', '26º BPM', '27º BPM', '8ª CIPM', 'Outro'],
-                '5º CRPM (Cascavel)': ['6º BPM', '14º BPM', '19º BPM', '31º BPM', 'Outro'],
-                '6º CRPM (SJP)': ['9º BPM', '17º BPM', '22º BPM', '28º BPM', '29º BPM', 'Outro'],
-                '7º CRPM (Pato Branco)': ['3º BPM', '12ª CIPM - Palmas', 'Outro'],
-                'Comandos Especiais (CME/CPE)': ['BOPE', 'BPRv', 'BPAmb', 'BPChoque', 'BPFron', 'BPMOA', 'BPTran', 'BPRONE', 'BPEC', 'CIROCAM', 'Outro']
-            },
-            'BMPR': {
-                '1º CRBM (Curitiba/Litoral)': ['1º BBM (Curitiba)', '6º BBM (SJP)', '7º BBM (Colombo)', '8º BBM (Paranaguá)', 'GOST', 'Outro'],
-                '2º CRBM (Londrina)': ['3º BBM', '11º BBM', '1ª CIBM', '3ª CIBM', 'Outro'],
-                '3º CRBM (Cascavel/Foz)': ['4º BBM (Cascavel)', '9º BBM (Foz do Iguaçu)', '10º BBM (Fco. Beltrão)', '13º BBM (Pato Branco)', 'Outro'],
-                '4º CRBM (Maringá)': ['5º BBM', '2ª CIBM', '4ª CIBM', '5ª CIBM', 'Outro'],
-                '5º CRBM (Ponta Grossa)': ['2º BBM', '12º BBM', '6ª CIBM', 'Outro']
-            },
-            'Reserva': { 'Reserva Remunerada': ['Veteranos', 'Outro'] }
-        };
-
-        window.filtroCorporacaoAtiva = 'TODOS'; 
-        let unsubAbertas = null; 
-        let unsubPagos = null; 
-        let unsubCrm = null;
-        window.associadosAvulsosLista = []; 
-        window.pixListeners = []; 
-        window.disparosGlobais = [];
-        window.processosGlobais = [];
-        window.ordemCrm = { campo: 'nome', asc: true };
-
-        window.mostrarLoading = (msg) => { document.getElementById("loadingMsg").innerText = msg; document.getElementById("loading").style.display = "flex"; };
-        window.esconderLoading = () => { document.getElementById("loading").style.display = "none"; };
-
-        window.formatarNumeroBR = (tel) => {
-            let t = String(tel).replace(/\D/g, '');
-            if (t.startsWith('55') && t.length >= 12) t = t.substring(2);
-            if (t.length > 0 && !t.startsWith('0')) t = '0' + t;
-            return t;
-        };
-
-        window.formatarUnidadeMilitar = (txt) => {
-            if (!txt) return '';
-            let res = txt.toUpperCase().trim();
-            res = res.replace(/(?:CIA|COMPANHIA)\s*(\d+)[A-Zªº]*/g, '$1ª CIA');
-            res = res.replace(/(\d+)[A-Zªº]*\s*(?:CIA|COMPANHIA)/g, '$1ª CIA');
-            res = res.replace(/(?:PEL|PELOT[AÃ]O)\s*(\d+)[A-Zªº]*/g, '$1º PEL');
-            res = res.replace(/(\d+)[A-Zªº]*\s*(?:PEL|PELOT[AÃ]O)/g, '$1º PEL');
-            res = res.replace(/(?:BBM)\s*(\d+)[A-Zªº]*/g, '$1º BBM');
-            res = res.replace(/(\d+)[A-Zªº]*\s*(?:BBM)/g, '$1º BBM');
-            res = res.replace(/(?:BPM)\s*(\d+)[A-Zªº]*/g, '$1º BPM');
-            res = res.replace(/(\d+)[A-Zªº]*\s*(?:BPM)/g, '$1º BPM');
-            return res;
-        };
-
-        window.atualizarCacheAssociados = async () => {
-            const snap = await getDocs(collection(db, "associados"));
-            window.associadosGlobal = {};
-            snap.forEach(d => window.associadosGlobal[d.id] = d.data());
-        };
-
-        // MÓDULO JURÍDICO (Mantido Intacto)
-        window.carregarJuridico = async () => {
-            window.mostrarLoading("Carregando Processos...");
-            try {
-                if(Object.keys(window.associadosGlobal).length === 0) await window.atualizarCacheAssociados();
-                const snap = await getDocs(collection(db, "juridico"));
-                window.processosGlobais = [];
-                snap.forEach(doc => { window.processosGlobais.push({id: doc.id, ...doc.data()}); });
-                window.renderizarTabelaJuridico();
-            } catch(e) { console.error(e); }
-            window.esconderLoading();
-        };
-
-        window.renderizarTabelaJuridico = () => {
-            const tbody = document.getElementById("tabelaJuridicoData");
-            if(!tbody) return;
-            const busca = document.getElementById("buscaJuridico").value.toLowerCase();
-
-            let filtrados = window.processosGlobais.filter(p => {
-                return !busca || (p.nome && p.nome.toLowerCase().includes(busca)) || (p.cpf && p.cpf.includes(busca)) || (p.numero_processo && p.numero_processo.toLowerCase().includes(busca));
-            });
-
-            filtrados.sort((a,b) => {
-                let dA = a.ultima_atualizacao ? a.ultima_atualizacao.split('/').reverse().join('') : '';
-                let dB = b.ultima_atualizacao ? b.ultima_atualizacao.split('/').reverse().join('') : '';
-                return dB.localeCompare(dA);
-            });
-
-            let html = "";
-            filtrados.forEach(p => {
-                let corStatus = 'text-blue-600 bg-blue-50 border-blue-200';
-                if(p.status.includes('Ganho') || p.status.includes('Favorável')) corStatus = 'text-green-700 bg-green-50 border-green-200';
-                if(p.status.includes('Perda') || p.status.includes('Arquivado') || p.status.includes('Desfavorável')) corStatus = 'text-red-700 bg-red-50 border-red-200';
-                if(p.status.includes('Aguardando')) corStatus = 'text-amber-700 bg-amber-50 border-amber-200';
-
-                const linkBtn = p.link_pdf ? `<a href="${p.link_pdf}" target="_blank" class="text-[10px] bg-gray-200 text-gray-700 px-2 py-1 rounded ml-2 hover:bg-gray-300 transition shadow-sm"><i class="fa-solid fa-link"></i> Doc PDF</a>` : '';
-                const nomeSeguro = p.nome.replace(/'/g, "\\'").replace(/"/g, "&quot;");
-
-                html += `
-                <tr class="border-b border-gray-100 hover:bg-gray-50 transition">
-                    <td class="font-bold text-sm text-gray-800">${p.nome || 'N/A'}<br><span class="text-[10px] text-gray-500 font-normal">CPF: ${p.cpf}</span></td>
-                    <td class="font-mono text-xs text-slate-600 font-bold">${p.numero_processo || 'Aguardando numeração'}</td>
-                    <td class="text-xs font-bold text-gray-700 uppercase">${p.assunto}<br><span class="inline-block mt-1 px-2 py-0.5 rounded border text-[9px] uppercase font-black ${corStatus}">${p.status}</span></td>
-                    <td class="text-xs text-gray-500 font-bold">${p.ultima_atualizacao || '-'} ${linkBtn}</td>
-                    <td class="text-center min-w-[120px]">
-                        <button onclick="window.notificarProcessoZap('${p.id}')" title="Avisar no WhatsApp" class="text-green-600 bg-green-50 hover:bg-green-100 border border-green-200 px-2.5 py-1.5 rounded-lg transition shadow-sm text-xs font-bold mr-1"><i class="fa-brands fa-whatsapp"></i></button>
-                        <button onclick="window.abrirModalJuridicoEdicao('${p.id}')" title="Editar Processo" class="text-blue-500 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-2.5 py-1.5 rounded-lg transition shadow-sm text-xs font-bold mr-1"><i class="fa-solid fa-pen"></i></button>
-                        <button onclick="window.excluirProcesso('${p.id}')" title="Excluir" class="text-red-500 bg-red-50 hover:bg-red-100 border border-red-200 px-2.5 py-1.5 rounded-lg transition shadow-sm text-xs font-bold"><i class="fa-solid fa-trash"></i></button>
-                    </td>
-                </tr>`;
-            });
-            tbody.innerHTML = html || "<tr><td colspan='5' class='p-8 text-center text-gray-500 font-bold'>Nenhum processo localizado.</td></tr>";
-        };
-
-        window.buscarAssociadoJuridico = () => {
-            const t = document.getElementById("jurBuscaNome").value.trim().toLowerCase(); 
-            const dd = document.getElementById("jurDropdown");
-            if(t.length < 3) { dd.innerHTML=""; dd.classList.add("hidden"); return; }
+        function renderizarPainel() {
+            const divP = document.getElementById('painelPendentes');
+            const divA = document.getElementById('painelAtivos');
+            divP.innerHTML = ''; divA.innerHTML = '';
             
-            const f = Object.values(window.associadosGlobal).filter(a => a.nome.toLowerCase().includes(t) || (a.matricula && a.matricula.includes(t)));
-            if(f.length === 0) { dd.innerHTML=`<div class="p-4 text-sm text-center text-gray-500">Nenhum associado encontrado</div>`; dd.classList.remove("hidden"); return; }
-            
-            let h = ""; 
-            f.forEach(a => {
-                const nomeSeguro = a.nome.replace(/'/g, "\\'").replace(/"/g, "&quot;");
-                h += `<div onclick="window.selecionarAssociadoJuridico('${nomeSeguro}', '${a.cpf}')" class="p-3 hover:bg-blue-50 cursor-pointer border-b font-bold text-blue-800 text-sm flex justify-between"><span>${a.nome}</span> <span class="text-[10px] text-gray-500 font-normal">Mat: ${a.matricula || 'N/A'} | CPF: ${a.cpf}</span></div>`;
-            }); 
-            dd.innerHTML = h; dd.classList.remove("hidden");
-        };
+            let totalAtivos = 0;
+            let totalPremium = 0;
+            let totalPendentes = 0;
 
-        window.selecionarAssociadoJuridico = (nome, cpf) => {
-            document.getElementById("jurBuscaNome").value = nome;
-            document.getElementById("jurNome").value = nome;
-            document.getElementById("jurCpf").value = cpf;
-            document.getElementById("jurDropdown").classList.add("hidden");
-        };
+            listaEmpresas.sort((a, b) => (a.nomeEmpresa || '').localeCompare(b.nomeEmpresa || ''));
 
-        window.abrirModalJuridico = () => {
-            document.getElementById("jurId").value = "";
-            document.getElementById("jurBuscaNome").value = "";
-            document.getElementById("jurNome").value = "";
-            document.getElementById("jurCpf").value = "";
-            document.getElementById("jurNumProcesso").value = "";
-            document.getElementById("jurAssunto").value = "";
-            document.getElementById("jurStatus").value = "Em análise";
-            document.getElementById("jurLinkDoc").value = "";
-            document.getElementById('modalJuridico').style.display = 'flex';
-        };
-
-        window.abrirModalJuridicoEdicao = (id) => {
-            const p = window.processosGlobais.find(x => x.id === id);
-            if(!p) return;
-            document.getElementById("jurId").value = p.id;
-            document.getElementById("jurBuscaNome").value = p.nome;
-            document.getElementById("jurNome").value = p.nome;
-            document.getElementById("jurCpf").value = p.cpf;
-            document.getElementById("jurNumProcesso").value = p.numero_processo || '';
-            document.getElementById("jurAssunto").value = p.assunto || '';
-            document.getElementById("jurStatus").value = p.status || 'Em análise';
-            document.getElementById("jurLinkDoc").value = p.link_pdf || '';
-            document.getElementById('modalJuridico').style.display = 'flex';
-        };
-
-        window.salvarJuridico = async (e) => {
-            e.preventDefault();
-            const id = document.getElementById("jurId").value;
-            const nome = document.getElementById("jurNome").value;
-            const cpf = document.getElementById("jurCpf").value;
-            
-            if(!cpf) return alert("Selecione um associado válido na busca!");
-
-            const obj = {
-                nome: nome,
-                cpf: cpf,
-                numero_processo: document.getElementById("jurNumProcesso").value.trim(),
-                assunto: document.getElementById("jurAssunto").value.trim(),
-                status: document.getElementById("jurStatus").value,
-                link_pdf: document.getElementById("jurLinkDoc").value.trim(),
-                ultima_atualizacao: new Date().toLocaleDateString('pt-BR')
-            };
-
-            window.mostrarLoading("Salvando processo...");
-            try {
-                if(id) { await updateDoc(doc(db, "juridico", id), obj); } 
-                else { await addDoc(collection(db, "juridico"), obj); }
-                alert("✅ Processo salvo com sucesso!");
-                document.getElementById('modalJuridico').style.display = 'none';
-                window.carregarJuridico();
-            } catch(err) { alert("Erro ao salvar: " + err.message); }
-            window.esconderLoading();
-        };
-
-        window.excluirProcesso = async (id) => {
-            if(!confirm("Tem certeza que deseja apagar este processo permanentemente?")) return;
-            window.mostrarLoading("Apagando...");
-            try { await deleteDoc(doc(db, "juridico", id)); window.carregarJuridico(); } catch(e) {}
-            window.esconderLoading();
-        };
-
-        window.notificarProcessoZap = async (id) => {
-            const p = window.processosGlobais.find(x => x.id === id);
-            if(!p) return;
-            const associado = Object.values(window.associadosGlobal).find(a => a.cpf === p.cpf);
-            if(!associado || !associado.telefone) return alert("Telefone do associado não encontrado na base de dados!");
-
-            if(!confirm(`Deseja notificar o militar ${p.nome.split(' ')[0]} sobre a atualização do processo pelo WhatsApp?`)) return;
-
-            window.mostrarLoading("Agendando notificação...");
-            try {
-                const numProcessoSeguro = p.numero_processo || 'Aguardando numeração';
-                const mensagemNotificacao = `⚖️ *ATUALIZAÇÃO JURÍDICA - PRAÇAS UNIDOS* ⚖️\n\nOlá, {nome}!\nSeu processo acompanhado pela Associação teve uma atualização.\n\n*Assunto:* ${p.assunto}\n*Nº Processo:* ${numProcessoSeguro}\n*Novo Status:* ${p.status}\n\nPara visualizar mais detalhes ou documentos, acesse a guia "Jurídico" conversando com o nosso robô no menu principal ou pelo Portal do Associado.\n\nForça e Honra! 🛡️`;
-
-                await addDoc(collection(db, "disparos"), { 
-                    telefone: associado.telefone, nome: p.nome, etiqueta: "Notificação Jurídica", mensagem: mensagemNotificacao, status: 'pendente', tipo: 'aviso', data_agendamento: new Date().toISOString() 
-                });
-                alert("✅ Notificação enviada para a fila do robô!");
-            } catch(err) { alert("Erro ao notificar: " + err.message); }
-            window.esconderLoading();
-        };
-
-
-        // MÓDULO CRM SAAS E DISPAROS (Mantido Intacto)
-        window.lidarUploadCrmSaas = async (event) => {
-            const file = event.target.files[0]; if (!file) return; 
-            const reader = new FileReader();
-            reader.onload = async (e) => {
-                const content = e.target.result; let extracted = [];
-                if (file.name.toLowerCase().endsWith('.vcf')) {
-                    content.split('END:VCARD').forEach(card => {
-                        let fnMatch = card.match(/FN(?:;[^:]*)?:(.*)/i); let telMatch = card.match(/TEL(?:;[^:]*)?:(.*)/i);
-                        if (telMatch) { 
-                            let nome = fnMatch ? fnMatch[1].replace(/;/g, ' ').trim() : 'Contato VCF'; 
-                            let tel = window.formatarNumeroBR(telMatch[1]);
-                            if(tel && tel.length >= 11) extracted.push({nome: nome, tel: tel});
-                        }
-                    });
+            listaEmpresas.forEach(emp => {
+                if(emp.statusRobo === 'pendente') {
+                    totalPendentes++;
+                    divP.innerHTML += `
+                        <div class="card-pendente">
+                            <div class="info-pendente">
+                                <h4>🏢 ${emp.nomeEmpresa}</h4>
+                                <p>📧 ${emp.email} | 📱 ${emp.whatsappLojista || 'Não informado'} | 📅 ${new Date(emp.dataCadastro || Date.now()).toLocaleDateString()}</p>
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <select id="plano-${emp.id}" class="btn-outline" style="padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+                                    <option value="basico">🥉 Básico</option>
+                                    <option value="premium">🥇 Premium</option>
+                                </select>
+                                <button class="btn" onclick="aprovarCliente('${emp.id}')">✅ Aprovar</button>
+                                <button class="btn btn-danger" onclick="excluirEmpresa('${emp.id}', '${emp.nomeEmpresa}')">🗑️</button>
+                            </div>
+                        </div>
+                    `;
                 } else {
-                    content.split('\n').forEach(line => {
-                        if(!line.trim()) return; 
-                        let cols = line.split(','); if (cols.length === 1) cols = line.split(';'); 
-                        let rowTel = ''; let rowNome = '';
-                        cols.forEach(col => {
-                            let cleanCol = col.replace(/"/g, '').trim(); 
-                            let numbersOnly = cleanCol.replace(/\D/g, '');
-                            if (numbersOnly.length >= 10 && numbersOnly.length <= 15) { rowTel = numbersOnly; } 
-                            else if (cleanCol.length > 2 && !rowNome && !cleanCol.includes('@')) { rowNome = cleanCol; }
-                        });
-                        if (rowTel) {
-                            let telFormatado = window.formatarNumeroBR(rowTel);
-                            if(telFormatado && telFormatado.length >= 11) extracted.push({nome: rowNome || "Contato CSV", tel: telFormatado});
-                        }
-                    });
+                    totalAtivos++;
+                    const premium = emp.plano === 'premium';
+                    if (premium) totalPremium++;
+                    
+                    const status = emp.statusRobo === 'ativo_central' || emp.statusRobo === 'online' ? 'online' : 'offline';
+                    
+                    divA.innerHTML += `
+                        <div class="card">
+                            <div class="card-header">
+                                <div>
+                                    <div class="empresa-nome">${emp.nomeEmpresa}</div>
+                                    <div class="empresa-sub">${premium ? '🥇 PLANO PREMIUM' : '🥉 PLANO BÁSICO'} | 📱 ${emp.whatsappLojista || 'Sem número'}</div>
+                                </div>
+                                <span class="status-tag ${status}">${status}</span>
+                            </div>
+                            <div class="log-window">
+                                > [${new Date().toLocaleTimeString()}] Inicializando container...<br>
+                                > [Info] Banco de dados sincronizado.<br>
+                                > [Status] ${premium ? (status === 'online' ? 'Sessão do WhatsApp estabelecida.' : 'Aguardando pareamento do QR Code no dispositivo do cliente...') : 'Conectado à Inteligência Central.'}
+                            </div>
+                            <div class="card-actions">
+                                <button class="btn btn-edit" onclick="abrirModal('${emp.id}')">⚙️ Configurações</button>
+                                <button class="btn btn-danger" onclick="excluirEmpresa('${emp.id}', '${emp.nomeEmpresa}')" style="flex:0; padding: 10px 15px;" title="Remover Conta">🗑️</button>
+                            </div>
+                        </div>
+                    `;
                 }
-                
-                if (extracted.length > 0) {
-                    if(!confirm(`Encontrados ${extracted.length} contatos válidos no arquivo.\nDeseja importar para a base do CRM?`)) { event.target.value = ''; return; }
-                    window.mostrarLoading(`A importar ${extracted.length} contatos (Modo Rápido)...`);
-                    try {
-                        const lotes = []; let batch = writeBatch(db); let count = 0;
-                        for(let i=0; i < extracted.length; i++) {
-                            const c = extracted[i]; const docRef = doc(collection(db, "disparos"));
-                            batch.set(docRef, { telefone: c.tel, nome: c.nome, etiqueta: "Importado", corporacao: "", batalhao: "", nascimento: "", status: 'pendente', tipo: 'crm', data_importacao: new Date().toISOString() });
-                            count++;
-                            if (count === 400 || i === extracted.length - 1) { lotes.push(batch.commit()); batch = writeBatch(db); count = 0; }
-                        }
-                        await Promise.all(lotes); alert(`✅ ${extracted.length} contatos importados com sucesso!`);
-                    } catch(err) { alert("Erro na importação: " + err.message); }
-                    window.esconderLoading();
-                } else { alert("Nenhum contato válido encontrado no arquivo."); }
-                event.target.value = '';
-            }; 
-            reader.readAsText(file);
+            });
+
+            // Atualiza Dashboard
+            document.getElementById('dashAtivos').innerText = totalAtivos;
+            document.getElementById('dashPremium').innerText = totalPremium;
+            document.getElementById('dashPendentes').innerText = totalPendentes;
+
+            if(totalPendentes === 0) divP.innerHTML = '<p style="text-align: center; color: #999; padding: 20px; background: white; border-radius: 8px; border: 1px dashed #ccc;">Nenhuma solicitação pendente no momento.</p>';
+        }
+
+        window.aprovarCliente = async (id) => {
+            const plano = document.getElementById('plano-'+id).value;
+            if(confirm("Confirmar a aprovação deste cliente na plataforma?")) {
+                const status = plano === 'basico' ? 'ativo_central' : 'offline';
+                await updateDoc(doc(db, "empresas", id), { statusRobo: status, plano: plano });
+            }
         };
 
-        window.abrirModalNovoContatoCrm = () => {
-            document.getElementById('novoNomeCrm').value = ""; document.getElementById('novoZapCrm').value = ""; document.getElementById('novoTagCrm').value = "";
-            document.getElementById('novoCorpCrm').value = ""; document.getElementById('novoBatCrm').value = ""; document.getElementById('novoNascCrm').value = "";
-            document.getElementById('modalNovoContatoCrm').style.display = 'flex';
+        window.excluirEmpresa = async (id, nome) => {
+            if(confirm(`Tem certeza que deseja excluir permanentemente o cliente "${nome}"? Esta ação não pode ser desfeita.`)) {
+                await deleteDoc(doc(db, "empresas", id));
+            }
         };
 
-        window.fecharModalNovoContatoCrm = () => { document.getElementById('modalNovoContatoCrm').style.display = 'none'; };
-
-        window.salvarContatoManualCrm = async () => {
-            const nome = document.getElementById('novoNomeCrm').value.trim();
-            let tel = window.formatarNumeroBR(document.getElementById('novoZapCrm').value);
-            const tag = document.getElementById('novoTagCrm').value.trim() || 'Geral';
-            const corp = document.getElementById('novoCorpCrm').value;
-            const bat = document.getElementById('novoBatCrm').value.trim();
-            const nasc = document.getElementById('novoNascCrm').value;
+        window.abrirModal = (id) => {
+            const emp = listaEmpresas.find(e => e.id === id);
+            window.empresaEmEdicao = emp; 
             
-            if(!tel || tel.length < 11) return alert("Digite um WhatsApp válido com DDD.");
-            window.mostrarLoading("A guardar Contato...");
-            try {
-                await addDoc(collection(db, "disparos"), { telefone: tel, nome: nome || "Contato", etiqueta: tag, corporacao: corp, batalhao: bat, nascimento: nasc, status: 'pendente', tipo: 'crm', data_importacao: new Date().toISOString() });
-                alert("✅ Contato adicionado com sucesso!"); window.fecharModalNovoContatoCrm();
-            } catch(e) { alert("Erro: " + e.message); }
-            window.esconderLoading();
-        };
-
-        window.abrirModalEdicaoCrm = (id, nome, telefone, etiqueta, corp, bat, nasc) => {
-            document.getElementById('editIdCrm').value = id; document.getElementById('editNomeCrm').value = nome; document.getElementById('editZapCrm').value = telefone || '';
-            document.getElementById('editTagCrm').value = etiqueta === 'Geral' ? '' : etiqueta; document.getElementById('editCorpCrm').value = corp || '';
-            document.getElementById('editBatCrm').value = bat || ''; document.getElementById('editNascCrm').value = nasc || '';
-            document.getElementById('modalEdicaoCrm').style.display = 'flex';
-        };
-
-        window.salvarEdicaoCrm = async () => {
-            const id = document.getElementById('editIdCrm').value; const nome = document.getElementById('editNomeCrm').value.trim();
-            let tel = window.formatarNumeroBR(document.getElementById('editZapCrm').value); const tag = document.getElementById('editTagCrm').value.trim() || 'Geral';
-            const corp = document.getElementById('editCorpCrm').value; const bat = document.getElementById('editBatCrm').value.trim(); const nasc = document.getElementById('editNascCrm').value;
-
-            if(!tel || tel.length < 11) return alert("Digite um WhatsApp válido com DDD.");
-            window.mostrarLoading("A atualizar Contato...");
-            try {
-                await updateDoc(doc(db, "disparos", id), { nome: nome || "Contato", telefone: tel, etiqueta: tag, corporacao: corp, batalhao: bat, nascimento: nasc });
-                document.getElementById('modalEdicaoCrm').style.display = 'none';
-            } catch(e) { alert("Erro ao atualizar: " + e.message); }
-            window.esconderLoading();
-        };
-
-        window.abrirModalDisparoCrm = () => { window.mudarAlvoDisparoCrm(); document.getElementById('modalDisparoCrm').style.display = 'flex'; };
-        window.fecharModalDisparoCrm = () => { document.getElementById('modalDisparoCrm').style.display = 'none'; };
-
-        window.mudarAlvoDisparoCrm = () => {
-            const alvo = document.getElementById('alvoDisparoCrm').value; const blocoEtiqueta = document.getElementById('blocoEtiquetaDisparo'); const selectEtiqueta = document.getElementById('etiquetaAlvoDisparo');
-            if(alvo === 'etiqueta') {
-                blocoEtiqueta.classList.remove('hidden'); let t = new Set(); window.disparosGlobais.forEach(d => { if(d.etiqueta) t.add(d.etiqueta); });
-                let html = ""; Array.from(t).forEach(tag => { html += `<option value="${tag}">${tag}</option>`; });
-                selectEtiqueta.innerHTML = html || '<option value="">Nenhuma etiqueta na base</option>';
-            } else { blocoEtiqueta.classList.add('hidden'); }
-        };
-
-        window.iniciarDisparoCampanhaCrm = async () => {
-            const alvo = document.getElementById('alvoDisparoCrm').value; const msg = document.getElementById('textoDisparoCrm').value.trim();
-            if(!msg) return alert("A mensagem não pode estar vazia!");
-            let idsParaEnviar = [];
+            document.getElementById('editEmpresaId').value = emp.id;
+            document.getElementById('nomeRoboEdit').innerText = emp.nomeEmpresa;
+            document.getElementById('editPlanoConta').value = emp.plano || 'basico'; 
+            document.getElementById('editZapLoja').value = emp.whatsappLojista || '';
             
-            if(alvo === 'selecionados') {
-                document.querySelectorAll('.check-crm:checked').forEach(c => { if(c.closest('tr') && c.closest('tr').style.display !== 'none') idsParaEnviar.push(c.value); });
-                if(idsParaEnviar.length === 0) return alert("Seleccione contatos visíveis na tabela primeiro!");
-            } else if(alvo === 'etiqueta') {
-                const etiqueta = document.getElementById('etiquetaAlvoDisparo').value;
-                if(!etiqueta) return alert("Seleccione uma etiqueta válida.");
-                window.disparosGlobais.forEach(d => { if(d.etiqueta === etiqueta) idsParaEnviar.push(d.id); });
-            } else if(alvo === 'todos') {
-                window.disparosGlobais.forEach(d => idsParaEnviar.push(d.id));
+            if(emp.menu) {
+                document.getElementById('menuSaudacao').value = emp.menu.saudacao || '';
+                document.getElementById('opt1Nome').value = emp.menu.opt1Nome || '';
+                document.getElementById('opt1Resp').value = emp.menu.opt1Resp || '';
+                document.getElementById('opt2Nome').value = emp.menu.opt2Nome || '';
+                document.getElementById('opt2Resp').value = emp.menu.opt2Resp || '';
+                document.getElementById('opt3Nome').value = emp.menu.opt3Nome || '';
+                document.getElementById('opt3Resp').value = emp.menu.opt3Resp || '';
+            } else {
+                document.getElementById('menuSaudacao').value = '';
+                document.getElementById('opt1Nome').value = '';
+                document.getElementById('opt1Resp').value = '';
+                document.getElementById('opt2Nome').value = '';
+                document.getElementById('opt2Resp').value = '';
+                document.getElementById('opt3Nome').value = '';
+                document.getElementById('opt3Resp').value = '';
+            }
+            document.getElementById('modalEmpresa').style.display = 'flex';
+        };
+
+        window.fecharModal = () => document.getElementById('modalEmpresa').style.display = 'none';
+
+        window.salvarConfiguracao = async () => {
+            const id = document.getElementById('editEmpresaId').value;
+            const zap = document.getElementById('editZapLoja').value.replace(/\D/g, '');
+            const novoPlano = document.getElementById('editPlanoConta').value;
+            const emp = window.empresaEmEdicao;
+
+            let novoStatus = emp.statusRobo;
+            if (emp.plano !== novoPlano) {
+                novoStatus = (novoPlano === 'basico') ? 'ativo_central' : 'offline';
             }
 
-            if(idsParaEnviar.length === 0) return alert("Nenhum contato encontrado para estes critérios.");
-            if(!confirm(`Agendar a campanha para ${idsParaEnviar.length} contato(s)?`)) return;
-
-            window.mostrarLoading("A preparar fila...");
-            try {
-                const lotes = []; let batch = writeBatch(db); let count = 0;
-                for(let i=0; i < idsParaEnviar.length; i++) {
-                    batch.update(doc(db, "disparos", idsParaEnviar[i]), { mensagem: msg, status: 'pendente', data_agendamento: new Date().toISOString() });
-                    count++;
-                    if (count === 400 || i === idsParaEnviar.length - 1) { lotes.push(batch.commit()); batch = writeBatch(db); count = 0; }
-                }
-                await Promise.all(lotes); alert(`✅ Campanha agendada com sucesso para ${idsParaEnviar.length} contatos!`);
-                window.fecharModalDisparoCrm(); document.getElementById('checkTodosCrm').checked = false; window.alternarTodosChecksCrm();
-            } catch(e) { alert("Erro: " + e.message); }
-            window.esconderLoading();
-        };
-
-        window.pausarCampanha = async () => {
-            window.mostrarLoading("Pausando fila...");
-            try {
-                let lotes = []; let batch = writeBatch(db); let count = 0, total = 0;
-                for(let i=0; i < window.disparosGlobais.length; i++) {
-                    const d = window.disparosGlobais[i];
-                    if(d.status === 'pendente') {
-                        batch.update(doc(db, "disparos", d.id), { status: 'pausado' }); count++; total++;
-                        if(count === 400) { lotes.push(batch.commit()); batch = writeBatch(db); count = 0; }
-                    }
-                }
-                if(count > 0) lotes.push(batch.commit()); await Promise.all(lotes);
-                if(total > 0) alert(`⏸️ ${total} mensagens pausadas.`);
-            } catch(e) {} window.esconderLoading();
-        };
-
-        window.retomarCampanha = async () => {
-            window.mostrarLoading("Retomando fila...");
-            try {
-                let lotes = []; let batch = writeBatch(db); let count = 0, total = 0;
-                for(let i=0; i < window.disparosGlobais.length; i++) {
-                    const d = window.disparosGlobais[i];
-                    if(d.status === 'pausado') {
-                        batch.update(doc(db, "disparos", d.id), { status: 'pendente' }); count++; total++;
-                        if(count === 400) { lotes.push(batch.commit()); batch = writeBatch(db); count = 0; }
-                    }
-                }
-                if(count > 0) lotes.push(batch.commit()); await Promise.all(lotes);
-                if(total > 0) alert(`▶️ ${total} mensagens retomadas.`);
-            } catch(e) {} window.esconderLoading();
-        };
-
-        window.cancelarCampanha = async () => {
-            if(!confirm("Tem certeza? Isso vai cancelar tudo que está na fila ou pausado.")) return;
-            window.mostrarLoading("Cancelando envios...");
-            try {
-                let lotes = []; let batch = writeBatch(db); let count = 0, total = 0;
-                for(let i=0; i < window.disparosGlobais.length; i++) {
-                    const d = window.disparosGlobais[i];
-                    if(d.status === 'pendente' || d.status === 'pausado') {
-                        batch.update(doc(db, "disparos", d.id), { status: 'cancelado' }); count++; total++;
-                        if(count === 400) { lotes.push(batch.commit()); batch = writeBatch(db); count = 0; }
-                    }
-                }
-                if(count > 0) lotes.push(batch.commit()); await Promise.all(lotes);
-                if(total > 0) alert(`🛑 ${total} mensagens canceladas.`);
-            } catch(e) {} window.esconderLoading();
-        };
-
-        window.iniciarListenerCrm = () => {
-            if(unsubCrm) unsubCrm();
-            unsubCrm = onSnapshot(collection(db, "disparos"), (snap) => {
-                window.disparosGlobais = []; let pendente = 0, enviado = 0, erro = 0, pausado = 0;
-                snap.forEach(doc => {
-                    const raw = doc.data();
-                    let d = { id: doc.id, nome: (!raw.nome || raw.nome === 'undefined') ? '' : raw.nome, telefone: (!raw.telefone || raw.telefone === 'undefined') ? '' : raw.telefone, etiqueta: (!raw.etiqueta || raw.etiqueta === 'undefined') ? 'Geral' : raw.etiqueta, corporacao: (!raw.corporacao || raw.corporacao === 'undefined') ? '' : raw.corporacao, batalhao: (!raw.batalhao || raw.batalhao === 'undefined') ? '' : raw.batalhao, nascimento: (!raw.nascimento || raw.nascimento === 'undefined') ? '' : raw.nascimento, status: raw.status || 'pendente', tipo: raw.tipo || 'crm', data_importacao: raw.data_importacao || '', data_agendamento: raw.data_agendamento || '' };
-                    window.disparosGlobais.push(d);
-                    if(d.status === 'pendente') pendente++; else if(d.status === 'enviado') enviado++; else if(d.status === 'pausado') pausado++; else if(d.status !== 'cancelado') erro++;
-                });
-
-                const painel = document.getElementById('painelCampanhaStatus');
-                const totalCampanha = pendente + enviado + erro + pausado;
-                
-                if(totalCampanha > 0 && (pendente > 0 || enviado > 0 || pausado > 0 || erro > 0)) {
-                    painel.classList.remove('hidden');
-                    const progresso = totalCampanha === 0 ? 0 : Math.round(((enviado + erro) / totalCampanha) * 100);
-                    document.getElementById('txtProgressoCampanha').innerText = `${progresso}% Concluído`;
-                    document.getElementById('barraProgressoCampanha').style.width = `${progresso}%`;
-                    document.getElementById('qtdEnviados').innerText = enviado;
-                    document.getElementById('qtdPendentes').innerText = pendente + pausado;
-                    document.getElementById('qtdErros').innerText = erro;
-
-                    if(pausado > 0 && pendente === 0) { document.getElementById('btnPausarCampanha').classList.add('hidden'); document.getElementById('btnRetomarCampanha').classList.remove('hidden'); } 
-                    else { document.getElementById('btnPausarCampanha').classList.remove('hidden'); document.getElementById('btnRetomarCampanha').classList.add('hidden'); }
-                    if(pendente === 0 && pausado === 0) painel.classList.add('hidden');
-                } else { painel.classList.add('hidden'); }
-                window.renderizarTabelaCrm();
-            });
-        };
-
-        let debounceTimer;
-        window.debounceRenderCrm = () => { clearTimeout(debounceTimer); debounceTimer = setTimeout(() => { window.renderizarTabelaCrm(); }, 300); };
-
-        window.ordenarCrm = (campo) => { if(window.ordemCrm.campo === campo) { window.ordemCrm.asc = !window.ordemCrm.asc; } else { window.ordemCrm.campo = campo; window.ordemCrm.asc = true; } window.renderizarTabelaCrm(); };
-
-        window.toggleCheckRowCrm = (e, id) => {
-            if(e.target.tagName === 'BUTTON' || e.target.closest('button') || e.target.tagName === 'INPUT') return;
-            const chk = document.getElementById(`chk-${id}`); if(chk) chk.checked = !chk.checked;
-        };
-
-        window.renderizarTabelaCrm = () => {
-            const tbody = document.getElementById("tabelaCrmData"); if(!tbody) return;
-            const busca = document.getElementById("buscaCrmSaas") ? document.getElementById("buscaCrmSaas").value.toLowerCase() : "";
-            const filtroCorp = document.getElementById("filtroCorpCrm") ? document.getElementById("filtroCorpCrm").value : "TODOS";
-            const filtroMes = document.getElementById("filtroMesCrm") ? document.getElementById("filtroMesCrm").value : "TODOS";
-
-            let filtrados = window.disparosGlobais.filter(d => {
-                let matchBusca = !busca || (d.telefone && d.telefone.includes(busca)) || (d.nome && d.nome.toLowerCase().includes(busca)) || (d.batalhao && d.batalhao.toLowerCase().includes(busca));
-                let matchCorp = filtroCorp === 'TODOS' || d.corporacao === filtroCorp || (filtroCorp === 'Nenhuma' && (!d.corporacao || d.corporacao === ''));
-                let matchMes = filtroMes === 'TODOS' || (d.nascimento && d.nascimento.includes(filtroMes));
-                return matchBusca && matchCorp && matchMes;
-            });
-
-            filtrados.sort((a, b) => {
-                let valA = (a[window.ordemCrm.campo] || '').toLowerCase(), valB = (b[window.ordemCrm.campo] || '').toLowerCase();
-                if(valA < valB) return window.ordemCrm.asc ? -1 : 1; if(valA > valB) return window.ordemCrm.asc ? 1 : -1; return 0;
-            });
-
-            let html = "";
-            filtrados.forEach(d => {
-                let badgeStatus = '';
-                if (d.status === 'pendente') badgeStatus = '<span class="text-[10px] text-amber-600 font-bold ml-2"><i class="fa-solid fa-clock"></i> Fila</span>';
-                else if (d.status === 'enviado') badgeStatus = '<span class="text-[10px] text-green-600 font-bold ml-2"><i class="fa-solid fa-check"></i> Enviado</span>';
-                else if (d.status === 'pausado') badgeStatus = '<span class="text-[10px] text-gray-500 font-bold ml-2"><i class="fa-solid fa-pause"></i> Pausa</span>';
-                else if (d.status === 'cancelado') badgeStatus = ''; 
-                else badgeStatus = '<span class="text-[10px] text-red-600 font-bold ml-2"><i class="fa-solid fa-triangle-exclamation"></i> Erro</span>';
-
-                let etiquetaBadge = '';
-                if (d.etiqueta && d.etiqueta !== 'Geral') {
-                    let cor = 'bg-gray-100 text-gray-800';
-                    if (d.etiqueta.toUpperCase() === 'PMPR') cor = 'bg-blue-100 text-blue-800 border-blue-300';
-                    if (d.etiqueta.toUpperCase() === 'BMPR') cor = 'bg-red-100 text-red-800 border-red-300';
-                    if (d.etiqueta.toUpperCase() === 'RESERVA') cor = 'bg-amber-100 text-amber-800 border-amber-300';
-                    etiquetaBadge = `<span class="tag-pill ${cor} border">${d.etiqueta}</span>`;
-                } else { etiquetaBadge = `<span class="text-[10px] text-gray-400 italic">Sem Etiqueta</span>`; }
-
-                let detalhesExtras = '';
-                if(d.corporacao) detalhesExtras += `<span class="bg-gray-100 px-1 rounded text-[9px] mr-1">${d.corporacao}</span>`;
-                if(d.batalhao) detalhesExtras += `<span class="text-[9px] text-gray-500 truncate max-w-[100px] inline-block align-bottom">${d.batalhao}</span>`;
-
-                const nomeSeguro = d.nome.replace(/'/g, "\\'").replace(/"/g, "&quot;");
-                const batSeguro = d.batalhao.replace(/'/g, "\\'").replace(/"/g, "&quot;");
-
-                html += `
-                <tr class="hover:bg-blue-50 transition border-b border-gray-100 cursor-pointer" onclick="window.toggleCheckRowCrm(event, '${d.id}')">
-                    <td class="text-center"><input type="checkbox" id="chk-${d.id}" class="check-crm w-4 h-4 rounded text-blue-600 border-gray-300 cursor-pointer" value="${d.id}"></td>
-                    <td class="font-bold text-gray-800 text-sm">${d.nome || 'Contato / Desconhecido'} <br>${detalhesExtras}</td>
-                    <td class="font-mono text-gray-600 text-xs flex items-center h-full pt-4"><i class="fa-brands fa-whatsapp text-green-500 mr-1"></i> ${d.telefone} ${badgeStatus}</td>
-                    <td>${etiquetaBadge}</td>
-                    <td class="text-center">
-                        <button onclick="window.abrirModalEdicaoCrm('${d.id}', '${nomeSeguro}', '${d.telefone}', '${d.etiqueta}', '${d.corporacao}', '${batSeguro}', '${d.nascimento}')" class="text-blue-500 hover:text-white border border-blue-200 hover:bg-blue-500 px-3 py-1.5 rounded-lg transition shadow-sm text-xs font-bold mr-1"><i class="fa-solid fa-pen"></i></button>
-                        <button onclick="window.apagarContatoCrm('${d.id}')" class="text-red-500 hover:text-white border border-red-200 hover:bg-red-500 px-3 py-1.5 rounded-lg transition shadow-sm text-xs font-bold"><i class="fa-solid fa-trash"></i></button>
-                    </td>
-                </tr>`;
-            });
-            tbody.innerHTML = html || "<tr><td colspan='5' class='p-8 text-center text-gray-500 font-bold'>Nenhum registro encontrado com os filtros atuais.</td></tr>";
-        };
-
-        window.alternarTodosChecksCrm = () => {
-            const isChecked = document.getElementById('checkTodosCrm').checked;
-            document.querySelectorAll('#tabelaCrmData tr').forEach(tr => { if(tr.style.display !== 'none') { const chk = tr.querySelector('.check-crm'); if(chk) chk.checked = isChecked; } });
-        };
-
-        window.apagarContatoCrm = async (id) => { if(confirm("Remover este contato?")) await deleteDoc(doc(db, "disparos", id)); };
-
-        window.apagarSelecionadosCrm = async () => {
-            let idsParaApagar = [];
-            document.querySelectorAll('.check-crm:checked').forEach(c => { if(c.closest('tr') && c.closest('tr').style.display !== 'none') idsParaApagar.push(c.value); });
-            if(idsParaApagar.length === 0) return alert("Seleccione contatos visíveis na tabela primeiro.");
-            if(!confirm(`Remover os ${idsParaApagar.length} contatos selecionados?`)) return;
+            const menu = {
+                saudacao: document.getElementById('menuSaudacao').value,
+                opt1Nome: document.getElementById('opt1Nome').value,
+                opt1Resp: document.getElementById('opt1Resp').value,
+                opt2Nome: document.getElementById('opt2Nome').value,
+                opt2Resp: document.getElementById('opt2Resp').value,
+                opt3Nome: document.getElementById('opt3Nome').value,
+                opt3Resp: document.getElementById('opt3Resp').value
+            };
             
-            window.mostrarLoading("A remover...");
-            try {
-                const lotes = []; let batch = writeBatch(db); let count = 0;
-                for(let i=0; i < idsParaApagar.length; i++) {
-                    batch.delete(doc(db, "disparos", idsParaApagar[i])); count++;
-                    if (count === 400 || i === idsParaApagar.length - 1) { lotes.push(batch.commit()); batch = writeBatch(db); count = 0; }
-                }
-                await Promise.all(lotes);
-            } catch(e) {}
-            document.getElementById('checkTodosCrm').checked = false; window.esconderLoading();
-        };
-
-        window.abrirModalEtiquetaCrm = () => {
-            let visiveis = 0;
-            document.querySelectorAll('.check-crm:checked').forEach(c => { if(c.closest('tr').style.display !== 'none') visiveis++; });
-            if(visiveis === 0) return alert("Seleccione contatos visíveis primeiro!");
+            await updateDoc(doc(db, "empresas", id), { 
+                whatsappLojista: zap, 
+                menu: menu,
+                plano: novoPlano,
+                statusRobo: novoStatus
+            });
             
-            let t = new Set(); window.disparosGlobais.forEach(d => { if(d.etiqueta) t.add(d.etiqueta); });
-            const area = document.getElementById('areaTagsExistentes'); const botoes = document.getElementById('botoesTagsSalvas'); botoes.innerHTML = '';
-            
-            if(t.size > 0) {
-                area.style.display = 'block';
-                Array.from(t).forEach(tag => { botoes.innerHTML += `<button class="tag-pill bg-gray-100 hover:bg-gray-200 border cursor-pointer" onclick="document.getElementById('nomeNovaTagCrm').value='${tag}'">${tag}</button>`; });
-            } else { area.style.display = 'none'; }
-            
-            document.getElementById('modalTagCrm').style.display = 'flex';
+            fecharModal();
+            alert("✅ Configurações atualizadas e salvas com sucesso!");
         };
-
-        window.salvarTagMassaCrm = async () => {
-            const tag = document.getElementById('nomeNovaTagCrm').value.trim();
-            if(!tag) return alert("Digite o nome da etiqueta.");
-            let ids = [];
-            document.querySelectorAll('.check-crm:checked').forEach(c => { if(c.closest('tr').style.display !== 'none') ids.push(c.value); });
-
-            window.mostrarLoading("A etiquetar...");
-            try {
-                const lotes = []; let batch = writeBatch(db); let count = 0;
-                for(let i=0; i < ids.length; i++) {
-                    batch.update(doc(db, "disparos", ids[i]), { etiqueta: tag }); count++;
-                    if (count === 400 || i === ids.length - 1) { lotes.push(batch.commit()); batch = writeBatch(db); count = 0; }
-                }
-                await Promise.all(lotes); alert("✅ Etiqueta aplicada!");
-            } catch(e) {}
-            window.fecharModalTagCrm(); document.getElementById('checkTodosCrm').checked = false; window.alternarTodosChecksCrm(); window.esconderLoading();
-        };
-
-        window.fecharModalTagCrm = () => { document.getElementById('modalTagCrm').style.display = 'none'; document.getElementById('nomeNovaTagCrm').value = ""; };
-
     </script>
 </body>
 </html>
