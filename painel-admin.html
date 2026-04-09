@@ -2,326 +2,519 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Master Admin - Central Omnichannel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Central SaaS Omnichannel</title>
+    
+    <!-- Tailwind CSS & FontAwesome -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        primary: '#2563eb', // Azul dos botões
+                        surface: '#f8fafc', // Fundo geral
+                        card: '#ffffff',
+                        success: '#059669', // Verde do card de receita
+                        danger: '#dc2626'
+                    }
+                }
+            }
+        }
+    </script>
+
     <style>
-        :root { --primary: #003399; --bg-color: #f4f7f6; --card-bg: #ffffff; --text-dark: #333; --terminal-bg: #1e1e1e; --danger: #dc3545; --success: #28a745; --warning: #ffc107; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); margin: 0; padding: 20px; color: var(--text-dark); }
+        body { background-color: theme('colors.surface'); -webkit-tap-highlight-color: transparent; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
-        /* HEADER E BOTÕES */
-        .header { display: flex; justify-content: space-between; align-items: center; background-color: var(--primary); color: white; padding: 15px 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        .btn { background-color: var(--success); color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: background 0.3s; font-size: 13px; display: inline-flex; align-items: center; justify-content: center; gap: 5px; }
-        .btn:hover { background-color: #218838; }
-        .btn-danger { background-color: var(--danger); }
-        .btn-danger:hover { background-color: #c82333; }
-        .btn-outline { background-color: transparent; color: var(--primary); border: 1px solid var(--primary); }
-        .btn-edit { background-color: var(--warning); color: black; }
-
-        /* DASHBOARD METRICS */
-        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px; }
-        .dash-card { background: var(--card-bg); padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); text-align: center; border-bottom: 4px solid var(--primary); }
-        .dash-card.warning { border-bottom-color: var(--warning); }
-        .dash-card.success { border-bottom-color: var(--success); }
-        .dash-title { font-size: 12px; color: #666; text-transform: uppercase; font-weight: bold; margin-bottom: 10px; }
-        .dash-value { font-size: 28px; font-weight: 900; color: var(--primary); margin: 0; }
-
-        .section-title { font-size: 20px; color: var(--primary); border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 20px; margin-top: 20px; display: flex; align-items: center; gap: 10px;}
+        /* Oculta abas não ativas */
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
         
-        /* LISTA PENDENTES */
-        .lista-pendentes { display: flex; flex-direction: column; gap: 15px; margin-bottom: 40px; }
-        .card-pendente { background: #fff3cd; border-left: 5px solid var(--warning); padding: 15px 20px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .info-pendente h4 { margin: 0 0 5px 0; color: #856404; font-size: 18px; }
-        .info-pendente p { margin: 0; font-size: 14px; color: #666; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* GRID ATIVOS */
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
-        .card { background: var(--card-bg); border-radius: 8px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-top: 4px solid var(--primary); display: flex; flex-direction: column; position: relative; }
-        .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
-        .empresa-nome { font-size: 18px; font-weight: bold; color: var(--primary); }
-        .empresa-sub { font-size: 11px; color: #777; margin-top: 3px; }
-        
-        .status-tag { font-size: 10px; padding: 4px 8px; border-radius: 12px; color: white; font-weight: bold; text-transform: uppercase; }
-        .status-tag.online { background-color: var(--success); }
-        .status-tag.offline { background-color: #6c757d; }
-
-        .log-window { background-color: var(--terminal-bg); color: #00ff00; font-family: 'Courier New', monospace; font-size: 11px; height: 100px; overflow-y: auto; padding: 10px; border-radius: 5px; margin-bottom: 15px; border: 1px solid #333; }
-        
-        .card-actions { display: flex; gap: 8px; margin-top: auto; }
-        .card-actions button { flex: 1; }
-
-        /* MODAL */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: white; padding: 30px; border-radius: 8px; width: 600px; max-width: 95%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
-        .modal label { font-weight: bold; font-size: 13px; display: block; margin-bottom: 5px; color: #555; margin-top: 15px; }
-        .modal input, .modal textarea, .modal select { width: 100%; padding: 10px; margin-bottom: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: inherit; font-size: 14px; }
-        .menu-row { display: grid; grid-template-columns: 1fr 2fr; gap: 15px; background: #f9f9f9; padding: 10px; border-radius: 6px; border: 1px solid #eee; margin-bottom: 10px; }
+        /* Estilo para Inputs */
+        .input-base { width: 100%; padding: 0.75rem 1rem; border: 1px solid #e2e8f0; border-radius: 0.75rem; outline: none; transition: border-color 0.2s; font-size: 0.875rem; color: #1e293b; font-weight: 500; }
+        .input-base:focus { border-color: theme('colors.primary'); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+        .label-base { display: block; font-size: 0.75rem; font-weight: 700; color: #475569; text-transform: uppercase; margin-bottom: 0.5rem; letter-spacing: 0.05em; }
     </style>
 </head>
-<body>
+<body class="text-slate-800 h-screen flex overflow-hidden">
 
-    <div class="header">
-        <h2>🛠️ Painel Admin - Central Omnichannel SaaS</h2>
-        <div>Sistema Operacional</div>
+    <!-- OVERLAY DE LOADING -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-white/90 z-[9999] flex flex-col justify-center items-center hidden backdrop-blur-sm">
+        <i class="fa-solid fa-circle-notch fa-spin text-4xl text-primary mb-4"></i>
+        <p class="font-bold text-slate-600 animate-pulse">Sincronizando Sistema...</p>
     </div>
 
-    <!-- DASHBOARD DE MÉTRICAS -->
-    <div class="dashboard-grid">
-        <div class="dash-card">
-            <div class="dash-title">Total de Clientes Ativos</div>
-            <p class="dash-value" id="dashAtivos">0</p>
+    <!-- SIDEBAR PC -->
+    <aside class="w-64 bg-white border-r border-slate-200 flex-col hidden md:flex z-30 shadow-sm relative">
+        <div class="p-6 border-b border-slate-100 flex items-center gap-3">
+            <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white font-black text-xl"><i class="fa-solid fa-layer-group"></i></div>
+            <div>
+                <h1 class="font-black text-sm leading-tight text-slate-800">OmniSaaS</h1>
+                <p class="text-[10px] text-slate-500 font-bold uppercase">Painel Master</p>
+            </div>
         </div>
-        <div class="dash-card success">
-            <div class="dash-title">Contas Premium (Robô Próprio)</div>
-            <p class="dash-value" id="dashPremium" style="color: var(--success);">0</p>
-        </div>
-        <div class="dash-card warning">
-            <div class="dash-title">Aguardando Aprovação</div>
-            <p class="dash-value" id="dashPendentes" style="color: var(--warning);">0</p>
-        </div>
-    </div>
+        <nav class="flex-1 p-4 space-y-2">
+            <button onclick="mudarAba('faturas', this)" class="nav-btn-pc w-full flex items-center p-3 rounded-xl bg-blue-50 text-primary font-bold transition">
+                <i class="fa-solid fa-sack-dollar w-6"></i> Faturas / Dash
+            </button>
+            <button onclick="mudarAba('clientes', this)" class="nav-btn-pc w-full flex items-center p-3 rounded-xl text-slate-500 hover:bg-slate-50 hover:text-slate-800 font-bold transition">
+                <i class="fa-solid fa-users w-6"></i> Meus Clientes
+            </button>
+            <button onclick="mudarAba('avisos', this)" class="nav-btn-pc w-full flex items-center p-3 rounded-xl text-slate-500 hover:bg-slate-50 hover:text-slate-800 font-bold transition">
+                <i class="fa-solid fa-bullhorn w-6"></i> Central de Avisos
+            </button>
+        </nav>
+    </aside>
 
-    <h3 class="section-title">🔔 Solicitações Pendentes</h3>
-    <div class="lista-pendentes" id="painelPendentes">
-        <p style="text-align: center; color: #999;">Conectando ao banco de dados...</p>
-    </div>
+    <!-- ÁREA PRINCIPAL -->
+    <main class="flex-1 flex flex-col h-full w-full relative">
+        
+        <!-- HEADER MOBILE & PC -->
+        <header class="bg-white border-b border-slate-200 p-4 flex justify-between items-center z-20">
+            <div class="flex items-center gap-2 md:hidden">
+                <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white"><i class="fa-solid fa-layer-group text-sm"></i></div>
+                <h2 class="font-black text-slate-800">OmniSaaS</h2>
+            </div>
+            <div class="hidden md:block">
+                <h2 id="headerTitulo" class="font-black text-xl text-slate-800">Dashboard de Faturamento</h2>
+            </div>
+            <button class="w-10 h-10 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 transition relative">
+                <i class="fa-solid fa-bell"></i>
+                <span class="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
+            </button>
+        </header>
 
-    <h3 class="section-title">🤖 Clientes Ativos na Plataforma</h3>
-    <div class="grid" id="painelAtivos"></div>
-
-    <!-- MODAL DE EDIÇÃO -->
-    <div class="modal" id="modalEmpresa">
-        <div class="modal-content">
-            <h2 style="margin-top: 0; color: var(--primary); border-bottom: 2px solid #eee; padding-bottom: 10px;">⚙️ Configurar Cliente: <span id="nomeRoboEdit"></span></h2>
-            <input type="hidden" id="editEmpresaId">
+        <!-- CONTEÚDO DAS ABAS -->
+        <div class="flex-1 overflow-y-auto p-4 md:p-8 pb-24 md:pb-8 bg-surface">
             
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                <div>
-                    <label>Plano da Conta:</label>
-                    <select id="editPlanoConta">
-                        <option value="basico">🥉 Plano Básico</option>
-                        <option value="premium">🥇 Plano Premium</option>
-                    </select>
+            <!-- ABA: FATURAS / DASHBOARD -->
+            <div id="aba-faturas" class="tab-content active max-w-5xl mx-auto">
+                
+                <!-- CARD VERDE -->
+                <div class="bg-success rounded-2xl p-6 md:p-8 text-white shadow-lg mb-6 relative overflow-hidden">
+                    <div class="absolute -right-10 -top-10 opacity-10"><i class="fa-solid fa-chart-line text-9xl"></i></div>
+                    <p class="text-xs font-black tracking-widest uppercase opacity-90 mb-1">Receita Fixa Estimada</p>
+                    <h2 class="text-4xl md:text-5xl font-black mb-2" id="dashReceita">R$ 0,00</h2>
+                    <p class="text-[10px] md:text-xs opacity-80 font-medium">+ Valores Variáveis (%) calculados no fechamento.</p>
                 </div>
-                <div>
-                    <label>WhatsApp de Atendimento:</label>
-                    <input type="text" id="editZapLoja" placeholder="Ex: 46999999999">
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                    <!-- CONTAS EM DIA -->
+                    <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex flex-col justify-center">
+                        <p class="text-xs font-black text-slate-500 uppercase tracking-wide mb-1">Contas em Dia</p>
+                        <h3 class="text-3xl font-black text-primary" id="dashEmDia">0</h3>
+                    </div>
+                    
+                    <!-- BLOQUEIOS -->
+                    <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex flex-col justify-center">
+                        <p class="text-xs font-black text-slate-500 uppercase tracking-wide mb-1">Bloqueios por falta de pagto</p>
+                        <h3 class="text-3xl font-black text-danger" id="dashBloqueios">0</h3>
+                    </div>
+                </div>
+
+                <!-- CONTROLE DE PAGAMENTOS -->
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="p-5 border-b border-slate-100 flex items-center gap-3">
+                        <i class="fa-solid fa-list-check text-slate-400"></i>
+                        <h3 class="font-black text-slate-800 text-lg">Controle de Pagamentos</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse min-w-[600px]">
+                            <thead>
+                                <tr class="bg-slate-50 text-[10px] text-slate-500 uppercase tracking-wider font-black">
+                                    <th class="p-4 border-b border-slate-100">Cliente / Sistema</th>
+                                    <th class="p-4 border-b border-slate-100 text-center">Vencimento</th>
+                                    <th class="p-4 border-b border-slate-100 text-right">Cobrança Mensal</th>
+                                    <th class="p-4 border-b border-slate-100 text-center">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabelaFaturas" class="divide-y divide-slate-100">
+                                <tr><td colspan="4" class="p-8 text-center text-slate-400 font-bold">Aguarde...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
-            <label>Mensagem de Boas-vindas do Robô:</label>
-            <textarea id="menuSaudacao" rows="3" placeholder="Ex: Olá! Seja bem-vindo ao nosso atendimento. Como podemos ajudar hoje?"></textarea>
+            <!-- ABA: CLIENTES -->
+            <div id="aba-clientes" class="tab-content max-w-5xl mx-auto">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h2 class="text-2xl font-black text-slate-800">Meus Clientes</h2>
+                        <p class="text-xs text-slate-500 font-medium">Gestão de licenças e inquilinos</p>
+                    </div>
+                    <button onclick="abrirModalCliente()" class="bg-primary hover:bg-blue-700 text-white px-5 py-3 rounded-xl font-bold text-sm shadow-md transition flex items-center gap-2">
+                        <i class="fa-solid fa-plus"></i> <span class="hidden sm:inline">Novo Cliente</span>
+                    </button>
+                </div>
 
-            <label style="color: var(--primary); border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-top: 20px;">Menu de Autoatendimento (Premium)</label>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="gridClientes">
+                    <!-- Preenchido via JS -->
+                </div>
+            </div>
+
+            <!-- ABA: AVISOS -->
+            <div id="aba-avisos" class="tab-content max-w-5xl mx-auto text-center py-20">
+                <i class="fa-solid fa-bullhorn text-6xl text-slate-200 mb-4"></i>
+                <h2 class="text-xl font-black text-slate-800">Central de Avisos</h2>
+                <p class="text-sm text-slate-500 mt-2">Módulo em desenvolvimento. Aqui você poderá enviar push notifications para o painel dos seus clientes.</p>
+            </div>
+
+        </div>
+        
+        <!-- BOTTOM NAVIGATION (MOBILE) -->
+        <nav class="md:hidden fixed bottom-0 w-full bg-white border-t border-slate-200 flex justify-around items-center pb-safe pt-2 px-2 shadow-[0_-5px_15px_rgba(0,0,0,0.05)] z-40">
+            <button onclick="mudarAba('clientes', this)" class="nav-btn-mobile flex-1 py-2 flex flex-col items-center text-slate-400 transition">
+                <i class="fa-solid fa-users text-xl mb-1"></i>
+                <span class="text-[10px] font-bold uppercase tracking-wider">Clientes</span>
+            </button>
+            <button onclick="mudarAba('faturas', this)" class="nav-btn-mobile flex-1 py-2 flex flex-col items-center text-primary transition scale-110">
+                <i class="fa-solid fa-sack-dollar text-xl mb-1"></i>
+                <span class="text-[10px] font-bold uppercase tracking-wider">Faturas</span>
+            </button>
+            <button onclick="mudarAba('avisos', this)" class="nav-btn-mobile flex-1 py-2 flex flex-col items-center text-slate-400 transition">
+                <i class="fa-solid fa-bullhorn text-xl mb-1"></i>
+                <span class="text-[10px] font-bold uppercase tracking-wider">Avisos</span>
+            </button>
+        </nav>
+    </main>
+
+    <!-- MODAL PAINEL DO CLIENTE -->
+    <div id="modalCliente" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden justify-center items-end md:items-center">
+        <div class="bg-white w-full max-w-2xl md:rounded-2xl rounded-t-3xl shadow-2xl flex flex-col max-h-[90vh] animate-[fadeIn_0.3s_ease]">
             
-            <div class="menu-row">
-                <div>
-                    <label style="margin-top:0;">Opção 1 (Botão):</label>
-                    <input type="text" id="opt1Nome" placeholder="Ex: Catálogo">
+            <!-- Modal Header -->
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50 md:rounded-t-2xl rounded-t-3xl">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-sliders text-primary text-xl"></i>
+                    <div>
+                        <h2 class="font-black text-slate-800 text-lg leading-tight">Painel do Cliente</h2>
+                        <p id="subtituloModal" class="text-xs text-slate-500 font-bold mt-0.5">Novo Registro</p>
+                    </div>
                 </div>
+                <button onclick="fecharModalCliente()" class="w-8 h-8 bg-slate-200 hover:bg-slate-300 text-slate-600 rounded-full flex justify-center items-center transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="p-6 overflow-y-auto hide-scrollbar space-y-6">
+                <input type="hidden" id="cliId">
+
+                <!-- Bloco ID Integração -->
+                <div class="border border-slate-200 rounded-xl p-4 bg-slate-50 flex justify-between items-center">
+                    <div class="overflow-hidden pr-4">
+                        <label class="label-base text-[10px]">ID de Integração (Chave do Cliente)</label>
+                        <p id="cliChave" class="font-mono font-bold text-primary text-sm truncate">Gerado ao salvar...</p>
+                    </div>
+                    <button onclick="copiarChave()" class="w-10 h-10 shrink-0 bg-white border border-slate-200 shadow-sm rounded-lg text-slate-600 hover:text-primary transition flex justify-center items-center">
+                        <i class="fa-regular fa-copy"></i>
+                    </button>
+                </div>
+
+                <!-- Nome -->
                 <div>
-                    <label style="margin-top:0;">Resposta Automática:</label>
-                    <input type="text" id="opt1Resp" placeholder="Ex: Acesse nosso catálogo em www.site.com">
+                    <label class="label-base">Nome do Cliente / Sistema / Associação:</label>
+                    <input type="text" id="cliNome" class="input-base" placeholder="Ex: pH Cosméticos">
+                </div>
+
+                <!-- Bloco Licença e Cobrança -->
+                <div class="border border-slate-200 rounded-xl p-5 bg-white relative">
+                    <div class="absolute -top-3 left-4 bg-white px-2 flex items-center gap-2">
+                        <i class="fa-solid fa-id-card text-primary text-sm"></i>
+                        <span class="text-xs font-black text-slate-700 tracking-wide uppercase">Licença, Plano e Cobrança</span>
+                    </div>
+
+                    <div class="space-y-4 mt-2">
+                        <div>
+                            <label class="label-base">Nicho de Mercado:</label>
+                            <div class="relative">
+                                <i class="fa-solid fa-shop absolute left-3 top-3.5 text-slate-400"></i>
+                                <select id="cliNicho" class="input-base pl-10 appearance-none bg-white">
+                                    <option value="Loja Comercial">Loja Comercial</option>
+                                    <option value="Associação Militar">Associação Militar</option>
+                                    <option value="Clínica / Saúde">Clínica / Saúde</option>
+                                    <option value="Imobiliária">Imobiliária</option>
+                                    <option value="Outro">Outro</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="label-base">Plano de Funcionalidades:</label>
+                            <div class="relative">
+                                <i class="fa-solid fa-medal absolute left-3 top-3.5 text-slate-400"></i>
+                                <select id="cliPlano" class="input-base pl-10 appearance-none bg-white">
+                                    <option value="Básico">BÁSICO (Padrão)</option>
+                                    <option value="Premium">PREMIUM (Avançado)</option>
+                                    <option value="White Label">WHITE LABEL</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="label-base">Formato da Sua Cobrança:</label>
+                            <div class="relative">
+                                <i class="fa-solid fa-sack-dollar absolute left-3 top-3.5 text-slate-400"></i>
+                                <select id="cliFormatoCobranca" class="input-base pl-10 appearance-none bg-white">
+                                    <option value="Fixo">Valor Fixo Mensal (R$)</option>
+                                    <option value="Percentual">Percentual sobre Vendas (%)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="label-base">Valor / Percentual:</label>
+                                <input type="number" id="cliValor" class="input-base" placeholder="Ex: 150.00" step="0.01">
+                            </div>
+                            <div>
+                                <label class="label-base">Dia do Vencimento:</label>
+                                <input type="number" id="cliVencimento" class="input-base" placeholder="Ex: 10" min="1" max="31">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="label-base">Status do Inquilino:</label>
+                            <select id="cliStatus" class="input-base bg-white font-bold">
+                                <option value="ativo" class="text-success">🟢 Conta em Dia (Ativa)</option>
+                                <option value="bloqueado" class="text-danger">🔴 Bloqueio por Falta de Pagto</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="menu-row">
-                <div>
-                    <label style="margin-top:0;">Opção 2 (Botão):</label>
-                    <input type="text" id="opt2Nome" placeholder="Ex: Falar com Vendedor">
-                </div>
-                <div>
-                    <label style="margin-top:0;">Resposta Automática:</label>
-                    <input type="text" id="opt2Resp" placeholder="Ex: Aguarde um momento, já vamos te atender!">
-                </div>
-            </div>
-
-            <div class="menu-row">
-                <div>
-                    <label style="margin-top:0;">Opção 3 (Botão):</label>
-                    <input type="text" id="opt3Nome" placeholder="Ex: Dúvidas / Entregas">
-                </div>
-                <div>
-                    <label style="margin-top:0;">Resposta Automática:</label>
-                    <input type="text" id="opt3Resp" placeholder="Ex: Nossas entregas são feitas em até 2 dias úteis.">
-                </div>
-            </div>
-
-            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 25px;">
-                <button class="btn btn-outline" onclick="fecharModal()">Cancelar</button>
-                <button class="btn" onclick="salvarConfiguracao()">💾 Salvar Alterações</button>
+            <!-- Modal Footer -->
+            <div class="p-6 border-t border-slate-100 flex gap-3 bg-white">
+                <button onclick="fecharModalCliente()" class="flex-1 py-3.5 rounded-xl font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition">
+                    Cancelar
+                </button>
+                <button onclick="salvarCliente()" class="flex-[2] py-3.5 rounded-xl font-bold text-white bg-primary hover:bg-blue-700 transition shadow-lg flex justify-center items-center gap-2">
+                    <i class="fa-solid fa-floppy-disk"></i> Salvar Cliente
+                </button>
             </div>
         </div>
     </div>
 
+    <!-- FIREBASE & LÓGICA JAVASCRIPT -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
+        // Configuração SaaS fornecida anteriormente
         const firebaseConfig = {
             apiKey: "AIzaSyC4-2LavZt7iWPt2u71u-yRUYbIJu-Vzf0",
             authDomain: "central-omnichannel-saas.firebaseapp.com",
             projectId: "central-omnichannel-saas",
             storageBucket: "central-omnichannel-saas.firebasestorage.app",
             messagingSenderId: "869327159480",
-            appId: "1:869327159480:web:605be5ec37ab688d44b44d",
-            measurementId: "G-984WSSJBHP"
+            appId: "1:869327159480:web:605be5ec37ab688d44b44d"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        let listaEmpresas = [];
-        window.empresaEmEdicao = null; 
+        
+        let clientesGlobal = [];
 
-        onSnapshot(collection(db, "empresas"), (snapshot) => {
-            listaEmpresas = [];
-            snapshot.forEach((doc) => { listaEmpresas.push({ id: doc.id, ...doc.data() }); });
-            renderizarPainel();
-        });
+        // NAVEGAÇÃO DE ABAS
+        window.mudarAba = (idAba, btnElement) => {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.getElementById(`aba-${idAba}`).classList.add('active');
 
-        function renderizarPainel() {
-            const divP = document.getElementById('painelPendentes');
-            const divA = document.getElementById('painelAtivos');
-            divP.innerHTML = ''; divA.innerHTML = '';
-            
-            let totalAtivos = 0;
-            let totalPremium = 0;
-            let totalPendentes = 0;
+            // Reset cores botões PC
+            document.querySelectorAll('.nav-btn-pc').forEach(el => {
+                el.classList.remove('bg-blue-50', 'text-primary');
+                el.classList.add('text-slate-500');
+            });
+            // Reset cores botões Mobile
+            document.querySelectorAll('.nav-btn-mobile').forEach(el => {
+                el.classList.remove('text-primary', 'scale-110');
+                el.classList.add('text-slate-400');
+            });
 
-            listaEmpresas.sort((a, b) => (a.nomeEmpresa || '').localeCompare(b.nomeEmpresa || ''));
-
-            listaEmpresas.forEach(emp => {
-                if(emp.statusRobo === 'pendente') {
-                    totalPendentes++;
-                    divP.innerHTML += `
-                        <div class="card-pendente">
-                            <div class="info-pendente">
-                                <h4>🏢 ${emp.nomeEmpresa}</h4>
-                                <p>📧 ${emp.email} | 📱 ${emp.whatsappLojista || 'Não informado'} | 📅 ${new Date(emp.dataCadastro || Date.now()).toLocaleDateString()}</p>
-                            </div>
-                            <div style="display: flex; gap: 10px;">
-                                <select id="plano-${emp.id}" class="btn-outline" style="padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
-                                    <option value="basico">🥉 Básico</option>
-                                    <option value="premium">🥇 Premium</option>
-                                </select>
-                                <button class="btn" onclick="aprovarCliente('${emp.id}')">✅ Aprovar</button>
-                                <button class="btn btn-danger" onclick="excluirEmpresa('${emp.id}', '${emp.nomeEmpresa}')">🗑️</button>
-                            </div>
-                        </div>
-                    `;
+            if(btnElement) {
+                if(btnElement.classList.contains('nav-btn-pc')) {
+                    btnElement.classList.remove('text-slate-500');
+                    btnElement.classList.add('bg-blue-50', 'text-primary');
                 } else {
-                    totalAtivos++;
-                    const premium = emp.plano === 'premium';
-                    if (premium) totalPremium++;
-                    
-                    const status = emp.statusRobo === 'ativo_central' || emp.statusRobo === 'online' ? 'online' : 'offline';
-                    
-                    divA.innerHTML += `
-                        <div class="card">
-                            <div class="card-header">
-                                <div>
-                                    <div class="empresa-nome">${emp.nomeEmpresa}</div>
-                                    <div class="empresa-sub">${premium ? '🥇 PLANO PREMIUM' : '🥉 PLANO BÁSICO'} | 📱 ${emp.whatsappLojista || 'Sem número'}</div>
-                                </div>
-                                <span class="status-tag ${status}">${status}</span>
-                            </div>
-                            <div class="log-window">
-                                > [${new Date().toLocaleTimeString()}] Inicializando container...<br>
-                                > [Info] Banco de dados sincronizado.<br>
-                                > [Status] ${premium ? (status === 'online' ? 'Sessão do WhatsApp estabelecida.' : 'Aguardando pareamento do QR Code no dispositivo do cliente...') : 'Conectado à Inteligência Central.'}
-                            </div>
-                            <div class="card-actions">
-                                <button class="btn btn-edit" onclick="abrirModal('${emp.id}')">⚙️ Configurações</button>
-                                <button class="btn btn-danger" onclick="excluirEmpresa('${emp.id}', '${emp.nomeEmpresa}')" style="flex:0; padding: 10px 15px;" title="Remover Conta">🗑️</button>
-                            </div>
-                        </div>
-                    `;
+                    btnElement.classList.remove('text-slate-400');
+                    btnElement.classList.add('text-primary', 'scale-110');
+                }
+            }
+
+            // Atualiza Header
+            const titulos = { 'faturas': 'Dashboard de Faturamento', 'clientes': 'Gestão de Inquilinos', 'avisos': 'Avisos Push' };
+            document.getElementById('headerTitulo').innerText = titulos[idAba];
+        };
+
+        // FORMATAÇÃO DE MOEDA
+        const formatarMoeda = (valor) => {
+            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor || 0);
+        };
+
+        // GERAR CHAVE ALEATÓRIA ESTILO VERCEL
+        const gerarChaveIntegracao = () => {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            for (let i = 0; i < 24; i++) result += chars.charAt(Math.floor(Math.random() * chars.length));
+            return result;
+        };
+
+        // COPIAR CHAVE
+        window.copiarChave = () => {
+            const txt = document.getElementById('cliChave').innerText;
+            if(!txt || txt.includes('Gerado')) return;
+            navigator.clipboard.writeText(txt).then(() => {
+                alert("✅ Chave de Integração copiada!");
+            });
+        };
+
+        // LISTENER DO BANCO DE DADOS
+        onSnapshot(collection(db, "inquilinos_saas"), (snapshot) => {
+            clientesGlobal = [];
+            let receitaFixa = 0;
+            let emDia = 0;
+            let bloqueios = 0;
+
+            snapshot.forEach((doc) => { 
+                const data = doc.data();
+                clientesGlobal.push({ id: doc.id, ...data }); 
+                
+                if(data.statusConta === 'ativo') {
+                    emDia++;
+                    if(data.formatoCobranca === 'Fixo') receitaFixa += Number(data.valorCobranca || 0);
+                } else if(data.statusConta === 'bloqueado') {
+                    bloqueios++;
                 }
             });
-
-            // Atualiza Dashboard
-            document.getElementById('dashAtivos').innerText = totalAtivos;
-            document.getElementById('dashPremium').innerText = totalPremium;
-            document.getElementById('dashPendentes').innerText = totalPendentes;
-
-            if(totalPendentes === 0) divP.innerHTML = '<p style="text-align: center; color: #999; padding: 20px; background: white; border-radius: 8px; border: 1px dashed #ccc;">Nenhuma solicitação pendente no momento.</p>';
-        }
-
-        window.aprovarCliente = async (id) => {
-            const plano = document.getElementById('plano-'+id).value;
-            if(confirm("Confirmar a aprovação deste cliente na plataforma?")) {
-                const status = plano === 'basico' ? 'ativo_central' : 'offline';
-                await updateDoc(doc(db, "empresas", id), { statusRobo: status, plano: plano });
-            }
-        };
-
-        window.excluirEmpresa = async (id, nome) => {
-            if(confirm(`Tem certeza que deseja excluir permanentemente o cliente "${nome}"? Esta ação não pode ser desfeita.`)) {
-                await deleteDoc(doc(db, "empresas", id));
-            }
-        };
-
-        window.abrirModal = (id) => {
-            const emp = listaEmpresas.find(e => e.id === id);
-            window.empresaEmEdicao = emp; 
             
-            document.getElementById('editEmpresaId').value = emp.id;
-            document.getElementById('nomeRoboEdit').innerText = emp.nomeEmpresa;
-            document.getElementById('editPlanoConta').value = emp.plano || 'basico'; 
-            document.getElementById('editZapLoja').value = emp.whatsappLojista || '';
-            
-            if(emp.menu) {
-                document.getElementById('menuSaudacao').value = emp.menu.saudacao || '';
-                document.getElementById('opt1Nome').value = emp.menu.opt1Nome || '';
-                document.getElementById('opt1Resp').value = emp.menu.opt1Resp || '';
-                document.getElementById('opt2Nome').value = emp.menu.opt2Nome || '';
-                document.getElementById('opt2Resp').value = emp.menu.opt2Resp || '';
-                document.getElementById('opt3Nome').value = emp.menu.opt3Nome || '';
-                document.getElementById('opt3Resp').value = emp.menu.opt3Resp || '';
-            } else {
-                document.getElementById('menuSaudacao').value = '';
-                document.getElementById('opt1Nome').value = '';
-                document.getElementById('opt1Resp').value = '';
-                document.getElementById('opt2Nome').value = '';
-                document.getElementById('opt2Resp').value = '';
-                document.getElementById('opt3Nome').value = '';
-                document.getElementById('opt3Resp').value = '';
-            }
-            document.getElementById('modalEmpresa').style.display = 'flex';
-        };
+            // Renderiza Métricas
+            document.getElementById('dashReceita').innerText = formatarMoeda(receitaFixa);
+            document.getElementById('dashEmDia').innerText = emDia;
+            document.getElementById('dashBloqueios').innerText = bloqueios;
 
-        window.fecharModal = () => document.getElementById('modalEmpresa').style.display = 'none';
+            renderizarTabelas();
+        });
 
-        window.salvarConfiguracao = async () => {
-            const id = document.getElementById('editEmpresaId').value;
-            const zap = document.getElementById('editZapLoja').value.replace(/\D/g, '');
-            const novoPlano = document.getElementById('editPlanoConta').value;
-            const emp = window.empresaEmEdicao;
+        const renderizarTabelas = () => {
+            const tbodyFat = document.getElementById('tabelaFaturas');
+            const gridCli = document.getElementById('gridClientes');
+            tbodyFat.innerHTML = ''; gridCli.innerHTML = '';
 
-            let novoStatus = emp.statusRobo;
-            if (emp.plano !== novoPlano) {
-                novoStatus = (novoPlano === 'basico') ? 'ativo_central' : 'offline';
+            if(clientesGlobal.length === 0) {
+                tbodyFat.innerHTML = '<tr><td colspan="4" class="p-8 text-center text-slate-500 font-bold">Nenhum cliente cadastrado.</td></tr>';
+                gridCli.innerHTML = '<div class="col-span-full p-8 text-center text-slate-500 bg-white rounded-xl border border-dashed border-slate-300">Nenhum cliente cadastrado. Comece adicionando um novo!</div>';
+                return;
             }
 
-            const menu = {
-                saudacao: document.getElementById('menuSaudacao').value,
-                opt1Nome: document.getElementById('opt1Nome').value,
-                opt1Resp: document.getElementById('opt1Resp').value,
-                opt2Nome: document.getElementById('opt2Nome').value,
-                opt2Resp: document.getElementById('opt2Resp').value,
-                opt3Nome: document.getElementById('opt3Nome').value,
-                opt3Resp: document.getElementById('opt3Resp').value
-            };
-            
-            await updateDoc(doc(db, "empresas", id), { 
-                whatsappLojista: zap, 
-                menu: menu,
-                plano: novoPlano,
-                statusRobo: novoStatus
+            clientesGlobal.forEach(c => {
+                // Tabela de Faturas
+                const corStatus = c.statusConta === 'ativo' ? 'bg-success/10 text-success' : 'bg-danger/10 text-danger';
+                const txtStatus = c.statusConta === 'ativo' ? 'Em Dia' : 'Bloqueado';
+                const valCobranca = c.formatoCobranca === 'Fixo' ? formatarMoeda(c.valorCobranca) : `${c.valorCobranca || 0}% das Vendas`;
+
+                tbodyFat.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition cursor-pointer" onclick="abrirModalCliente('${c.id}')">
+                        <td class="p-4 border-b border-slate-100 font-bold text-slate-800 text-sm">${c.nome} <br><span class="text-[10px] text-slate-400 font-normal">Plano: ${c.plano}</span></td>
+                        <td class="p-4 border-b border-slate-100 text-center text-sm font-bold text-slate-600">Dia ${c.diaVencimento || '--'}</td>
+                        <td class="p-4 border-b border-slate-100 text-right text-sm font-black text-slate-700">${valCobranca}</td>
+                        <td class="p-4 border-b border-slate-100 text-center"><span class="px-3 py-1 rounded-full text-[10px] font-black uppercase ${corStatus}">${txtStatus}</span></td>
+                    </tr>
+                `;
+
+                // Grid de Clientes
+                gridCli.innerHTML += `
+                    <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="font-black text-slate-800 text-lg">${c.nome}</h3>
+                                <p class="text-xs font-bold text-primary">${c.nicho}</p>
+                            </div>
+                            <span class="w-3 h-3 rounded-full ${c.statusConta === 'ativo' ? 'bg-success' : 'bg-danger'} shadow-sm"></span>
+                        </div>
+                        <div class="bg-slate-50 p-3 rounded-lg mb-4">
+                            <p class="text-[10px] text-slate-500 uppercase font-bold mb-1">Chave de API:</p>
+                            <p class="font-mono text-xs text-slate-700 truncate">${c.chaveIntegracao}</p>
+                        </div>
+                        <button onclick="abrirModalCliente('${c.id}')" class="w-full py-2.5 bg-white border border-slate-200 hover:border-primary hover:text-primary text-slate-600 font-bold rounded-xl text-sm transition">
+                            Gerenciar Conta
+                        </button>
+                    </div>
+                `;
             });
-            
-            fecharModal();
-            alert("✅ Configurações atualizadas e salvas com sucesso!");
         };
+
+        // MODAL E CRUD
+        window.abrirModalCliente = (id = null) => {
+            const modal = document.getElementById('modalCliente');
+            
+            if(id) {
+                const c = clientesGlobal.find(x => x.id === id);
+                document.getElementById('cliId').value = c.id;
+                document.getElementById('cliChave').innerText = c.chaveIntegracao;
+                document.getElementById('cliNome').value = c.nome;
+                document.getElementById('cliNicho').value = c.nicho;
+                document.getElementById('cliPlano').value = c.plano;
+                document.getElementById('cliFormatoCobranca').value = c.formatoCobranca;
+                document.getElementById('cliValor').value = c.valorCobranca;
+                document.getElementById('cliVencimento').value = c.diaVencimento;
+                document.getElementById('cliStatus').value = c.statusConta;
+                document.getElementById('subtituloModal').innerText = c.nome;
+            } else {
+                document.getElementById('cliId').value = "";
+                document.getElementById('cliChave').innerText = gerarChaveIntegracao();
+                document.getElementById('cliNome').value = "";
+                document.getElementById('cliValor').value = "";
+                document.getElementById('cliVencimento').value = "";
+                document.getElementById('cliStatus').value = "ativo";
+                document.getElementById('subtituloModal').innerText = "Novo Registro";
+            }
+            
+            modal.style.display = 'flex';
+        };
+
+        window.fecharModalCliente = () => {
+            document.getElementById('modalCliente').style.display = 'none';
+        };
+
+        window.salvarCliente = async () => {
+            const id = document.getElementById('cliId').value || document.getElementById('cliChave').innerText; // Usa a chave gerada como ID do Doc se for novo
+            const obj = {
+                chaveIntegracao: document.getElementById('cliChave').innerText,
+                nome: document.getElementById('cliNome').value.trim(),
+                nicho: document.getElementById('cliNicho').value,
+                plano: document.getElementById('cliPlano').value,
+                formatoCobranca: document.getElementById('cliFormatoCobranca').value,
+                valorCobranca: document.getElementById('cliValor').value,
+                diaVencimento: document.getElementById('cliVencimento').value,
+                statusConta: document.getElementById('cliStatus').value,
+                dataAtualizacao: new Date().toISOString()
+            };
+
+            if(!obj.nome) return alert("Preencha o nome do cliente.");
+
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            try {
+                // Usando setDoc para criar com ID específico (Chave) ou atualizar existente
+                await setDoc(doc(db, "inquilinos_saas", id), obj);
+                fecharModalCliente();
+            } catch(e) {
+                alert("Erro ao salvar: " + e.message);
+            }
+            document.getElementById('loadingOverlay').style.display = 'none';
+        };
+
     </script>
 </body>
 </html>
