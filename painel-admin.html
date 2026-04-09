@@ -162,7 +162,7 @@
                     </div>
                     <p id="subtituloModal" class="text-[11px] font-bold text-textMuted uppercase tracking-wide">Novo Registro</p>
                 </div>
-                <button onclick="fecharModalCliente()" class="w-8 h-8 bg-slate-100 text-slate-500 rounded-full flex justify-center items-center hover:bg-slate-200">
+                onclick="window.fecharModalCliente()" class="w-8 h-8 bg-slate-100 text-slate-500 rounded-full flex justify-center items-center hover:bg-slate-200">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
@@ -177,7 +177,7 @@
                         <label class="input-label text-[10px] tracking-wide">ID de Integração (Chave do Cliente)</label>
                         <p id="cliChave" class="font-mono font-bold text-primary text-sm truncate">KILhFSEVUpY...</p>
                     </div>
-                    <button onclick="copiarChave()" class="w-10 h-10 border border-slate-200 rounded-xl text-slate-600 flex justify-center items-center shrink-0">
+                    <button onclick="window.copiarChave()" class="w-10 h-10 border border-slate-200 rounded-xl text-slate-600 flex justify-center items-center shrink-0">
                         <i class="fa-regular fa-copy"></i>
                     </button>
                 </div>
@@ -559,7 +559,7 @@
                     alert("⚠️ Cliente salvo no Master, mas houve erro ao injetar a licença: " + resLicenca.erro);
                 }
 
-                fecharModalCliente();
+               window.fecharModalCliente();
             } catch(e) {
                 alert("Erro ao salvar: " + e.message);
             }
