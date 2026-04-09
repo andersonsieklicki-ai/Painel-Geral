@@ -219,17 +219,18 @@
                             </div>
                         </div>
 
-                        <div>
-                            <label class="input-label">Formato da Sua Cobrança:</label>
-                            <div class="relative">
-                                <span class="absolute left-4 top-3 text-sm">💰</span>
-                                <select id="cliFormatoCobranca" class="input-field pl-10 bg-white">
-                             <option value="Valor Fixo Mensal (R$)">Valor Fixo Mensal (R$)</option>
-                          <!-- O texto "Percentual" é o gatilho para o robô contar alunos -->
-                            <option value="Percentual sobre Alunos (%)">Percentual sobre Alunos (%)</option>
-                           </select>
-                            </div>
-                        </div>
+                       <!-- FORMATO DE COBRANÇA -->
+                       <div>
+              <label class="input-label">Formato da Sua Cobrança:</label>
+               <div class="relative">
+            <span class="absolute left-4 top-3 text-sm">💰</span>
+           <select id="cliFormatoCobranca" class="input-field pl-10 bg-white">
+            <option value="Valor Fixo Mensal (R$)">Valor Fixo Mensal (R$)</option>
+            <!-- O robô no central.js buscará este valor para contar os alunos no banco -->
+            <option value="Percentual sobre Alunos (%)">Percentual sobre Alunos (%)</option>
+                 </select>
+                </div>
+                   </div>
 
                         <div class="grid grid-cols-2 gap-3">
                             <div>
