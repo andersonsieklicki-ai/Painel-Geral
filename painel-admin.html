@@ -18,11 +18,17 @@
                 extend: {
                     fontFamily: { sans: ['Inter', 'sans-serif'] },
                     colors: {
-                        primary: '#2563eb',
-                        surface: '#f8fafc',
+                        brand: '#2563eb', // Azul Vercel/SaaS
+                        background: '#f4f7f6', // Fundo gelo dos prints
                         card: '#ffffff',
-                        success: '#059669',
-                        danger: '#dc2626'
+                        revenue: '#0F9D58', // Verde exato do card de receita
+                        danger: '#dc2626',
+                        textMain: '#1e293b',
+                        textMuted: '#64748b'
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'float': '0 10px 30px -5px rgba(0, 0, 0, 0.1)',
                     }
                 }
             }
@@ -30,267 +36,306 @@
     </script>
 
     <style>
-        body { background-color: theme('colors.surface'); -webkit-tap-highlight-color: transparent; }
+        body { background-color: theme('colors.background'); -webkit-tap-highlight-color: transparent; }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
         .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+        .tab-content.active { display: block; animation: fadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeUp { 
+            from { opacity: 0; transform: translateY(10px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
 
-        .input-base { width: 100%; padding: 0.75rem 1rem; border: 1px solid #e2e8f0; border-radius: 0.75rem; outline: none; transition: border-color 0.2s; font-size: 0.875rem; color: #1e293b; font-weight: 500; }
-        .input-base:focus { border-color: theme('colors.primary'); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
-        .label-base { display: block; font-size: 0.75rem; font-weight: 700; color: #475569; text-transform: uppercase; margin-bottom: 0.5rem; letter-spacing: 0.05em; }
+        /* Inputs Premium estilo Vercel */
+        .input-premium { width: 100%; padding: 0.875rem 1rem; border: 1px solid #e2e8f0; border-radius: 0.75rem; background: #ffffff; outline: none; transition: all 0.2s ease; font-size: 0.875rem; color: theme('colors.textMain'); font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
+        .input-premium:focus { border-color: theme('colors.brand'); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }
+        
+        .label-premium { display: block; font-size: 0.65rem; font-weight: 800; color: theme('colors.textMuted'); text-transform: uppercase; margin-bottom: 0.375rem; letter-spacing: 0.08em; }
+
+        /* Botões de Ação Rápidos */
+        .btn-action { display: inline-flex; align-items: center; justify-content: center; width: 2.25rem; height: 2.25rem; border-radius: 0.5rem; transition: all 0.2s ease; }
+        .btn-play { background: #ecfdf5; color: #059669; border: 1px solid #d1fae5; }
+        .btn-play:hover { background: #059669; color: white; }
+        .btn-pause { background: #fef2f2; color: #dc2626; border: 1px solid #fee2e2; }
+        .btn-pause:hover { background: #dc2626; color: white; }
+        .btn-edit { background: #f8fafc; color: #475569; border: 1px solid #e2e8f0; }
+        .btn-edit:hover { background: #e2e8f0; color: #0f172a; }
     </style>
 </head>
-<body class="text-slate-800 h-screen w-screen overflow-hidden flex">
+<body class="text-textMain h-screen w-screen flex overflow-hidden">
 
     <!-- OVERLAY DE LOADING -->
-    <div id="loadingOverlay" class="fixed inset-0 bg-white/90 z-[9999] flex flex-col justify-center items-center hidden backdrop-blur-sm">
-        <i class="fa-solid fa-circle-notch fa-spin text-4xl text-primary mb-4"></i>
-        <p class="font-bold text-slate-600 animate-pulse">Sincronizando Sistema...</p>
+    <div id="loadingOverlay" class="fixed inset-0 bg-white/95 z-[9999] flex flex-col justify-center items-center hidden backdrop-blur-md">
+        <div class="w-12 h-12 border-4 border-brand border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p class="font-black text-brand tracking-widest uppercase text-xs">Processando...</p>
     </div>
 
     <!-- SIDEBAR PC -->
-    <aside class="w-64 bg-white border-r border-slate-200 flex-col hidden md:flex z-30 shadow-sm relative shrink-0">
-        <div class="p-6 border-b border-slate-100 flex items-center gap-3">
-            <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white font-black text-xl"><i class="fa-solid fa-layer-group"></i></div>
+    <aside class="w-64 bg-white border-r border-slate-200 flex-col hidden md:flex z-30 shadow-soft relative shrink-0">
+        <div class="p-6 flex items-center gap-3">
+            <div class="w-10 h-10 bg-brand rounded-xl flex items-center justify-center text-white shadow-lg shadow-brand/30">
+                <i class="fa-solid fa-layer-group text-lg"></i>
+            </div>
             <div>
-                <h1 class="font-black text-sm leading-tight text-slate-800">OmniSaaS</h1>
-                <p class="text-[10px] text-slate-500 font-bold uppercase">Painel Master</p>
+                <h1 class="font-black text-base leading-tight">Master Panel</h1>
+                <p class="text-[9px] text-brand font-black uppercase tracking-widest">SaaS Edition</p>
             </div>
         </div>
-        <nav class="flex-1 p-4 space-y-2">
-            <button onclick="mudarAba('faturas', this)" class="nav-btn-pc w-full flex items-center p-3 rounded-xl bg-blue-50 text-primary font-bold transition">
-                <i class="fa-solid fa-sack-dollar w-6"></i> Faturas / Dash
+        <nav class="flex-1 px-4 py-2 space-y-1">
+            <button onclick="mudarAba('faturas', this)" class="nav-btn-pc w-full flex items-center px-4 py-3.5 rounded-xl bg-blue-50/70 text-brand font-bold transition">
+                <i class="fa-solid fa-chart-pie w-6"></i> Dashboard
             </button>
-            <button onclick="mudarAba('clientes', this)" class="nav-btn-pc w-full flex items-center p-3 rounded-xl text-slate-500 hover:bg-slate-50 hover:text-slate-800 font-bold transition">
-                <i class="fa-solid fa-users w-6"></i> Meus Clientes
-            </button>
-            <button onclick="mudarAba('avisos', this)" class="nav-btn-pc w-full flex items-center p-3 rounded-xl text-slate-500 hover:bg-slate-50 hover:text-slate-800 font-bold transition">
-                <i class="fa-solid fa-bullhorn w-6"></i> Central de Avisos
+            <button onclick="mudarAba('clientes', this)" class="nav-btn-pc w-full flex items-center px-4 py-3.5 rounded-xl text-textMuted hover:bg-slate-50 hover:text-textMain font-bold transition">
+                <i class="fa-solid fa-users w-6"></i> Clientes
             </button>
         </nav>
     </aside>
 
     <!-- ÁREA PRINCIPAL -->
-    <main class="flex-1 flex flex-col min-w-0 overflow-hidden relative">
+    <!-- Flex column e min-h-0 são essenciais para o scroll funcionar na DIV filha -->
+    <main class="flex-1 flex flex-col min-w-0 bg-background relative h-full">
         
         <!-- HEADER -->
-        <header class="bg-white border-b border-slate-200 p-4 flex justify-between items-center z-20 shrink-0">
-            <div class="flex items-center gap-2 md:hidden">
-                <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white"><i class="fa-solid fa-layer-group text-sm"></i></div>
-                <h2 class="font-black text-slate-800">OmniSaaS</h2>
+        <header class="bg-white/80 backdrop-blur-md border-b border-slate-200 p-4 md:px-8 flex justify-between items-center z-20 shrink-0 sticky top-0">
+            <div class="flex items-center gap-3 md:hidden">
+                <div class="w-8 h-8 bg-brand rounded-lg flex items-center justify-center text-white shadow-md">
+                    <i class="fa-solid fa-layer-group text-sm"></i>
+                </div>
+                <h2 class="font-black text-lg">Master Panel</h2>
             </div>
             <div class="hidden md:block">
-                <h2 id="headerTitulo" class="font-black text-xl text-slate-800">Dashboard de Faturamento</h2>
+                <h2 id="headerTitulo" class="font-black text-xl text-textMain">Visão Geral</h2>
             </div>
-            <button class="w-10 h-10 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 transition relative">
-                <i class="fa-solid fa-bell"></i>
-                <span class="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
+            <button class="w-10 h-10 rounded-full bg-slate-100 border border-slate-200 text-textMuted hover:bg-slate-200 transition relative flex items-center justify-center">
+                <i class="fa-regular fa-bell"></i>
+                <span class="absolute top-2.5 right-2.5 w-2 h-2 bg-brand rounded-full border border-white"></span>
             </button>
         </header>
 
-        <!-- CONTEÚDO DAS ABAS (Scroll corrigido) -->
-        <div class="flex-1 overflow-y-auto p-4 md:p-8 pb-32 bg-surface">
+        <!-- ÁREA DE CONTEÚDO SCROLLÁVEL -->
+        <div class="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-8 pb-32">
             
-            <!-- ABA: FATURAS / DASHBOARD -->
-            <div id="aba-faturas" class="tab-content active max-w-5xl mx-auto">
-                <div class="bg-success rounded-2xl p-6 md:p-8 text-white shadow-lg mb-6 relative overflow-hidden">
-                    <div class="absolute -right-10 -top-10 opacity-10"><i class="fa-solid fa-chart-line text-9xl"></i></div>
-                    <p class="text-xs font-black tracking-widest uppercase opacity-90 mb-1">Receita Fixa Estimada</p>
-                    <h2 class="text-4xl md:text-5xl font-black mb-2" id="dashReceita">R$ 0,00</h2>
-                    <p class="text-[10px] md:text-xs opacity-80 font-medium">+ Valores Variáveis (%) calculados no fechamento.</p>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                    <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex flex-col justify-center">
-                        <p class="text-xs font-black text-slate-500 uppercase tracking-wide mb-1">Contas em Dia</p>
-                        <h3 class="text-3xl font-black text-primary" id="dashEmDia">0</h3>
+            <!-- ============================================== -->
+            <!-- ABA: DASHBOARD / FATURAS (IDÊNTICO AO PRINT)   -->
+            <!-- ============================================== -->
+            <div id="aba-faturas" class="tab-content active max-w-5xl mx-auto space-y-5">
+                
+                <!-- CARD DE RECEITA -->
+                <div class="bg-revenue rounded-2xl p-6 md:p-8 text-white shadow-float relative overflow-hidden">
+                    <div class="relative z-10">
+                        <p class="text-[10px] md:text-xs font-black tracking-[0.15em] uppercase opacity-90 mb-2">Receita Fixa Estimada</p>
+                        <h2 class="text-4xl md:text-5xl font-black mb-3 tracking-tight drop-shadow-sm" id="dashReceita">R$ 0,00</h2>
+                        <p class="text-[10px] opacity-80 font-medium">+ Valores Variáveis (%) calculados no fechamento.</p>
                     </div>
-                    <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex flex-col justify-center">
-                        <p class="text-xs font-black text-slate-500 uppercase tracking-wide mb-1">Bloqueios por falta de pagto</p>
-                        <h3 class="text-3xl font-black text-danger" id="dashBloqueios">0</h3>
+                    <!-- Elemento decorativo -->
+                    <div class="absolute -right-8 -bottom-12 opacity-10">
+                        <i class="fa-solid fa-sack-dollar" style="font-size: 180px;"></i>
                     </div>
                 </div>
 
-                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                    <div class="p-5 border-b border-slate-100 flex items-center gap-3">
+                <!-- CARDS DE MÉTRICAS -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-soft flex flex-col justify-center">
+                        <p class="text-[10px] font-black text-textMuted uppercase tracking-widest mb-2">Contas em Dia</p>
+                        <h3 class="text-4xl font-black text-brand" id="dashEmDia">0</h3>
+                    </div>
+                    <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-soft flex flex-col justify-center">
+                        <p class="text-[10px] font-black text-textMuted uppercase tracking-widest mb-2">Bloqueios por falta de pagto</p>
+                        <h3 class="text-4xl font-black text-danger" id="dashBloqueios">0</h3>
+                    </div>
+                </div>
+
+                <!-- TABELA DE CONTROLE -->
+                <div class="bg-white rounded-2xl border border-slate-100 shadow-soft mt-8 overflow-hidden">
+                    <div class="p-6 border-b border-slate-100 flex items-center gap-3">
                         <i class="fa-solid fa-list-check text-slate-400"></i>
-                        <h3 class="font-black text-slate-800 text-lg">Controle de Pagamentos</h3>
+                        <h3 class="font-black text-textMain text-lg">Controle de Pagamentos</h3>
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse min-w-[600px]">
+                        <table class="w-full text-left min-w-[600px]">
                             <thead>
-                                <tr class="bg-slate-50 text-[10px] text-slate-500 uppercase tracking-wider font-black">
-                                    <th class="p-4 border-b border-slate-100">Cliente / Sistema</th>
-                                    <th class="p-4 border-b border-slate-100 text-center">Vencimento</th>
-                                    <th class="p-4 border-b border-slate-100 text-right">Cobrança Mensal</th>
-                                    <th class="p-4 border-b border-slate-100 text-center">Status</th>
+                                <tr class="bg-slate-50/50 text-[10px] text-textMuted uppercase tracking-widest font-black">
+                                    <th class="p-4 pl-6 font-bold">Cliente / Sistema</th>
+                                    <th class="p-4 text-center font-bold">Vencimento</th>
+                                    <th class="p-4 text-right font-bold">Cobrança Mensal</th>
+                                    <th class="p-4 pr-6 text-center font-bold">Status</th>
                                 </tr>
                             </thead>
                             <tbody id="tabelaFaturas" class="divide-y divide-slate-100">
-                                <tr><td colspan="4" class="p-8 text-center text-slate-400 font-bold">Aguarde...</td></tr>
+                                <tr><td colspan="4" class="p-8 text-center text-textMuted font-bold">Carregando dados financeiros...</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-            <!-- ABA: CLIENTES (Design Compacto + Botões de Ação) -->
+            <!-- ============================================== -->
+            <!-- ABA: CLIENTES (PAINEL DE CONTROLE REAL)        -->
+            <!-- ============================================== -->
             <div id="aba-clientes" class="tab-content max-w-5xl mx-auto">
-                <div class="flex justify-between items-center mb-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
                     <div>
-                        <h2 class="text-2xl font-black text-slate-800">Meus Clientes</h2>
-                        <p class="text-xs text-slate-500 font-medium">Gestão rápida de inquilinos</p>
+                        <h2 class="text-2xl font-black text-textMain">Gestão de Clientes</h2>
+                        <p class="text-xs text-textMuted font-medium mt-1">Gerencie licenças, bloqueios e integrações.</p>
                     </div>
-                    <button onclick="abrirModalCliente()" class="bg-primary hover:bg-blue-700 text-white px-5 py-3 rounded-xl font-bold text-sm shadow-md transition flex items-center gap-2 shrink-0">
-                        <i class="fa-solid fa-plus"></i> <span class="hidden sm:inline">Novo Cliente</span>
+                    <button onclick="abrirModalCliente()" class="w-full sm:w-auto bg-brand hover:bg-blue-700 text-white px-6 py-3.5 rounded-xl font-bold text-sm shadow-lg shadow-brand/20 transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-plus"></i> Novo Cliente
                     </button>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-3" id="gridClientes">
+                <!-- GRID DE CLIENTES -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="gridClientes">
                     <!-- Preenchido via JS -->
                 </div>
             </div>
-
-            <!-- ABA: AVISOS -->
-            <div id="aba-avisos" class="tab-content max-w-5xl mx-auto text-center py-20">
-                <i class="fa-solid fa-bullhorn text-6xl text-slate-200 mb-4"></i>
-                <h2 class="text-xl font-black text-slate-800">Central de Avisos</h2>
-                <p class="text-sm text-slate-500 mt-2">Módulo em desenvolvimento. Aqui você poderá enviar push notifications para o painel dos seus clientes.</p>
-            </div>
-
         </div>
         
-        <!-- BOTTOM NAVIGATION -->
-        <nav class="md:hidden absolute bottom-0 w-full bg-white border-t border-slate-200 flex justify-around items-center pb-safe pt-2 px-2 shadow-[0_-5px_15px_rgba(0,0,0,0.05)] z-40">
-            <button onclick="mudarAba('clientes', this)" class="nav-btn-mobile flex-1 py-2 flex flex-col items-center text-slate-400 transition">
+        <!-- BOTTOM NAVIGATION (MOBILE) -->
+        <nav class="md:hidden absolute bottom-0 w-full bg-white/90 backdrop-blur-lg border-t border-slate-200 flex justify-around items-center pb-safe pt-2 px-2 shadow-[0_-10px_20px_rgba(0,0,0,0.05)] z-40">
+            <button onclick="mudarAba('faturas', this)" class="nav-btn-mobile flex-1 py-3 flex flex-col items-center text-brand transition scale-110">
+                <i class="fa-solid fa-chart-pie text-xl mb-1"></i>
+                <span class="text-[9px] font-black uppercase tracking-widest">Dash</span>
+            </button>
+            <button onclick="mudarAba('clientes', this)" class="nav-btn-mobile flex-1 py-3 flex flex-col items-center text-textMuted transition">
                 <i class="fa-solid fa-users text-xl mb-1"></i>
-                <span class="text-[10px] font-bold uppercase tracking-wider">Clientes</span>
-            </button>
-            <button onclick="mudarAba('faturas', this)" class="nav-btn-mobile flex-1 py-2 flex flex-col items-center text-primary transition scale-110">
-                <i class="fa-solid fa-sack-dollar text-xl mb-1"></i>
-                <span class="text-[10px] font-bold uppercase tracking-wider">Faturas</span>
-            </button>
-            <button onclick="mudarAba('avisos', this)" class="nav-btn-mobile flex-1 py-2 flex flex-col items-center text-slate-400 transition">
-                <i class="fa-solid fa-bullhorn text-xl mb-1"></i>
-                <span class="text-[10px] font-bold uppercase tracking-wider">Avisos</span>
+                <span class="text-[9px] font-black uppercase tracking-widest">Clientes</span>
             </button>
         </nav>
     </main>
 
-    <!-- MODAL PAINEL DO CLIENTE -->
-    <div id="modalCliente" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden justify-center items-end md:items-center">
-        <div class="bg-white w-full max-w-2xl md:rounded-2xl rounded-t-3xl shadow-2xl flex flex-col max-h-[90vh] animate-[fadeIn_0.3s_ease]">
-            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50 md:rounded-t-2xl rounded-t-3xl">
+    <!-- ============================================== -->
+    <!-- MODAL (IDÊNTICO AO SEU SEGUNDO PRINT)          -->
+    <!-- ============================================== -->
+    <div id="modalCliente" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden justify-center items-end md:items-center">
+        <div class="bg-[#f4f7f6] w-full max-w-2xl md:rounded-3xl rounded-t-[2rem] shadow-float flex flex-col max-h-[90vh] animate-[fadeUp_0.3s_ease]">
+            
+            <!-- HEADER DO MODAL -->
+            <div class="p-6 md:p-8 border-b border-slate-200 bg-white md:rounded-t-3xl rounded-t-[2rem] flex justify-between items-center sticky top-0 z-10">
                 <div class="flex items-center gap-3">
-                    <i class="fa-solid fa-sliders text-primary text-xl"></i>
+                    <i class="fa-solid fa-sliders text-brand text-xl"></i>
                     <div>
-                        <h2 class="font-black text-slate-800 text-lg leading-tight">Painel do Cliente</h2>
-                        <p id="subtituloModal" class="text-xs text-slate-500 font-bold mt-0.5">Novo Registro</p>
+                        <h2 class="font-black text-textMain text-lg leading-tight">Painel do Cliente</h2>
+                        <p id="subtituloModal" class="text-xs text-textMuted font-bold mt-0.5">Novo Registro</p>
                     </div>
                 </div>
-                <button onclick="fecharModalCliente()" class="w-8 h-8 bg-slate-200 hover:bg-slate-300 text-slate-600 rounded-full flex justify-center items-center transition">
+                <button onclick="fecharModalCliente()" class="w-8 h-8 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-full flex justify-center items-center transition">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
 
-            <div class="p-6 overflow-y-auto hide-scrollbar space-y-6">
+            <!-- CORPO DO MODAL (ESTILO VERCEL/PRINT) -->
+            <div class="p-4 md:p-8 overflow-y-auto hide-scrollbar space-y-6">
                 <input type="hidden" id="cliId">
 
-                <div class="border border-slate-200 rounded-xl p-4 bg-slate-50 flex justify-between items-center">
+                <!-- CARD 1: ID DE INTEGRAÇÃO -->
+                <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex justify-between items-center">
                     <div class="overflow-hidden pr-4">
-                        <label class="label-base text-[10px]">ID de Integração (Chave)</label>
-                        <p id="cliChave" class="font-mono font-bold text-primary text-sm truncate">Gerado ao salvar...</p>
+                        <label class="label-premium">ID de Integração (Chave do Cliente)</label>
+                        <p id="cliChave" class="font-mono font-bold text-brand text-sm truncate">Gerado ao salvar...</p>
                     </div>
-                    <button onclick="copiarChave()" class="w-10 h-10 shrink-0 bg-white border border-slate-200 shadow-sm rounded-lg text-slate-600 hover:text-primary transition flex justify-center items-center">
+                    <button onclick="copiarChave()" class="w-10 h-10 shrink-0 bg-slate-50 border border-slate-200 rounded-lg text-slate-500 hover:text-brand hover:border-brand transition flex justify-center items-center" title="Copiar Chave">
                         <i class="fa-regular fa-copy"></i>
                     </button>
                 </div>
 
-                <div>
-                    <label class="label-base">Nome do Cliente / Sistema:</label>
-                    <input type="text" id="cliNome" class="input-base" placeholder="Ex: pH Cosméticos">
+                <!-- CARD 2: NOME -->
+                <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                    <label class="label-premium">Nome do Cliente / Sistema / Associação:</label>
+                    <input type="text" id="cliNome" class="input-premium" placeholder="Ex: pH Cosméticos">
                 </div>
 
-                <div class="border border-slate-200 rounded-xl p-5 bg-white relative">
-                    <div class="absolute -top-3 left-4 bg-white px-2 flex items-center gap-2">
-                        <i class="fa-solid fa-id-card text-primary text-sm"></i>
-                        <span class="text-xs font-black text-slate-700 tracking-wide uppercase">Licença e Cobrança</span>
+                <!-- CARD 3: LICENÇA E COBRANÇA -->
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm relative mt-8">
+                    <!-- Badge Flutuante igual ao print -->
+                    <div class="absolute -top-3.5 left-5 bg-white px-3 flex items-center gap-2">
+                        <i class="fa-solid fa-id-card text-brand text-sm"></i>
+                        <span class="text-[10px] font-black text-brand tracking-widest uppercase">Licença, Plano e Cobrança</span>
                     </div>
 
-                    <div class="space-y-4 mt-2">
-                        
-                        <!-- Restauração dos Campos Originais -->
+                    <div class="space-y-5 pt-2">
+                        <!-- Nicho -->
                         <div>
-                            <label class="label-base">Nicho de Mercado:</label>
+                            <label class="label-premium">Nicho de Mercado:</label>
                             <div class="relative">
-                                <i class="fa-solid fa-shop absolute left-3 top-3.5 text-slate-400"></i>
-                                <select id="cliNicho" class="input-base pl-10 appearance-none bg-white">
-                                    <option value="Loja Comercial">Loja Comercial</option>
-                                    <option value="Associação Militar">Associação Militar</option>
-                                    <option value="Clínica / Saúde">Clínica / Saúde</option>
-                                    <option value="Imobiliária">Imobiliária</option>
-                                    <option value="Outro">Outro</option>
+                                <i class="fa-solid fa-shop absolute left-4 top-3.5 text-slate-400 text-sm"></i>
+                                <select id="cliNicho" class="input-premium pl-11 appearance-none">
+                                    <option value="Loja Comercial">🛍️ Loja Comercial</option>
+                                    <option value="Associação Militar">🛡️ Associação Militar</option>
+                                    <option value="Clínica / Saúde">⚕️ Clínica / Saúde</option>
+                                    <option value="Serviços Gerais">💼 Serviços Gerais</option>
                                 </select>
+                                <i class="fa-solid fa-chevron-down absolute right-4 top-4 text-slate-400 text-xs pointer-events-none"></i>
                             </div>
                         </div>
 
+                        <!-- Plano -->
                         <div>
-                            <label class="label-base">Plano de Funcionalidades:</label>
+                            <label class="label-premium">Plano de Funcionalidades:</label>
                             <div class="relative">
-                                <i class="fa-solid fa-medal absolute left-3 top-3.5 text-slate-400"></i>
-                                <select id="cliPlano" class="input-base pl-10 appearance-none bg-white">
-                                    <option value="Básico">BÁSICO (Padrão)</option>
-                                    <option value="Premium">PREMIUM (Avançado)</option>
-                                    <option value="White Label">WHITE LABEL</option>
+                                <i class="fa-solid fa-medal absolute left-4 top-3.5 text-slate-400 text-sm"></i>
+                                <select id="cliPlano" class="input-premium pl-11 appearance-none">
+                                    <option value="Básico">🥉 BÁSICO (Padrão)</option>
+                                    <option value="Premium">🥇 PREMIUM (Avançado)</option>
+                                    <option value="White Label">💎 WHITE LABEL</option>
                                 </select>
+                                <i class="fa-solid fa-chevron-down absolute right-4 top-4 text-slate-400 text-xs pointer-events-none"></i>
                             </div>
                         </div>
 
+                        <!-- Formato de Cobrança -->
                         <div>
-                            <label class="label-base">Formato da Sua Cobrança:</label>
+                            <label class="label-premium">Formato da Sua Cobrança:</label>
                             <div class="relative">
-                                <i class="fa-solid fa-sack-dollar absolute left-3 top-3.5 text-slate-400"></i>
-                                <select id="cliFormatoCobranca" class="input-base pl-10 appearance-none bg-white">
-                                    <option value="Fixo">Valor Fixo Mensal (R$)</option>
-                                    <option value="Percentual">Percentual sobre Vendas (%)</option>
+                                <i class="fa-solid fa-sack-dollar absolute left-4 top-3.5 text-slate-400 text-sm"></i>
+                                <select id="cliFormatoCobranca" class="input-premium pl-11 appearance-none">
+                                    <option value="Fixo">💰 Valor Fixo Mensal (R$)</option>
+                                    <option value="Percentual">📊 Percentual sobre Vendas (%)</option>
                                 </select>
+                                <i class="fa-solid fa-chevron-down absolute right-4 top-4 text-slate-400 text-xs pointer-events-none"></i>
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-3">
+                        <!-- Valores -->
+                        <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label class="label-base">Valor / Percentual:</label>
-                                <input type="number" id="cliValor" class="input-base" placeholder="Ex: 150.00" step="0.01">
+                                <label class="label-premium">Valor / Perc. (Num):</label>
+                                <input type="number" id="cliValor" class="input-premium" placeholder="Ex: 150.00" step="0.01">
                             </div>
                             <div>
-                                <label class="label-base">Dia Vencimento:</label>
-                                <input type="number" id="cliVencimento" class="input-base" placeholder="Ex: 10" min="1" max="31">
+                                <label class="label-premium">Dia Vencimento:</label>
+                                <input type="number" id="cliVencimento" class="input-premium" placeholder="Ex: 10" min="1" max="31">
                             </div>
                         </div>
                         
-                        <div>
-                            <label class="label-base">Status Atual:</label>
-                            <select id="cliStatus" class="input-base bg-white font-bold">
-                                <option value="ativo" class="text-success">🟢 Conta em Dia (Ativa)</option>
-                                <option value="bloqueado" class="text-danger">🔴 Bloqueado (Suspenso)</option>
+                        <!-- Status -->
+                        <div class="pt-2 border-t border-slate-100">
+                            <label class="label-premium">Controle de Acesso do Cliente:</label>
+                            <select id="cliStatus" class="input-premium font-bold border-l-4 border-l-brand">
+                                <option value="ativo" class="text-success">🟢 CONTA LIBERADA (Em Dia)</option>
+                                <option value="bloqueado" class="text-danger">🔴 ACESSO BLOQUEADO (Inadimplente)</option>
                             </select>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="p-6 border-t border-slate-100 flex gap-3 bg-white">
-                <button onclick="fecharModalCliente()" class="flex-1 py-3.5 rounded-xl font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition">Cancelar</button>
-                <button onclick="salvarCliente()" class="flex-[2] py-3.5 rounded-xl font-bold text-white bg-primary hover:bg-blue-700 transition shadow-lg">Salvar Cliente</button>
+            <!-- FOOTER DO MODAL -->
+            <div class="p-6 md:p-8 border-t border-slate-200 bg-white flex gap-3 sticky bottom-0">
+                <button onclick="fecharModalCliente()" class="flex-1 py-4 rounded-xl font-bold text-textMuted bg-white border border-slate-200 hover:bg-slate-50 transition">
+                    Cancelar
+                </button>
+                <button onclick="salvarCliente()" class="flex-[2] py-4 rounded-xl font-bold text-white bg-brand hover:bg-blue-700 transition shadow-lg shadow-brand/20 flex justify-center items-center gap-2">
+                    <i class="fa-solid fa-floppy-disk"></i> Salvar Cliente
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- FIREBASE & JAVASCRIPT -->
+    <!-- ============================================== -->
+    <!-- JAVASCRIPT & FIREBASE                          -->
+    <!-- ============================================== -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, onSnapshot, doc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
@@ -309,27 +354,28 @@
         
         let clientesGlobal = [];
 
+        // NAVEGAÇÃO
         window.mudarAba = (idAba, btnElement) => {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.getElementById(`aba-${idAba}`).classList.add('active');
 
             document.querySelectorAll('.nav-btn-pc').forEach(el => {
-                el.classList.remove('bg-blue-50', 'text-primary'); el.classList.add('text-slate-500');
+                el.classList.remove('bg-blue-50/70', 'text-brand'); el.classList.add('text-textMuted');
             });
             document.querySelectorAll('.nav-btn-mobile').forEach(el => {
-                el.classList.remove('text-primary', 'scale-110'); el.classList.add('text-slate-400');
+                el.classList.remove('text-brand', 'scale-110'); el.classList.add('text-textMuted');
             });
 
             if(btnElement) {
                 if(btnElement.classList.contains('nav-btn-pc')) {
-                    btnElement.classList.remove('text-slate-500'); btnElement.classList.add('bg-blue-50', 'text-primary');
+                    btnElement.classList.remove('text-textMuted'); btnElement.classList.add('bg-blue-50/70', 'text-brand');
                 } else {
-                    btnElement.classList.remove('text-slate-400'); btnElement.classList.add('text-primary', 'scale-110');
+                    btnElement.classList.remove('text-textMuted'); btnElement.classList.add('text-brand', 'scale-110');
                 }
             }
 
-            const titulos = { 'faturas': 'Dashboard de Faturamento', 'clientes': 'Meus Clientes', 'avisos': 'Central de Avisos' };
-            document.getElementById('headerTitulo').innerText = titulos[idAba];
+            const titulos = { 'faturas': 'Visão Geral', 'clientes': 'Painel de Inquilinos' };
+            document.getElementById('headerTitulo').innerText = titulos[idAba] || '';
         };
 
         const formatarMoeda = (valor) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor || 0);
@@ -347,20 +393,21 @@
             navigator.clipboard.writeText(txt).then(() => alert("✅ Chave de Integração copiada!"));
         };
 
-        // LÓGICA DOS NOVOS BOTÕES (LIGAR / SUSPENDER)
+        // AÇÕES RÁPIDAS (LIGAR / SUSPENDER)
         window.mudarStatusCliente = async (id, novoStatus) => {
-            const acao = novoStatus === 'ativo' ? 'LIGAR (Ativar)' : 'SUSPENDER (Bloquear)';
-            if(confirm(`Deseja realmente ${acao} este cliente?`)) {
+            const acao = novoStatus === 'ativo' ? 'LIBERAR O ACESSO' : 'BLOQUEAR O SISTEMA';
+            if(confirm(`ATENÇÃO: Deseja realmente ${acao} deste cliente?`)) {
                 document.getElementById('loadingOverlay').style.display = 'flex';
                 try {
                     await updateDoc(doc(db, "inquilinos_saas", id), { statusConta: novoStatus });
                 } catch(e) {
-                    alert("Erro ao alterar status: " + e.message);
+                    alert("Erro ao executar ação: " + e.message);
                 }
                 document.getElementById('loadingOverlay').style.display = 'none';
             }
         };
 
+        // REALTIME DATABASE
         onSnapshot(collection(db, "inquilinos_saas"), (snapshot) => {
             clientesGlobal = [];
             let receitaFixa = 0, emDia = 0, bloqueios = 0;
@@ -378,65 +425,79 @@
             document.getElementById('dashReceita').innerText = formatarMoeda(receitaFixa);
             document.getElementById('dashEmDia').innerText = emDia;
             document.getElementById('dashBloqueios').innerText = bloqueios;
-            renderizarTabelas();
+            renderizarDados();
         });
 
-        const renderizarTabelas = () => {
+        const renderizarDados = () => {
             const tbodyFat = document.getElementById('tabelaFaturas');
             const gridCli = document.getElementById('gridClientes');
             tbodyFat.innerHTML = ''; gridCli.innerHTML = '';
 
             if(clientesGlobal.length === 0) {
-                tbodyFat.innerHTML = '<tr><td colspan="4" class="p-8 text-center text-slate-500 font-bold">Nenhum cliente cadastrado.</td></tr>';
-                gridCli.innerHTML = '<div class="col-span-full p-8 text-center text-slate-500 bg-white rounded-xl border border-dashed border-slate-300">Nenhum cliente cadastrado. Comece adicionando um novo!</div>';
+                const emptyState = '<tr><td colspan="4" class="p-8 text-center text-textMuted font-bold text-sm">Nenhum cliente cadastrado no momento.</td></tr>';
+                tbodyFat.innerHTML = emptyState;
+                gridCli.innerHTML = '<div class="col-span-full p-12 text-center text-textMuted bg-white rounded-2xl border border-dashed border-slate-300 font-bold">A base de inquilinos está vazia. Adicione o primeiro cliente!</div>';
                 return;
             }
 
-            // Ordena alfabeticamente
+            // Ordem Alfabética
             clientesGlobal.sort((a,b) => (a.nome || '').localeCompare(b.nome || ''));
 
             clientesGlobal.forEach(c => {
                 const isAtivo = c.statusConta === 'ativo';
                 const valCobranca = c.formatoCobranca === 'Fixo' ? formatarMoeda(c.valorCobranca) : `${c.valorCobranca || 0}%`;
 
-                // Tabela Dashboard
+                // ==========================================
+                // 1. LINHA DA TABELA (DASHBOARD)
+                // ==========================================
                 tbodyFat.innerHTML += `
-                    <tr class="hover:bg-slate-50 transition border-b border-slate-100">
-                        <td class="p-4 font-bold text-slate-800 text-sm truncate max-w-[120px]">${c.nome}</td>
-                        <td class="p-4 text-center text-sm font-bold text-slate-600">Dia ${c.diaVencimento || '--'}</td>
-                        <td class="p-4 text-right text-sm font-black text-slate-700">${valCobranca}</td>
-                        <td class="p-4 text-center">
-                            <span class="px-2 py-1 rounded-full text-[9px] font-black uppercase ${isAtivo ? 'bg-success/10 text-success' : 'bg-danger/10 text-danger'}">
+                    <tr class="hover:bg-slate-50 transition border-b border-slate-100/60">
+                        <td class="p-4 pl-6 font-black text-textMain text-sm truncate max-w-[150px]">${c.nome}</td>
+                        <td class="p-4 text-center text-sm font-bold text-textMuted">Dia ${c.diaVencimento || '--'}</td>
+                        <td class="p-4 text-right text-sm font-black text-textMain">${valCobranca}</td>
+                        <td class="p-4 pr-6 text-center">
+                            <span class="inline-block px-3 py-1 rounded-md text-[9px] font-black uppercase tracking-widest ${isAtivo ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-red-50 text-red-600 border border-red-100'}">
                                 ${isAtivo ? 'Em Dia' : 'Bloqueado'}
                             </span>
                         </td>
                     </tr>
                 `;
 
-                // CARD COMPACTO COM BOTÕES DE AÇÃO
-                const opacityCard = isAtivo ? 'opacity-100' : 'opacity-60 grayscale';
-                const corPonto = isAtivo ? 'bg-success' : 'bg-danger';
+                // ==========================================
+                // 2. CARD DO CLIENTE (Módulo Clientes)
+                // ==========================================
+                const cardOpacity = isAtivo ? '' : 'opacity-70 bg-slate-50';
+                const dotColor = isAtivo ? 'bg-emerald-500' : 'bg-red-500';
 
                 gridCli.innerHTML += `
-                    <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm hover:shadow-md transition flex items-center justify-between ${opacityCard}">
-                        <div class="flex-1 min-w-0 pr-2">
-                            <div class="flex items-center gap-2">
-                                <span class="w-2.5 h-2.5 rounded-full ${corPonto} shrink-0"></span>
-                                <h3 class="font-black text-slate-800 text-sm truncate" title="${c.nome}">${c.nome}</h3>
+                    <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-soft hover:shadow-md transition flex flex-col justify-between ${cardOpacity}">
+                        <!-- Cabeçalho do Card -->
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="flex-1 pr-2">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="w-2.5 h-2.5 rounded-full ${dotColor} shadow-sm"></span>
+                                    <h3 class="font-black text-textMain text-base truncate" title="${c.nome}">${c.nome}</h3>
+                                </div>
+                                <p class="text-[10px] font-bold text-textMuted uppercase tracking-widest pl-4.5">${c.nicho || 'Geral'}</p>
                             </div>
-                            <p class="text-xs font-bold text-primary mt-1 pl-4.5">${valCobranca} <span class="text-[9px] text-slate-400 font-normal">/mês</span></p>
                         </div>
                         
-                        <!-- BOTÕES LIGAR / SUSPENDER / EDITAR -->
-                        <div class="flex gap-1.5 shrink-0">
-                            <button onclick="mudarStatusCliente('${c.id}', 'ativo')" class="w-8 h-8 rounded-lg bg-green-50 text-green-600 hover:bg-green-600 hover:text-white flex justify-center items-center transition" title="Ligar (Ativar Conta)">
-                                <i class="fa-solid fa-play text-xs"></i>
+                        <!-- Meio do Card (Valor) -->
+                        <div class="pl-4.5 mb-5">
+                            <p class="text-xl font-black text-brand">${valCobranca} <span class="text-[10px] text-textMuted font-bold uppercase">Mensal</span></p>
+                        </div>
+
+                        <!-- Rodapé com Botões -->
+                        <div class="flex gap-2 pt-4 border-t border-slate-100">
+                            <button onclick="mudarStatusCliente('${c.id}', 'ativo')" class="btn-action btn-play" title="Ligar (Liberar Acesso)">
+                                <i class="fa-solid fa-play text-sm"></i>
                             </button>
-                            <button onclick="mudarStatusCliente('${c.id}', 'bloqueado')" class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white flex justify-center items-center transition" title="Suspender (Bloquear Conta)">
-                                <i class="fa-solid fa-pause text-xs"></i>
+                            <button onclick="mudarStatusCliente('${c.id}', 'bloqueado')" class="btn-action btn-pause" title="Suspender (Bloquear Acesso)">
+                                <i class="fa-solid fa-pause text-sm"></i>
                             </button>
-                            <button onclick="abrirModalCliente('${c.id}')" class="w-8 h-8 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-300 flex justify-center items-center transition" title="Editar Configurações">
-                                <i class="fa-solid fa-pen text-xs"></i>
+                            <div class="flex-1"></div> <!-- Spacer -->
+                            <button onclick="abrirModalCliente('${c.id}')" class="flex-1 h-9 rounded-lg bg-slate-50 border border-slate-200 hover:bg-slate-100 hover:border-slate-300 text-slate-600 font-bold text-xs transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-pen"></i> Editar
                             </button>
                         </div>
                     </div>
@@ -444,6 +505,7 @@
             });
         };
 
+        // CONTROLE DO MODAL
         window.abrirModalCliente = (id = null) => {
             if(id) {
                 const c = clientesGlobal.find(x => x.id === id);
@@ -485,14 +547,14 @@
                 dataAtualizacao: new Date().toISOString()
             };
 
-            if(!obj.nome) return alert("Preencha o nome do cliente.");
+            if(!obj.nome) return alert("Por favor, preencha o nome do cliente antes de salvar.");
 
             document.getElementById('loadingOverlay').style.display = 'flex';
             try {
                 await setDoc(doc(db, "inquilinos_saas", id), obj);
                 fecharModalCliente();
             } catch(e) {
-                alert("Erro ao salvar: " + e.message);
+                alert("Erro ao salvar cliente: " + e.message);
             }
             document.getElementById('loadingOverlay').style.display = 'none';
         };
