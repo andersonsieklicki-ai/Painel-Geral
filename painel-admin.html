@@ -365,7 +365,7 @@
                     </div>
                 `;
 
-                // CARD COMPACTO COM BOTÕES (CLIENTES)
+      // CARD COMPACTO COM BOTÕES (CLIENTES) E BOTÃO DE COBRANÇA
                 gridCli.innerHTML += `
                     <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex items-center justify-between ${isAtivo ? '' : 'opacity-70'}">
                         <div class="flex-1 overflow-hidden pr-2">
@@ -376,14 +376,18 @@
                             <p class="text-xs font-bold text-primary ml-4.5 mt-0.5">${textoValor}</p>
                         </div>
                         <div class="flex gap-1.5 shrink-0">
-                            <button onclick="acaoBotao('${c.id}', 'ativo')" class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex justify-center items-center"><i class="fa-solid fa-play text-[10px]"></i></button>
-                            <button onclick="acaoBotao('${c.id}', 'bloqueado')" class="w-8 h-8 rounded-lg bg-red-50 text-red-600 flex justify-center items-center"><i class="fa-solid fa-pause text-[10px]"></i></button>
-                            <button onclick="abrirModalCliente('${c.id}')" class="w-8 h-8 rounded-lg bg-slate-100 text-slate-500 flex justify-center items-center"><i class="fa-solid fa-pen text-[10px]"></i></button>
+                            <!-- NOVO BOTÃO DE COBRANÇA AQUI -->
+                            <button onclick="window.gerarCobrancaSaaS('${c.id}', '${c.nome}', '${c.telefone}', ${c.valorCobranca})" class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-600 hover:text-white flex justify-center items-center transition" title="Enviar Cobrança no WhatsApp">
+                                <i class="fa-solid fa-file-invoice-dollar text-[10px]"></i>
+                            </button>
+                            
+                            <!-- BOTÕES ORIGINAIS -->
+                            <button onclick="acaoBotao('${c.id}', 'ativo')" class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex justify-center items-center" title="Liberar Acesso"><i class="fa-solid fa-play text-[10px]"></i></button>
+                            <button onclick="acaoBotao('${c.id}', 'bloqueado')" class="w-8 h-8 rounded-lg bg-red-50 text-red-600 flex justify-center items-center" title="Bloquear Acesso"><i class="fa-solid fa-pause text-[10px]"></i></button>
+                            <button onclick="abrirModalCliente('${c.id}')" class="w-8 h-8 rounded-lg bg-slate-100 text-slate-500 flex justify-center items-center" title="Editar"><i class="fa-solid fa-pen text-[10px]"></i></button>
                         </div>
                     </div>
                 `;
-            });
-        };
 
         window.abrirModalCliente = (id = null) => {
             if(id) {
