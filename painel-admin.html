@@ -262,7 +262,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, onSnapshot, doc, setDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
         const firebaseConfig = {
             apiKey: "AIzaSyC4-2LavZt7iWPt2u71u-yRUYbIJu-Vzf0",
             authDomain: "central-omnichannel-saas.firebaseapp.com",
@@ -274,6 +274,26 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+		const auth = getAuth(app); // ADICIONE ESTA LINHA
+        const provider = new GoogleAuthProvider(); // ADICIONE ESTA LINHA
+
+    // REGRA DE ACESSO (Cole logo abaixo)
+    const emailsAutorizados = ["andersonsieklikci@gmail.com", "silvaneazeredo83@gmail.com"];
+
+    document.body.style.display = "none"; // Esconde o painel até validar
+
+    onAuthStateChanged(auth, (user) => {
+        if (user && emailsAutorizados.includes(user.email)) {
+            document.body.style.display = "flex"; 
+        } else {
+            if (user) alert("Acesso negado para: " + user.email);
+            signInWithPopup(auth, provider).catch((error) => console.error("Erro:", error));
+        }
+    });
+
+    window.logoutSaaS = () => {
+        signOut(auth).then(() => location.reload());
+    };
         let clientesGlobal = [];
         const API_URL = "https://painel-geral-two.vercel.app/api-oracle";
 
@@ -336,7 +356,7 @@ window.excluirClienteSaaS = async (id, nome) => {
             renderizarTabelaFinanceira(faturas);
         });
 
-        const renderizarTabelaFinanceira = (lista) => {
+       const renderizarTabelaFinanceira = (lista) => {
             const tbody = document.getElementById('tabelaFaturas');
             tbody.innerHTML = '';
             lista.sort((a, b) => new Date(b.dataEmissao) - new Date(a.dataEmissao));
@@ -353,12 +373,10 @@ window.excluirClienteSaaS = async (id, nome) => {
                         </div>
                         <div class="flex-1 text-center hidden md:flex flex-col items-center">
                             <span class="${corBadge} text-[9px] px-2.5 py-1 rounded-md font-bold uppercase tracking-wider">${f.status}</span>
-                            <p class="text-[10px] text-slate-400 mt-1" title="NSU">${f.nsu || 'Pendente'}</p>
                         </div>
-                        <div class="flex-1 text-right flex flex-col items-end">
+                        <div class="flex-1 text-right flex items-center justify-end gap-3">
                             <p class="font-black text-sm text-slate-800">${formatarMoeda(f.valor)}</p>
-                            <!-- Badge no mobile se esconde no meio e aparece aqui -->
-                            <span class="md:hidden mt-1 ${corBadge} text-[9px] px-2 py-0.5 rounded font-bold uppercase">${f.status}</span>
+                            <button onclick="window.excluirFaturaSaaS('${f.id}')" class="w-8 h-8 text-slate-300 hover:text-red-500 transition" title="Excluir Histórico"><i class="fa-solid fa-trash-can text-xs"></i></button>
                         </div>
                     </div>`;
             });
@@ -422,51 +440,41 @@ window.excluirClienteSaaS = async (id, nome) => {
             renderizarCardsClientes();
         });
 
-        const renderizarCardsClientes = () => {
+       const renderizarCardsClientes = () => {
             const gridCli = document.getElementById('gridClientes');
             gridCli.innerHTML = '';
             clientesGlobal.forEach(c => {
                 const isAtivo = c.statusConta === 'ativo';
                 const corIcone = isAtivo ? 'bg-emerald-50 text-emerald-500' : 'bg-red-50 text-red-500';
                 const corBadge = isAtivo ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700';
-                const iconeStatus = isAtivo ? 'fa-building-circle-check' : 'fa-building-circle-xmark';
                 
                 const textoValor = c.formatoCobranca && c.formatoCobranca.includes('Fixo') ? formatarMoeda(parseFloat(c.valorCobranca)||0) : `${c.valorCobranca||0}%`;
                 
                 gridCli.innerHTML += `
-                    <div class="bg-white rounded-[20px] border border-slate-100 p-5 shadow-sm hover:shadow-md transition duration-200 flex flex-col gap-4">
-                        <div class="flex items-start justify-between">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-xl ${corIcone} flex items-center justify-center text-lg">
-                                    <i class="fa-solid ${iconeStatus}"></i>
-                                </div>
-                                <div>
-                                    <h4 class="font-bold text-sm text-slate-800 line-clamp-1">${c.nome}</h4>
-                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-bold ${corBadge} uppercase tracking-wider mt-1">
-                                        ${c.statusConta}
-                                    </span>
-                                </div>
+                    <div class="bg-white rounded-[20px] border border-slate-100 p-5 shadow-sm hover:shadow-md transition duration-200 flex flex-col gap-4 relative">
+                        <!-- BOTÃO LIXEIRA -->
+                        <button onclick="window.excluirClienteSaaS('${c.id}', '${c.nome}')" class="absolute top-4 right-4 text-slate-200 hover:text-red-500 transition"><i class="fa-solid fa-trash text-xs"></i></button>
+                        
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl ${corIcone} flex items-center justify-center text-lg"><i class="fa-solid fa-building"></i></div>
+                            <div>
+                                <h4 class="font-bold text-sm text-slate-800">${c.nome}</h4>
+                                <span class="text-[9px] font-bold ${corBadge} uppercase px-2 py-0.5 rounded tracking-tighter">${c.statusConta}</span>
                             </div>
                         </div>
-                        
-                        <div class="flex items-end justify-between border-t border-slate-50 pt-4 mt-auto">
+                        <div class="flex items-end justify-between border-t border-slate-50 pt-4">
                             <div>
                                 <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Mensalidade</p>
                                 <p class="text-sm font-black text-primary">${textoValor}</p>
                             </div>
                             <div class="flex gap-2">
-                                <button onclick="window.gerarCobrancaSaaS('${c.id}', '${c.nome}', '${c.telefone}', ${c.valorCobranca})" class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 hover:bg-amber-100 transition flex justify-center items-center" title="Forçar Cobrança">
-                                    <i class="fa-solid fa-file-invoice-dollar"></i>
-                                </button>
-                                <button onclick="window.abrirModalCliente('${c.id}')" class="w-9 h-9 rounded-xl bg-slate-50 text-slate-600 hover:bg-slate-100 transition flex justify-center items-center" title="Editar Cadastro">
-                                    <i class="fa-solid fa-pen"></i>
-                                </button>
+                                <button onclick="window.gerarCobrancaSaaS('${c.id}', '${c.nome}', '${c.telefone}', ${c.valorCobranca})" class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex justify-center items-center"><i class="fa-solid fa-file-invoice-dollar"></i></button>
+                                <button onclick="window.abrirModalCliente('${c.id}')" class="w-9 h-9 rounded-xl bg-slate-50 text-slate-600 flex justify-center items-center"><i class="fa-solid fa-pen"></i></button>
                             </div>
                         </div>
                     </div>`;
             });
         };
-
         window.abrirModalCliente = (id = null) => {
             if(id) {
                 const c = clientesGlobal.find(x => x.id === id);
