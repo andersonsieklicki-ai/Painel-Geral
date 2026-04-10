@@ -262,7 +262,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, onSnapshot, doc, setDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getAuth, signInWithRedirect, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
         const firebaseConfig = {
             apiKey: "AIzaSyC4-2LavZt7iWPt2u71u-yRUYbIJu-Vzf0",
             authDomain: "central-omnichannel-saas.firebaseapp.com",
@@ -274,53 +274,53 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-		const auth = getAuth(app); // ADICIONE ESTA LINHA
-        const provider = new GoogleAuthProvider(); // ADICIONE ESTA LINHA
-		provider.setCustomParameters({ prompt: 'select_account' });
+	const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
 
-    // REGRA DE ACESSO (Cole logo abaixo)
-    const emailsAutorizados = ["andersonsieklikci@gmail.com", "silvaneazeredo83@gmail.com"];
-
-    document.body.style.display = "none"; // Esconde o painel até validar
+    // Seus e-mails liberados
+    const emailsAutorizados = ["andersonsieklikci@gmail.com", "silvaneazeredo83@gmail.com", "phcosmeticoscapanema@gmail.com"];
 
     onAuthStateChanged(auth, (user) => {
-    if (user) {
-        if (emailsAutorizados.includes(user.email)) {
-            document.body.style.display = "flex";
-            // Se o overlay de loading existir, esconda-o
-            const loading = document.getElementById('loadingOverlay');
-            if(loading) loading.classList.add('hidden');
+        if (user) {
+            if (emailsAutorizados.includes(user.email)) {
+                // USUÁRIO APROVADO! Remove a tela de login de cima do painel
+                const telaLogin = document.getElementById('tela-login-segura');
+                if (telaLogin) telaLogin.remove();
+            } else {
+                // E-mail não autorizado
+                alert("Acesso negado para o e-mail: " + user.email);
+                signOut(auth);
+            }
         } else {
-            alert("Acesso negado para: " + user.email);
-            signOut(auth);
-        }
-    } else {
-        // Se não houver usuário, exibe um botão de login no meio da tela branca
-        document.body.style.display = "flex";
-        document.body.innerHTML = `
-            <div class="fixed inset-0 bg-surface flex flex-col justify-center items-center p-4">
-                <div class="bg-white p-8 rounded-[32px] shadow-2xl text-center max-w-sm w-full border border-slate-100">
-                    <div class="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center text-white text-3xl mx-auto mb-6 shadow-lg shadow-blue-200">
-                        <i class="fa-solid fa-server"></i>
+            // NÃO LOGADO! Cria a tela de login travando o acesso ao painel que está no fundo
+            if (!document.getElementById('tela-login-segura')) {
+                const loginDiv = document.createElement('div');
+                loginDiv.id = 'tela-login-segura';
+                loginDiv.innerHTML = `
+                    <div style="position:fixed; inset:0; background:#f4f7f6; z-index:99999; display:flex; flex-direction:column; justify-content:center; align-items:center; padding:20px;">
+                        <div style="background:white; padding:40px 30px; border-radius:24px; box-shadow:0 10px 25px rgba(0,0,0,0.05); text-align:center; width:100%; max-width:350px;">
+                            <div style="width:60px; height:60px; background:#2563eb; color:white; border-radius:16px; display:flex; justify-content:center; align-items:center; font-size:24px; margin:0 auto 20px;">
+                                <i class="fa-solid fa-server"></i>
+                            </div>
+                            <h1 style="font-family:Inter, sans-serif; font-weight:900; font-size:22px; color:#1e293b; margin-bottom:5px;">Automatiza Tech</h1>
+                            <p style="color:#64748b; font-size:13px; margin-bottom:30px;">Painel Restrito</p>
+                            <button onclick="window.loginComGoogle()" style="width:100%; padding:14px; border-radius:12px; border:1px solid #e2e8f0; background:white; color:#1e293b; font-weight:bold; cursor:pointer; font-size:15px; display:flex; align-items:center; justify-content:center; gap:10px; transition: 0.2s;">
+                                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" style="width:20px;">
+                                Entrar com Google
+                            </button>
+                        </div>
                     </div>
-                    <h1 class="text-2xl font-black text-slate-800 mb-2">Automatiza Tech</h1>
-                    <p class="text-slate-500 text-sm mb-8 font-medium">Painel Administrativo SaaS</p>
-                    <button onclick="window.loginComGoogle()" class="w-full bg-white border-2 border-slate-100 hover:border-primary text-slate-700 font-bold py-4 px-6 rounded-2xl flex items-center justify-center gap-3 transition-all active:scale-95 shadow-sm">
-                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5">
-                        Entrar com Google
-                    </button>
-                </div>
-            </div>
-        `;
-    }
-});
-
-window.loginComGoogle = () => {
-    signInWithPopup(auth, provider).catch((error) => {
-        console.error("Erro no login:", error);
-        alert("Erro ao abrir login. Verifique se o navegador bloqueou o pop-up.");
+                `;
+                document.body.appendChild(loginDiv);
+            }
+        }
     });
-};
+
+    window.loginComGoogle = () => {
+        // MUDANÇA PRINCIPAL: Usando Redirect no lugar de Popup para o navegador não bloquear!
+        signInWithRedirect(auth, provider);
+    };
 
     window.logoutSaaS = () => {
         signOut(auth).then(() => location.reload());
