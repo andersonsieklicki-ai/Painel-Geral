@@ -453,43 +453,55 @@
             navigator.clipboard.writeText(txt).then(() => alert("✅ Chave copiada!"));
         };
 
-        window.abrirModalCliente = (id = null) => {
-            if(id) {
-                const c = clientesGlobal.find(x => x.id === id);
-                document.getElementById('cliId').value = c.id;
-                document.getElementById('cliChave').innerText = c.chaveIntegracao;
-                document.getElementById('cliNome').value = c.nome;
-                document.getElementById('cliEmail').value = c.email || '';
-                document.getElementById('cliDocumento').value = c.documento || '';
-                document.getElementById('cliFormatoCobranca').value = c.formatoCobranca || 'Valor Fixo Mensal (R$)';
-                document.getElementById('cliValor').value = c.valorCobranca;
-                document.getElementById('cliVencimento').value = c.diaVencimento;
-                document.getElementById('cliStatus').value = c.statusConta;
-                document.getElementById('subtituloModal').innerText = c.nome;
-				document.getElementById('cliTelefone').value = c.telefone || '';
-            } else {
-                document.getElementById('cliId').value = "";
-                document.getElementById('cliChave').innerText = gerarChave();
-                document.getElementById('cliNome').value = "";
-                document.getElementById('cliEmail').value = "";
-                document.getElementById('cliDocumento').value = "";
-                document.getElementById('cliFormatoCobranca').value = "Valor Fixo Mensal (R$)";
-                document.getElementById('subtituloModal').innerText = "Novo Registro";
-				document.getElementById('cliTelefone').value = "";
-            }
-            document.getElementById('modalCliente').style.display = 'flex';
-        };
+    window.abrirModalCliente = (id = null) => {
+    if (id) {
+        // MODO EDIÇÃO: Localiza o cliente no array global
+        const c = clientesGlobal.find(x => x.id === id);
+        if (!c) return alert("Cliente não encontrado.");
 
-        window.fecharModalCliente = () => { 
-            document.getElementById('modalCliente').style.display = 'none'; 
-        };
+        document.getElementById('cliId').value = c.id;
+        document.getElementById('cliChave').innerText = c.chaveIntegracao || '';
+        document.getElementById('cliNome').value = c.nome || '';
+        document.getElementById('cliEmail').value = c.email || '';
+        document.getElementById('cliDocumento').value = c.documento || '';
+        document.getElementById('cliTelefone').value = c.telefone || '';
+        document.getElementById('cliFormatoCobranca').value = c.formatoCobranca || 'Valor Fixo Mensal (R$)';
+        document.getElementById('cliValor').value = c.valorCobranca || 0;
+        document.getElementById('cliVencimento').value = c.diaVencimento || 10;
+        document.getElementById('cliStatus').value = c.statusConta || 'ativo';
+        
+        // Define o Plano (Básico/Premium) para não dar erro na VPS
+        document.getElementById('cliPlano').value = c.plano || 'BÁSICO (Padrão)';
+        
+        document.getElementById('subtituloModal').innerText = `Editando: ${c.nome}`;
+    } else {
+        // MODO NOVO REGISTRO: Limpa tudo e gera nova chave
+        document.getElementById('cliId').value = "";
+        document.getElementById('cliChave').innerText = gerarChave();
+        document.getElementById('cliNome').value = "";
+        document.getElementById('cliEmail').value = "";
+        document.getElementById('cliDocumento').value = "";
+        document.getElementById('cliTelefone').value = "";
+        document.getElementById('cliFormatoCobranca').value = "Valor Fixo Mensal (R$)";
+        document.getElementById('cliValor').value = "";
+        document.getElementById('cliVencimento').value = "10";
+        document.getElementById('cliStatus').value = "ativo";
+        document.getElementById('cliPlano').value = "BÁSICO (Padrão)";
+        
+        document.getElementById('subtituloModal').innerText = "Novo Registro (Configuração SaaS)";
+    }
+    
+    // Exibe o modal na tela
+    document.getElementById('modalCliente').style.display = 'flex';
+};
 
         window.salvarCliente = async () => {
             const id = document.getElementById('cliId').value || document.getElementById('cliChave').innerText;
             
-            const proj = prompt("Digite o ID Projeto (Ex: ctg, pracas, agua, loja):", "loja");
+            const proj = prompt("Digite o ID Projeto (Padrão SaaS = loja, ou digite ctg, pracas, etc):", "loja");
             if (!proj) return;
 
+            // AGORA O OBJETO CAPTURA O PLANO
             const obj = {
                 telefone: document.getElementById('cliTelefone').value.trim(),
                 chaveIntegracao: document.getElementById('cliChave').innerText,
@@ -500,6 +512,7 @@
                 valorCobranca: document.getElementById('cliValor').value,
                 diaVencimento: document.getElementById('cliVencimento').value,
                 statusConta: document.getElementById('cliStatus').value,
+                plano: document.getElementById('cliPlano').value, // <--- CORREÇÃO AQUI
                 idProjeto: proj, 
                 dataAtualizacao: new Date().toISOString()
             };
@@ -509,25 +522,29 @@
 
             document.getElementById('loadingOverlay').style.display = 'flex';
             try {
-                // Salva no banco de dados primeiro
+                // 1. Salva no banco de dados Web
                 await setDoc(doc(db, "inquilinos_saas", id), obj);
                 
-                // Tenta avisar o robô (sem travar a tela se a internet falhar)
+                // 2. Avisa o robô na VPS (agora enviando o plano)
                 try {
                     await fetch(`${API_URL}/api/gerar-licenca`, {
                         method: 'POST', headers: { 'Content-Type': 'application/json', 'x-senha': '123321' },
-                        body: JSON.stringify({ idProjeto: proj, chaveIntegracao: obj.chaveIntegracao, statusSistema: obj.statusConta })
+                        body: JSON.stringify({ 
+                            idProjeto: proj, 
+                            chaveIntegracao: obj.chaveIntegracao, 
+                            statusSistema: obj.statusConta,
+                            plano: obj.plano // <--- ENVIANDO PRO ROBÔ NÃO DAR UNDEFINED
+                        })
                     });
                 } catch(apiErr) {
-                    console.log("Aviso: Robô offline, mas cliente salvo no banco.");
+                    console.log("Aviso da VPS: " + apiErr);
                 }
 
-                alert("✅ Sucesso!");
+                alert("✅ Cliente Salvo com Sucesso!");
                 window.fecharModalCliente();
             } catch(e) { 
                 alert("Erro ao salvar: " + e.message); 
             } finally {
-                // TRAVA DE SEGURANÇA: Garante que a tela sempre vai destravar
                 document.getElementById('loadingOverlay').style.display = 'none';
             }
         };
