@@ -258,11 +258,11 @@
             </div>
         </div>
     </div>
-
-    <script type="module">
+<script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, doc, setDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
         import { getAuth, signInWithRedirect, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+
         const firebaseConfig = {
             apiKey: "AIzaSyC4-2LavZt7iWPt2u71u-yRUYbIJu-Vzf0",
             authDomain: "central-omnichannel-saas.firebaseapp.com",
@@ -274,60 +274,89 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-	const auth = getAuth(app);
-    const provider = new GoogleAuthProvider();
-    provider.setCustomParameters({ prompt: 'select_account' });
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+        provider.setCustomParameters({ prompt: 'select_account' });
 
-    // Seus e-mails liberados
-    const emailsAutorizados = ["andersonsieklikci@gmail.com", "silvaneazeredo83@gmail.com", "phcosmeticoscapanema@gmail.com"];
-
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            if (emailsAutorizados.includes(user.email)) {
-                // USUÁRIO APROVADO! Remove a tela de login de cima do painel
-                const telaLogin = document.getElementById('tela-login-segura');
-                if (telaLogin) telaLogin.remove();
-            } else {
-                // E-mail não autorizado
-                alert("Acesso negado para o e-mail: " + user.email);
-                signOut(auth);
-            }
-        } else {
-            // NÃO LOGADO! Cria a tela de login travando o acesso ao painel que está no fundo
-            if (!document.getElementById('tela-login-segura')) {
-                const loginDiv = document.createElement('div');
-                loginDiv.id = 'tela-login-segura';
-                loginDiv.innerHTML = `
-                    <div style="position:fixed; inset:0; background:#f4f7f6; z-index:99999; display:flex; flex-direction:column; justify-content:center; align-items:center; padding:20px;">
-                        <div style="background:white; padding:40px 30px; border-radius:24px; box-shadow:0 10px 25px rgba(0,0,0,0.05); text-align:center; width:100%; max-width:350px;">
-                            <div style="width:60px; height:60px; background:#2563eb; color:white; border-radius:16px; display:flex; justify-content:center; align-items:center; font-size:24px; margin:0 auto 20px;">
-                                <i class="fa-solid fa-server"></i>
-                            </div>
-                            <h1 style="font-family:Inter, sans-serif; font-weight:900; font-size:22px; color:#1e293b; margin-bottom:5px;">Automatiza Tech</h1>
-                            <p style="color:#64748b; font-size:13px; margin-bottom:30px;">Painel Restrito</p>
-                            <button onclick="window.loginComGoogle()" style="width:100%; padding:14px; border-radius:12px; border:1px solid #e2e8f0; background:white; color:#1e293b; font-weight:bold; cursor:pointer; font-size:15px; display:flex; align-items:center; justify-content:center; gap:10px; transition: 0.2s;">
-                                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" style="width:20px;">
-                                Entrar com Google
-                            </button>
-                        </div>
-                    </div>
-                `;
-                document.body.appendChild(loginDiv);
-            }
-        }
-    });
-
-    window.loginComGoogle = () => {
-        // MUDANÇA PRINCIPAL: Usando Redirect no lugar de Popup para o navegador não bloquear!
-        signInWithRedirect(auth, provider);
-    };
-
-    window.logoutSaaS = () => {
-        signOut(auth).then(() => location.reload());
-    };
+        const emailsAutorizados = ["andersonsieklikci@gmail.com", "silvaneazeredo83@gmail.com", "phcosmeticoscapanema@gmail.com"];
         let clientesGlobal = [];
+        window.faturasGlobaisSaaS = [];
         const API_URL = "https://painel-geral-two.vercel.app/api-oracle";
 
+        // ==========================================
+        // 1. AUTENTICAÇÃO
+        // ==========================================
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                if (emailsAutorizados.includes(user.email)) {
+                    const telaLogin = document.getElementById('tela-login-segura');
+                    if (telaLogin) telaLogin.remove();
+
+                    // SÓ INICIA A LEITURA DO BANCO DEPOIS DE VALIDAR O LOGIN!
+                    iniciarLeituraDoBanco();
+                } else {
+                    alert("Acesso negado para o e-mail: " + user.email);
+                    signOut(auth);
+                }
+            } else {
+                if (!document.getElementById('tela-login-segura')) {
+                    const loginDiv = document.createElement('div');
+                    loginDiv.id = 'tela-login-segura';
+                    loginDiv.innerHTML = `
+                        <div style="position:fixed; inset:0; background:#f4f7f6; z-index:99999; display:flex; flex-direction:column; justify-content:center; align-items:center; padding:20px;">
+                            <div style="background:white; padding:40px 30px; border-radius:24px; box-shadow:0 10px 25px rgba(0,0,0,0.05); text-align:center; width:100%; max-width:350px;">
+                                <div style="width:60px; height:60px; background:#2563eb; color:white; border-radius:16px; display:flex; justify-content:center; align-items:center; font-size:24px; margin:0 auto 20px;">
+                                    <i class="fa-solid fa-server"></i>
+                                </div>
+                                <h1 style="font-family:Inter, sans-serif; font-weight:900; font-size:22px; color:#1e293b; margin-bottom:5px;">Automatiza Tech</h1>
+                                <p style="color:#64748b; font-size:13px; margin-bottom:30px;">Painel Restrito</p>
+                                <button onclick="window.loginComGoogle()" style="width:100%; padding:14px; border-radius:12px; border:1px solid #e2e8f0; background:white; color:#1e293b; font-weight:bold; cursor:pointer; font-size:15px; display:flex; align-items:center; justify-content:center; gap:10px; transition: 0.2s;">
+                                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" style="width:20px;">
+                                    Entrar com Google
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    document.body.appendChild(loginDiv);
+                }
+            }
+        });
+
+        window.loginComGoogle = () => { signInWithRedirect(auth, provider); };
+        window.logoutSaaS = () => { signOut(auth).then(() => location.reload()); };
+
+        // ==========================================
+        // 2. LEITURA DE DADOS SEGURA (LISTENERS)
+        // ==========================================
+        const iniciarLeituraDoBanco = () => {
+            onSnapshot(collection(db, "faturas_saas"), (snapshot) => {
+                let faturas = [];
+                let totalPago = 0, emDia = 0, bloqueios = 0;
+                const hoje = new Date(); hoje.setHours(0,0,0,0);
+                
+                snapshot.forEach((doc) => {
+                    const data = doc.data(); faturas.push({ id: doc.id, ...data });
+                    if (data.status === 'pago') { totalPago += parseFloat(data.valor) || 0; emDia++; }
+                    else if (new Date(data.vencimento) < hoje) { bloqueios++; }
+                });
+                
+                window.faturasGlobaisSaaS = faturas;
+                document.getElementById('dashReceita').innerText = formatarMoeda(totalPago);
+                document.getElementById('dashEmDia').innerText = emDia;
+                document.getElementById('dashBloqueios').innerText = bloqueios;
+                renderizarTabelaFinanceira(faturas);
+            });
+
+            onSnapshot(collection(db, "inquilinos_saas"), (snapshot) => {
+                clientesGlobal = [];
+                snapshot.forEach((doc) => { clientesGlobal.push({ id: doc.id, ...doc.data() }); });
+                renderizarCardsClientes();
+            });
+        };
+
+        // ==========================================
+        // 3. FUNÇÕES DE INTERFACE (UI)
+        // ==========================================
         window.mudarAba = (idAba, btn) => {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.getElementById(`aba-${idAba}`).classList.add('active');
@@ -340,54 +369,7 @@
         const formatarMoeda = (valor) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor || 0);
         const gerarChave = () => [...Array(24)].map(() => Math.random().toString(36)[2]).join('');
 
-window.excluirClienteSaaS = async (id, nome) => {
-            if(!confirm(`⚠️ Tem certeza que deseja EXCLUIR o cliente ${nome}?\nIsso apagará o cadastro dele do seu painel.`)) return;
-            document.getElementById('loadingOverlay').style.display = 'flex';
-            try {
-                await deleteDoc(doc(db, "inquilinos_saas", id));
-            } catch(e) { alert("Erro ao excluir cliente: " + e.message); }
-            document.getElementById('loadingOverlay').style.display = 'none';
-        };
-
-        window.excluirFaturaSaaS = async (id) => {
-            if(!confirm(`Deseja realmente apagar este registro de fatura do seu histórico?`)) return;
-            try {
-                await deleteDoc(doc(db, "faturas_saas", id));
-            } catch(e) { alert("Erro ao excluir fatura: " + e.message); }
-        };
-        window.copiarChave = () => {
-            const txt = document.getElementById('cliChave').innerText;
-            if(!txt || txt.includes('Gerado')) return;
-            navigator.clipboard.writeText(txt).then(() => alert("✅ Chave copiada!"));
-        };
-
-        window.fecharModalCliente = () => { 
-            document.getElementById('modalCliente').style.display = 'none'; 
-        };
-
-       // Criamos uma variável global para o relatório conseguir ler os dados
-        window.faturasGlobaisSaaS = [];
-
-        onSnapshot(collection(db, "faturas_saas"), (snapshot) => {
-            let faturas = [];
-            let totalPago = 0, emDia = 0, bloqueios = 0;
-            const hoje = new Date(); hoje.setHours(0,0,0,0);
-            
-            snapshot.forEach((doc) => {
-                const data = doc.data(); faturas.push({ id: doc.id, ...data });
-                if (data.status === 'pago') { totalPago += parseFloat(data.valor) || 0; emDia++; }
-                else if (new Date(data.vencimento) < hoje) { bloqueios++; }
-            });
-            
-            window.faturasGlobaisSaaS = faturas; // Salva para o relatório
-            
-            document.getElementById('dashReceita').innerText = formatarMoeda(totalPago);
-            document.getElementById('dashEmDia').innerText = emDia;
-            document.getElementById('dashBloqueios').innerText = bloqueios;
-            renderizarTabelaFinanceira(faturas);
-        });
-
-       const renderizarTabelaFinanceira = (lista) => {
+        const renderizarTabelaFinanceira = (lista) => {
             const tbody = document.getElementById('tabelaFaturas');
             tbody.innerHTML = '';
             lista.sort((a, b) => new Date(b.dataEmissao) - new Date(a.dataEmissao));
@@ -413,7 +395,160 @@ window.excluirClienteSaaS = async (id, nome) => {
             });
         };
 
-        // --- FUNÇÃO NOVA: GERA O RELATÓRIO PARA IMPRESSÃO ---
+        const renderizarCardsClientes = () => {
+            const gridCli = document.getElementById('gridClientes');
+            gridCli.innerHTML = '';
+            clientesGlobal.forEach(c => {
+                const isAtivo = c.statusConta === 'ativo';
+                const corIcone = isAtivo ? 'bg-emerald-50 text-emerald-500' : 'bg-red-50 text-red-500';
+                const corBadge = isAtivo ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700';
+                
+                const textoValor = c.formatoCobranca && c.formatoCobranca.includes('Fixo') ? formatarMoeda(parseFloat(c.valorCobranca)||0) : `${c.valorCobranca||0}%`;
+                
+                gridCli.innerHTML += `
+                    <div class="bg-white rounded-[20px] border border-slate-100 p-5 shadow-sm hover:shadow-md transition duration-200 flex flex-col gap-4 relative">
+                        <button onclick="window.excluirClienteSaaS('${c.id}', '${c.nome}')" class="absolute top-4 right-4 text-slate-200 hover:text-red-500 transition"><i class="fa-solid fa-trash text-xs"></i></button>
+                        
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl ${corIcone} flex items-center justify-center text-lg"><i class="fa-solid fa-building"></i></div>
+                            <div>
+                                <h4 class="font-bold text-sm text-slate-800">${c.nome}</h4>
+                                <span class="text-[9px] font-bold ${corBadge} uppercase px-2 py-0.5 rounded tracking-tighter">${c.statusConta}</span>
+                            </div>
+                        </div>
+                        <div class="flex items-end justify-between border-t border-slate-50 pt-4">
+                            <div>
+                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Mensalidade</p>
+                                <p class="text-sm font-black text-primary">${textoValor}</p>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="window.gerarCobrancaSaaS('${c.id}', '${c.nome}', '${c.telefone}', ${c.valorCobranca})" class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex justify-center items-center"><i class="fa-solid fa-file-invoice-dollar"></i></button>
+                                <button onclick="window.abrirModalCliente('${c.id}')" class="w-9 h-9 rounded-xl bg-slate-50 text-slate-600 flex justify-center items-center"><i class="fa-solid fa-pen"></i></button>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+        };
+
+        // ==========================================
+        // 4. AÇÕES DE BANCO (SALVAR, EXCLUIR)
+        // ==========================================
+        window.excluirClienteSaaS = async (id, nome) => {
+            if(!confirm(`⚠️ Tem certeza que deseja EXCLUIR o cliente ${nome}?\nIsso apagará o cadastro dele do seu painel.`)) return;
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            try { await deleteDoc(doc(db, "inquilinos_saas", id)); } 
+            catch(e) { alert("Erro ao excluir cliente: " + e.message); }
+            finally { document.getElementById('loadingOverlay').style.display = 'none'; }
+        };
+
+        window.excluirFaturaSaaS = async (id) => {
+            if(!confirm(`Deseja realmente apagar este registro de fatura do seu histórico?`)) return;
+            try { await deleteDoc(doc(db, "faturas_saas", id)); } 
+            catch(e) { alert("Erro ao excluir fatura: " + e.message); }
+        };
+
+        window.copiarChave = () => {
+            const txt = document.getElementById('cliChave').innerText;
+            if(!txt || txt.includes('Gerado')) return;
+            navigator.clipboard.writeText(txt).then(() => alert("✅ Chave copiada!"));
+        };
+
+        window.abrirModalCliente = (id = null) => {
+            if(id) {
+                const c = clientesGlobal.find(x => x.id === id);
+                document.getElementById('cliId').value = c.id;
+                document.getElementById('cliChave').innerText = c.chaveIntegracao;
+                document.getElementById('cliNome').value = c.nome;
+                document.getElementById('cliEmail').value = c.email || '';
+                document.getElementById('cliDocumento').value = c.documento || '';
+                document.getElementById('cliFormatoCobranca').value = c.formatoCobranca || 'Valor Fixo Mensal (R$)';
+                document.getElementById('cliValor').value = c.valorCobranca;
+                document.getElementById('cliVencimento').value = c.diaVencimento;
+                document.getElementById('cliStatus').value = c.statusConta;
+                document.getElementById('subtituloModal').innerText = c.nome;
+				document.getElementById('cliTelefone').value = c.telefone || '';
+            } else {
+                document.getElementById('cliId').value = "";
+                document.getElementById('cliChave').innerText = gerarChave();
+                document.getElementById('cliNome').value = "";
+                document.getElementById('cliEmail').value = "";
+                document.getElementById('cliDocumento').value = "";
+                document.getElementById('cliFormatoCobranca').value = "Valor Fixo Mensal (R$)";
+                document.getElementById('subtituloModal').innerText = "Novo Registro";
+				document.getElementById('cliTelefone').value = "";
+            }
+            document.getElementById('modalCliente').style.display = 'flex';
+        };
+
+        window.fecharModalCliente = () => { 
+            document.getElementById('modalCliente').style.display = 'none'; 
+        };
+
+        window.salvarCliente = async () => {
+            const id = document.getElementById('cliId').value || document.getElementById('cliChave').innerText;
+            
+            const proj = prompt("Digite o ID Projeto (Ex: ctg, pracas, agua, loja):", "loja");
+            if (!proj) return;
+
+            const obj = {
+                telefone: document.getElementById('cliTelefone').value.trim(),
+                chaveIntegracao: document.getElementById('cliChave').innerText,
+                nome: document.getElementById('cliNome').value.trim(),
+                email: document.getElementById('cliEmail').value.trim(),
+                documento: document.getElementById('cliDocumento').value.trim(),
+                formatoCobranca: document.getElementById('cliFormatoCobranca').value,
+                valorCobranca: document.getElementById('cliValor').value,
+                diaVencimento: document.getElementById('cliVencimento').value,
+                statusConta: document.getElementById('cliStatus').value,
+                idProjeto: proj, 
+                dataAtualizacao: new Date().toISOString()
+            };
+
+            if(!obj.nome) return alert("Preencha o nome do cliente.");
+            if(!obj.telefone) return alert("Preencha o WhatsApp do cliente.");
+
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            try {
+                // Salva no banco de dados primeiro
+                await setDoc(doc(db, "inquilinos_saas", id), obj);
+                
+                // Tenta avisar o robô (sem travar a tela se a internet falhar)
+                try {
+                    await fetch(`${API_URL}/api/gerar-licenca`, {
+                        method: 'POST', headers: { 'Content-Type': 'application/json', 'x-senha': '123321' },
+                        body: JSON.stringify({ idProjeto: proj, chaveIntegracao: obj.chaveIntegracao, statusSistema: obj.statusConta })
+                    });
+                } catch(apiErr) {
+                    console.log("Aviso: Robô offline, mas cliente salvo no banco.");
+                }
+
+                alert("✅ Sucesso!");
+                window.fecharModalCliente();
+            } catch(e) { 
+                alert("Erro ao salvar: " + e.message); 
+            } finally {
+                // TRAVA DE SEGURANÇA: Garante que a tela sempre vai destravar
+                document.getElementById('loadingOverlay').style.display = 'none';
+            }
+        };
+
+        window.gerarCobrancaSaaS = async (idCliente, nome, telefone, valor) => {
+            if(!telefone || telefone.length < 10) return alert("WhatsApp inválido.");
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            try {
+                const req = await fetch(`${API_URL}/api/gerar-cobranca-saas`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json', 'x-senha': '123321' },
+                    body: JSON.stringify({ clienteId: idCliente, nome, telefone, valor })
+                });
+                const res = await req.json();
+                alert(res.sucesso ? "✅ Fatura enviada!" : "❌ Erro: " + res.erro);
+            } catch(e) { 
+                alert("Erro de conexão com o servidor."); 
+            } finally {
+                document.getElementById('loadingOverlay').style.display = 'none';
+            }
+        };
+
         window.imprimirRelatorioSaaS = () => {
             let totalCaixa = 0;
             let relatorioHtml = `
@@ -463,124 +598,6 @@ window.excluirClienteSaaS = async (id, nome) => {
             let janelaImpressao = window.open('', '', 'width=900,height=700');
             janelaImpressao.document.write(relatorioHtml);
             janelaImpressao.document.close();
-        };
-
-        onSnapshot(collection(db, "inquilinos_saas"), (snapshot) => {
-            clientesGlobal = [];
-            snapshot.forEach((doc) => { clientesGlobal.push({ id: doc.id, ...doc.data() }); });
-            renderizarCardsClientes();
-        });
-
-       const renderizarCardsClientes = () => {
-            const gridCli = document.getElementById('gridClientes');
-            gridCli.innerHTML = '';
-            clientesGlobal.forEach(c => {
-                const isAtivo = c.statusConta === 'ativo';
-                const corIcone = isAtivo ? 'bg-emerald-50 text-emerald-500' : 'bg-red-50 text-red-500';
-                const corBadge = isAtivo ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700';
-                
-                const textoValor = c.formatoCobranca && c.formatoCobranca.includes('Fixo') ? formatarMoeda(parseFloat(c.valorCobranca)||0) : `${c.valorCobranca||0}%`;
-                
-                gridCli.innerHTML += `
-                    <div class="bg-white rounded-[20px] border border-slate-100 p-5 shadow-sm hover:shadow-md transition duration-200 flex flex-col gap-4 relative">
-                        <!-- BOTÃO LIXEIRA -->
-                        <button onclick="window.excluirClienteSaaS('${c.id}', '${c.nome}')" class="absolute top-4 right-4 text-slate-200 hover:text-red-500 transition"><i class="fa-solid fa-trash text-xs"></i></button>
-                        
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-xl ${corIcone} flex items-center justify-center text-lg"><i class="fa-solid fa-building"></i></div>
-                            <div>
-                                <h4 class="font-bold text-sm text-slate-800">${c.nome}</h4>
-                                <span class="text-[9px] font-bold ${corBadge} uppercase px-2 py-0.5 rounded tracking-tighter">${c.statusConta}</span>
-                            </div>
-                        </div>
-                        <div class="flex items-end justify-between border-t border-slate-50 pt-4">
-                            <div>
-                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Mensalidade</p>
-                                <p class="text-sm font-black text-primary">${textoValor}</p>
-                            </div>
-                            <div class="flex gap-2">
-                                <button onclick="window.gerarCobrancaSaaS('${c.id}', '${c.nome}', '${c.telefone}', ${c.valorCobranca})" class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex justify-center items-center"><i class="fa-solid fa-file-invoice-dollar"></i></button>
-                                <button onclick="window.abrirModalCliente('${c.id}')" class="w-9 h-9 rounded-xl bg-slate-50 text-slate-600 flex justify-center items-center"><i class="fa-solid fa-pen"></i></button>
-                            </div>
-                        </div>
-                    </div>`;
-            });
-        };
-        window.abrirModalCliente = (id = null) => {
-            if(id) {
-                const c = clientesGlobal.find(x => x.id === id);
-                document.getElementById('cliId').value = c.id;
-                document.getElementById('cliChave').innerText = c.chaveIntegracao;
-                document.getElementById('cliNome').value = c.nome;
-                document.getElementById('cliEmail').value = c.email || '';
-                document.getElementById('cliDocumento').value = c.documento || '';
-                document.getElementById('cliFormatoCobranca').value = c.formatoCobranca || 'Valor Fixo Mensal (R$)';
-                document.getElementById('cliValor').value = c.valorCobranca;
-                document.getElementById('cliVencimento').value = c.diaVencimento;
-                document.getElementById('cliStatus').value = c.statusConta;
-                document.getElementById('subtituloModal').innerText = c.nome;
-				document.getElementById('cliTelefone').value = c.telefone || '';
-            } else {
-                document.getElementById('cliId').value = "";
-                document.getElementById('cliChave').innerText = gerarChave();
-                document.getElementById('cliNome').value = "";
-                document.getElementById('cliEmail').value = "";
-                document.getElementById('cliDocumento').value = "";
-                document.getElementById('cliFormatoCobranca').value = "Valor Fixo Mensal (R$)";
-                document.getElementById('subtituloModal').innerText = "Novo Registro";
-				document.getElementById('cliTelefone').value = "";
-            }
-            document.getElementById('modalCliente').style.display = 'flex';
-        };
-
-window.salvarCliente = async () => {
-            const id = document.getElementById('cliId').value || document.getElementById('cliChave').innerText;
-            
-            // Prompt obrigatório para o robô saber em qual banco de dados injetar a licença
-            const proj = prompt("Digite o ID Projeto (Ex: ctg, pracas, agua, loja):", "loja");
-            if (!proj) return;
-
-            const obj = {
-                telefone: document.getElementById('cliTelefone').value.trim(),
-                chaveIntegracao: document.getElementById('cliChave').innerText,
-                nome: document.getElementById('cliNome').value.trim(),
-                email: document.getElementById('cliEmail').value.trim(),
-                documento: document.getElementById('cliDocumento').value.trim(),
-                formatoCobranca: document.getElementById('cliFormatoCobranca').value,
-                valorCobranca: document.getElementById('cliValor').value,
-                diaVencimento: document.getElementById('cliVencimento').value,
-                statusConta: document.getElementById('cliStatus').value,
-                idProjeto: proj, 
-                dataAtualizacao: new Date().toISOString()
-            };
-
-            if(!obj.nome) return alert("Preencha o nome do cliente.");
-            if(!obj.telefone) return alert("Preencha o WhatsApp do cliente.");
-
-            document.getElementById('loadingOverlay').style.display = 'flex';
-            try {
-                await setDoc(doc(db, "inquilinos_saas", id), obj);
-                await fetch(`${API_URL}/api/gerar-licenca`, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json', 'x-senha': '123321' },
-                    body: JSON.stringify({ idProjeto: proj, chaveIntegracao: obj.chaveIntegracao, statusSistema: obj.statusConta })
-                });
-                alert("✅ Sucesso!");
-                window.fecharModalCliente();
-            } catch(e) { alert("Erro: " + e.message); }
-            document.getElementById('loadingOverlay').style.display = 'none';
-        };
-        window.gerarCobrancaSaaS = async (idCliente, nome, telefone, valor) => {
-            if(!telefone || telefone.length < 10) return alert("WhatsApp inválido.");
-            document.getElementById('loadingOverlay').style.display = 'flex';
-            try {
-                const req = await fetch(`${API_URL}/api/gerar-cobranca-saas`, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json', 'x-senha': '123321' },
-                    body: JSON.stringify({ clienteId: idCliente, nome, telefone, valor })
-                });
-                const res = await req.json();
-                alert(res.sucesso ? "✅ Fatura enviada!" : "❌ Erro: " + res.erro);
-            } catch(e) { alert("Erro de conexão."); }
-            document.getElementById('loadingOverlay').style.display = 'none';
         };
     </script>
 </body>
