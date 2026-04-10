@@ -260,7 +260,7 @@
     </div>
 <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, doc, setDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
         const firebaseConfig = {
@@ -330,6 +330,26 @@
             });
         };
         window.logoutSaaS = () => { signOut(auth).then(() => location.reload()); };
+// ==========================================
+        // ALTERNAR STATUS (BLOQUEIO RÁPIDO)
+        // ==========================================
+        window.alternarStatusCliente = async (id, statusAtual) => {
+            const novoStatus = statusAtual === 'ativo' ? 'bloqueado' : 'ativo';
+            const msg = novoStatus === 'bloqueado' ? 'Bloqueando acesso...' : 'Liberando acesso...';
+            
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            
+            try {
+                await updateDoc(doc(db, "inquilinos_saas", id), { 
+                    statusConta: novoStatus,
+                    dataAtualizacao: new Date().toISOString()
+                });
+            } catch(e) { 
+                alert("Erro ao mudar status: " + e.message); 
+            } finally {
+                document.getElementById('loadingOverlay').style.display = 'none';
+            }
+        };
 
         // ==========================================
         // 2. LEITURA DE DADOS SEGURA (LISTENERS)
