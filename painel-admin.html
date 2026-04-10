@@ -261,7 +261,7 @@
 <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, onSnapshot, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-        import { getAuth, signInWithRedirect, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyC4-2LavZt7iWPt2u71u-yRUYbIJu-Vzf0",
@@ -322,7 +322,13 @@
             }
         });
 
-        window.loginComGoogle = () => { signInWithRedirect(auth, provider); };
+      window.loginComGoogle = () => { 
+            // Agora com o botão, o Pop-up é 100% permitido e não cai no Loop da Vercel!
+            signInWithPopup(auth, provider).catch((error) => {
+                console.error("Erro no login:", error);
+                alert("Erro ao tentar abrir a janela de login do Google.");
+            });
+        };
         window.logoutSaaS = () => { signOut(auth).then(() => location.reload()); };
 
         // ==========================================
