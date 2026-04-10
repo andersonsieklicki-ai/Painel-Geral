@@ -501,6 +501,9 @@
     document.getElementById('modalCliente').style.display = 'flex';
 };
 
+          window.fecharModalCliente = () => { 
+            document.getElementById('modalCliente').style.display = 'none'; 
+        };
         window.salvarCliente = async () => {
             const id = document.getElementById('cliId').value || document.getElementById('cliChave').innerText;
             
