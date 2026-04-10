@@ -47,15 +47,16 @@
 
     <div id="loadingOverlay" class="fixed inset-0 bg-white/95 z-[9999] flex flex-col justify-center items-center hidden">
         <i class="fa-solid fa-circle-notch fa-spin text-4xl text-primary mb-4"></i>
-        <p class="font-bold text-slate-600 animate-pulse text-sm">Aguarde...</p>
+        <p class="font-bold text-slate-600 animate-pulse text-sm">Carregando...</p>
     </div>
 
     <header class="bg-white px-4 py-3 flex justify-between items-center shadow-sm z-20 shrink-0">
         <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white">
             <i class="fa-solid fa-server"></i>
         </div>
-        <button onclick="window.logoutSaaS()" class="w-10 h-10 rounded-full border border-slate-200 text-slate-500 hover:text-danger bg-slate-50 relative flex justify-center items-center transition" title="Sair do Painel">
-            <i class="fa-solid fa-right-from-bracket"></i>
+        <button class="w-10 h-10 rounded-full border border-slate-200 text-primary bg-blue-50 relative flex justify-center items-center">
+            <i class="fa-solid fa-bell"></i>
+            <span class="absolute top-2 right-2.5 w-2 h-2 bg-danger rounded-full border border-white"></span>
         </button>
     </header>
 
@@ -64,6 +65,7 @@
         <!-- ABA FATURAS -->
         <div id="aba-faturas" class="tab-content active max-w-5xl mx-auto">
             
+            <!-- Cards de Resumo Modernos (Em Grid) -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 <div class="bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-[20px] p-6 text-white shadow-lg shadow-emerald-200 flex flex-col justify-center">
                     <p class="text-[11px] font-bold tracking-widest uppercase mb-1 opacity-90 text-emerald-50">Receita Estimada</p>
@@ -119,7 +121,7 @@
                     <i class="fa-solid fa-plus"></i> Novo Cliente
                 </button>
             </div>
-            <!-- Grid de Clientes -->
+            <!-- Grid de Clientes (Ajustado para telas grandes) -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="gridClientes"></div>
         </div>
 
@@ -149,7 +151,6 @@
         </button>
     </nav>
 
-    <!-- MODAL CLIENTE -->
     <div id="modalCliente" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden justify-center items-center p-4">
         <div class="bg-surface w-full max-w-md rounded-[24px] shadow-2xl flex flex-col max-h-[95vh] overflow-hidden animate-[fadeIn_0.2s_ease]">
             <div class="p-6 bg-white flex justify-between items-start rounded-t-[24px]">
@@ -182,20 +183,21 @@
                     <input type="text" id="cliNome" class="input-field" placeholder="Ex: CTG Sentinela">
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
-                    <div>
-                        <label class="input-label">E-mail Faturas:</label>
-                        <input type="email" id="cliEmail" class="input-field" placeholder="email@cliente.com">
-                    </div>
-                    <div>
-                        <label class="input-label">WhatsApp (DDD+Num):</label>
-                        <input type="number" id="cliTelefone" class="input-field" placeholder="5546999999999">
-                    </div>
-                    <div>
-                        <label class="input-label">CPF ou CNPJ:</label>
-                        <input type="number" id="cliDocumento" class="input-field" placeholder="00000000000">
-                    </div>
-                </div>
+                <!-- DOCUMENTO, EMAIL E WHATSAPP -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+    <div>
+        <label class="input-label">E-mail para Faturas:</label>
+        <input type="email" id="cliEmail" class="input-field" placeholder="email@cliente.com">
+    </div>
+    <div>
+        <label class="input-label">WhatsApp (DDD+Num):</label>
+        <input type="number" id="cliTelefone" class="input-field" placeholder="5546999999999">
+    </div>
+    <div>
+        <label class="input-label">CPF ou CNPJ:</label>
+        <input type="number" id="cliDocumento" class="input-field" placeholder="00000000000">
+    </div>
+</div>
 
                 <div class="input-card border-blue-100 bg-blue-50/10">
                     <div class="flex items-center gap-2 mb-4">
@@ -256,8 +258,7 @@
             </div>
         </div>
     </div>
-
-    <script type="module">
+<script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, onSnapshot, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
@@ -277,19 +278,21 @@
         const provider = new GoogleAuthProvider();
         provider.setCustomParameters({ prompt: 'select_account' });
 
-        const emailsAutorizados = ["andersonsieklicki@gmail.com", "silvaneazeredo83@gmail.com", "phcosmeticoscapanema@gmail.com"];
+        const emailsAutorizados = ["andersonsieklikci@gmail.com", "silvaneazeredo83@gmail.com", "phcosmeticoscapanema@gmail.com"];
         let clientesGlobal = [];
         window.faturasGlobaisSaaS = [];
         const API_URL = "https://painel-geral-two.vercel.app/api-oracle";
 
         // ==========================================
-        // 1. AUTENTICAÇÃO E LOGIN (CORRIGIDO)
+        // 1. AUTENTICAÇÃO
         // ==========================================
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 if (emailsAutorizados.includes(user.email)) {
                     const telaLogin = document.getElementById('tela-login-segura');
                     if (telaLogin) telaLogin.remove();
+
+                    // SÓ INICIA A LEITURA DO BANCO DEPOIS DE VALIDAR O LOGIN!
                     iniciarLeituraDoBanco();
                 } else {
                     alert("Acesso negado para o e-mail: " + user.email);
@@ -319,20 +322,17 @@
             }
         });
 
-        window.loginComGoogle = async () => { 
-            try {
-                await signInWithPopup(auth, provider);
-            } catch (error) {
-                console.error("Detalhe do Erro:", error);
-                if (error.code !== 'auth/popup-closed-by-user') {
-                    alert("ERRO: O Firebase bloqueou o Login. Verifique se o domínio 'painel-geral-two.vercel.app' está autorizado na aba Authentication do console do Firebase!");
-                }
-            }
+      window.loginComGoogle = () => { 
+            // Agora com o botão, o Pop-up é 100% permitido e não cai no Loop da Vercel!
+            signInWithPopup(auth, provider).catch((error) => {
+                console.error("Erro no login:", error);
+                alert("Erro ao tentar abrir a janela de login do Google.");
+            });
         };
         window.logoutSaaS = () => { signOut(auth).then(() => location.reload()); };
 
         // ==========================================
-        // 2. LEITURA DE DADOS
+        // 2. LEITURA DE DADOS SEGURA (LISTENERS)
         // ==========================================
         const iniciarLeituraDoBanco = () => {
             onSnapshot(collection(db, "faturas_saas"), (snapshot) => {
@@ -361,7 +361,7 @@
         };
 
         // ==========================================
-        // 3. INTERFACE E RENDERIZAÇÃO
+        // 3. FUNÇÕES DE INTERFACE (UI)
         // ==========================================
         window.mudarAba = (idAba, btn) => {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -428,8 +428,13 @@
                                 <p class="text-sm font-black text-primary">${textoValor}</p>
                             </div>
                             <div class="flex gap-2">
-                                <button onclick="window.gerarCobrancaSaaS('${c.id}', '${c.nome}', '${c.telefone}', ${c.valorCobranca})" class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex justify-center items-center" title="Forçar Cobrança"><i class="fa-solid fa-file-invoice-dollar"></i></button>
-                                <button onclick="window.abrirModalCliente('${c.id}')" class="w-9 h-9 rounded-xl bg-slate-50 text-slate-600 flex justify-center items-center" title="Editar"><i class="fa-solid fa-pen"></i></button>
+                                <!-- NOVO BOTÃO DE CADEADO (TOGGLE) -->
+                                <button onclick="window.alternarStatusCliente('${c.id}', '${c.statusConta}')" class="w-9 h-9 rounded-xl ${c.statusConta === 'ativo' ? 'bg-red-50 text-red-600 hover:bg-red-100' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'} flex justify-center items-center transition" title="${c.statusConta === 'ativo' ? 'Bloquear Acesso' : 'Liberar Acesso'}">
+                                    <i class="fa-solid ${c.statusConta === 'ativo' ? 'fa-lock' : 'fa-unlock'}"></i>
+                                </button>
+                                
+                                <button onclick="window.gerarCobrancaSaaS('${c.id}', '${c.nome}', '${c.telefone}', ${c.valorCobranca})" class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex justify-center items-center hover:bg-amber-100 transition"><i class="fa-solid fa-file-invoice-dollar"></i></button>
+                                <button onclick="window.abrirModalCliente('${c.id}')" class="w-9 h-9 rounded-xl bg-slate-50 text-slate-600 flex justify-center items-center hover:bg-slate-100 transition"><i class="fa-solid fa-pen"></i></button>
                             </div>
                         </div>
                     </div>`;
@@ -437,7 +442,7 @@
         };
 
         // ==========================================
-        // 4. FUNÇÕES DE BANCO DE DADOS E MODAL
+        // 4. AÇÕES DE BANCO (SALVAR, EXCLUIR)
         // ==========================================
         window.excluirClienteSaaS = async (id, nome) => {
             if(!confirm(`⚠️ Tem certeza que deseja EXCLUIR o cliente ${nome}?\nIsso apagará o cadastro dele do seu painel.`)) return;
@@ -459,50 +464,58 @@
             navigator.clipboard.writeText(txt).then(() => alert("✅ Chave copiada!"));
         };
 
-        window.fecharModalCliente = () => { 
+    window.abrirModalCliente = (id = null) => {
+    if (id) {
+        // MODO EDIÇÃO: Localiza o cliente no array global
+        const c = clientesGlobal.find(x => x.id === id);
+        if (!c) return alert("Cliente não encontrado.");
+
+        document.getElementById('cliId').value = c.id;
+        document.getElementById('cliChave').innerText = c.chaveIntegracao || '';
+        document.getElementById('cliNome').value = c.nome || '';
+        document.getElementById('cliEmail').value = c.email || '';
+        document.getElementById('cliDocumento').value = c.documento || '';
+        document.getElementById('cliTelefone').value = c.telefone || '';
+        document.getElementById('cliFormatoCobranca').value = c.formatoCobranca || 'Valor Fixo Mensal (R$)';
+        document.getElementById('cliValor').value = c.valorCobranca || 0;
+        document.getElementById('cliVencimento').value = c.diaVencimento || 10;
+        document.getElementById('cliStatus').value = c.statusConta || 'ativo';
+        
+        // Define o Plano (Básico/Premium) para não dar erro na VPS
+        document.getElementById('cliPlano').value = c.plano || 'BÁSICO (Padrão)';
+        
+        document.getElementById('subtituloModal').innerText = `Editando: ${c.nome}`;
+    } else {
+        // MODO NOVO REGISTRO: Limpa tudo e gera nova chave
+        document.getElementById('cliId').value = "";
+        document.getElementById('cliChave').innerText = gerarChave();
+        document.getElementById('cliNome').value = "";
+        document.getElementById('cliEmail').value = "";
+        document.getElementById('cliDocumento').value = "";
+        document.getElementById('cliTelefone').value = "";
+        document.getElementById('cliFormatoCobranca').value = "Valor Fixo Mensal (R$)";
+        document.getElementById('cliValor').value = "";
+        document.getElementById('cliVencimento').value = "10";
+        document.getElementById('cliStatus').value = "ativo";
+        document.getElementById('cliPlano').value = "BÁSICO (Padrão)";
+        
+        document.getElementById('subtituloModal').innerText = "Novo Registro (Configuração SaaS)";
+    }
+    
+    // Exibe o modal na tela
+    document.getElementById('modalCliente').style.display = 'flex';
+};
+
+          window.fecharModalCliente = () => { 
             document.getElementById('modalCliente').style.display = 'none'; 
         };
-
-        window.abrirModalCliente = (id = null) => {
-            if (id) {
-                const c = clientesGlobal.find(x => x.id === id);
-                if (!c) return alert("Cliente não encontrado.");
-
-                document.getElementById('cliId').value = c.id;
-                document.getElementById('cliChave').innerText = c.chaveIntegracao || '';
-                document.getElementById('cliNome').value = c.nome || '';
-                document.getElementById('cliEmail').value = c.email || '';
-                document.getElementById('cliDocumento').value = c.documento || '';
-                document.getElementById('cliTelefone').value = c.telefone || '';
-                document.getElementById('cliFormatoCobranca').value = c.formatoCobranca || 'Valor Fixo Mensal (R$)';
-                document.getElementById('cliValor').value = c.valorCobranca || 0;
-                document.getElementById('cliVencimento').value = c.diaVencimento || 10;
-                document.getElementById('cliStatus').value = c.statusConta || 'ativo';
-                document.getElementById('cliPlano').value = c.plano || 'BÁSICO (Padrão)';
-                document.getElementById('subtituloModal').innerText = `Editando: ${c.nome}`;
-            } else {
-                document.getElementById('cliId').value = "";
-                document.getElementById('cliChave').innerText = gerarChave();
-                document.getElementById('cliNome').value = "";
-                document.getElementById('cliEmail').value = "";
-                document.getElementById('cliDocumento').value = "";
-                document.getElementById('cliTelefone').value = "";
-                document.getElementById('cliFormatoCobranca').value = "Valor Fixo Mensal (R$)";
-                document.getElementById('cliValor').value = "";
-                document.getElementById('cliVencimento').value = "10";
-                document.getElementById('cliStatus').value = "ativo";
-                document.getElementById('cliPlano').value = "BÁSICO (Padrão)";
-                document.getElementById('subtituloModal').innerText = "Novo Registro (Configuração SaaS)";
-            }
-            document.getElementById('modalCliente').style.display = 'flex';
-        };
-
         window.salvarCliente = async () => {
             const id = document.getElementById('cliId').value || document.getElementById('cliChave').innerText;
             
             const proj = prompt("Digite o ID Projeto (Padrão SaaS = loja, ou digite ctg, pracas, etc):", "loja");
             if (!proj) return;
 
+            // AGORA O OBJETO CAPTURA O PLANO
             const obj = {
                 telefone: document.getElementById('cliTelefone').value.trim(),
                 chaveIntegracao: document.getElementById('cliChave').innerText,
@@ -513,7 +526,7 @@
                 valorCobranca: document.getElementById('cliValor').value,
                 diaVencimento: document.getElementById('cliVencimento').value,
                 statusConta: document.getElementById('cliStatus').value,
-                plano: document.getElementById('cliPlano').value, 
+                plano: document.getElementById('cliPlano').value, // <--- CORREÇÃO AQUI
                 idProjeto: proj, 
                 dataAtualizacao: new Date().toISOString()
             };
@@ -523,8 +536,10 @@
 
             document.getElementById('loadingOverlay').style.display = 'flex';
             try {
+                // 1. Salva no banco de dados Web
                 await setDoc(doc(db, "inquilinos_saas", id), obj);
                 
+                // 2. Avisa o robô na VPS (agora enviando o plano)
                 try {
                     await fetch(`${API_URL}/api/gerar-licenca`, {
                         method: 'POST', headers: { 'Content-Type': 'application/json', 'x-senha': '123321' },
@@ -532,11 +547,11 @@
                             idProjeto: proj, 
                             chaveIntegracao: obj.chaveIntegracao, 
                             statusSistema: obj.statusConta,
-                            plano: obj.plano
+                            plano: obj.plano // <--- ENVIANDO PRO ROBÔ NÃO DAR UNDEFINED
                         })
                     });
                 } catch(apiErr) {
-                    console.log("Aviso da VPS: O robô pode estar offline, mas o cadastro foi salvo no Firebase.");
+                    console.log("Aviso da VPS: " + apiErr);
                 }
 
                 alert("✅ Cliente Salvo com Sucesso!");
@@ -559,7 +574,7 @@
                 const res = await req.json();
                 alert(res.sucesso ? "✅ Fatura enviada!" : "❌ Erro: " + res.erro);
             } catch(e) { 
-                alert("Erro de conexão com o servidor da VPS."); 
+                alert("Erro de conexão com o servidor."); 
             } finally {
                 document.getElementById('loadingOverlay').style.display = 'none';
             }
